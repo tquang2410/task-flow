@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// 1. Định nghĩa Nguồn dữ liệu (Database)
+datasource db {
+  provider = "mongodb" // Bạn đã chọn MongoDB
+  url      = env("DATABASE_URL") // Lấy từ file .env
+}
+
+// 2. Định nghĩa Trình tạo (Generator)
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------------------------------------------------
+// 3. ĐỊNH NGHĨA CÁC MODELS (CẤU TRÚC DỮ LIỆU)
+// ---------------------------------------------------
+
+// REQ-FUN-1: Quản lý Xác thực
+// Model này sẽ lưu trữ thông tin bổ sung của User
+// Việc xác thực (email/pass) sẽ do Supabase xử lý
+model User {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  // ID từ Supabase Auth, dùng để liên kết
+  // Chúng ta sẽ dùng nó làm "key" chính logic
+  supabaseId String @unique
+
+  email     String  @unique
+  name      String?
+  avatarUrl String? // URL ảnh đại diện
+
+  // Một User có thể là thành viên của nhiều Workspace
+  workspaces   Workspace[] @relation("WorkspaceMembers", fields: [workspaceIds], references: [id])
+  workspaceIds String[]    @db.ObjectId
+  // Một User có thể được gán nhiều Task
+  assignedTasks Task[]      @relation("AssignedTasks")
+  // Một User có thể tạo nhiều Task
+  reportedTasks Task[]      @relation("ReportedTasks")
+  // Một User có thể viết nhiều Comment
+  comments      Comment[]
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Attachment Attachment[]
+}
+
+// REQ-FUN-2: Quản lý Workspace
+model Workspace {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String // Tên của công ty/tổ chức
+
+  // Một Workspace có nhiều thành viên (User)
+  // và một User cũng có thể ở trong nhiều Workspace
+  members   User[]   @relation("WorkspaceMembers", fields: [memberIds], references: [id])
+  memberIds String[] @db.ObjectId
+
+  // Một Workspace có nhiều Project
+  projects Project[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// REQ-FUN-3: Quản lý Dự án (Project)
+model Project {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+
+  // Một Project thuộc về MỘT Workspace
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String    @db.ObjectId
+
+  // Một Project có nhiều Task
+  tasks Task[]
+
+  // REQ-FUN-3.3: Cấu hình Bảng (Board)
+  // Lưu trữ danh sách các cột (column) của bảng Kanban
+  // Chúng ta dùng kiểu JSON vì MongoDB hỗ trợ tốt
+  // Ví dụ: [{ "id": "col1", "title": "Todo" }, { "id": "col2", "title": "In Progress" }]
+  columns Json @default("[]")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// REQ-FUN-4: Quản lý Công việc (Task)
+model Task {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+
+  // REQ-FUN-4.4: Lưu trữ thứ tự của Task trong một Cột
+  // Đây là một kỹ thuật quan trọng để làm bảng Kanban
+  order Int
+
+  // REQ-FUN-4.2: Thuộc tính Task
+  priority Priority  @default(MEDIUM) // Enum: LOW, MEDIUM, HIGH
+  type     TaskType  @default(TASK) // Enum: TASK, BUG, FEATURE
+  dueDate  DateTime?
+
+  // REQ-FUN-3.3: Task này đang ở Cột (Column) nào?
+  // Sẽ lưu trữ "id" của Cột (ví dụ: "col1", "col2")
+  columnId String
+
+  // Một Task thuộc về MỘT Project
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @db.ObjectId
+
+  // REQ-FUN-4.2: Người được gán (Assignee)
+  // Một Task chỉ gán cho 1 người
+  assignee   User?   @relation("AssignedTasks", fields: [assigneeId], references: [supabaseId])
+  assigneeId String? // Dùng supabaseId để liên kết
+
+  // REQ-FUN-4.2: Người báo cáo (Reporter)
+  // Một Task được tạo bởi 1 người
+  reporter   User   @relation("ReportedTasks", fields: [reporterId], references: [supabaseId])
+  reporterId String // Dùng supabaseId để liên kết
+
+  // REQ-FUN-4.4: Một Task có nhiều Comment
+  comments    Comment[]
+  // REQ-FUN-4.5: Một Task có nhiều file đính kèm
+  attachments Attachment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Index để tăng tốc độ tìm kiếm Task theo Project
+  @@index([projectId])
+  // Index để tăng tốc độ tìm kiếm Task theo người gán
+  @@index([assigneeId])
+}
+
+// REQ-FUN-4.4: Bình luận
+model Comment {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  text String
+
+  // Một Comment thuộc về MỘT Task
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String @db.ObjectId
+
+  // Một Comment được viết bởi MỘT User
+  user   User   @relation(fields: [userId], references: [supabaseId])
+  userId String // Dùng supabaseId để liên kết
+
+  createdAt DateTime @default(now())
+}
+
+// REQ-FUN-4.5: Đính kèm
+model Attachment {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  url  String // URL của file (ví dụ: lưu trên S3, Vercel Blob)
+  name String // Tên file gốc
+
+  // Một Attachment thuộc về MỘT Task
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String @db.ObjectId
+
+  // Một Attachment được upload bởi MỘT User
+  uploader   User   @relation(fields: [uploaderId], references: [supabaseId])
+  uploaderId String // Dùng supabaseId để liên kết
+
+  createdAt DateTime @default(now())
+}
+
+// --- ENUMS (Các kiểu dữ liệu tùy chọn) ---
+
+// Độ ưu tiên của Task
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// Loại Task
+enum TaskType {
+  TASK
+  BUG
+  FEATURE
+}
