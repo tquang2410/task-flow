@@ -28,7 +28,7 @@ Luôn ưu tiên đọc và re-check lại các file sau:
 3. document/databaseFlow.md
 4. document/SRS.md
 5. document/PRD/epic1.md
-
+6. document/doing-task.md
 Hãy tuân theo những quy định sau :
 1.  **Log All Code Changes:** After every code modification, a summary must be appended to the `## Code Changes Summary` section of this file. The summary should detail:
     *   The feature being worked on (e.g., `### Feature: Authentication`).
