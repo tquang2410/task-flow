@@ -22,6 +22,13 @@ Hỏi để làm rõ: Nếu yêu cầu của tôi mơ hồ, bạn phải đặt 
 
 Tầm nhìn Kiến trúc: Ngoài code, hãy sẵn sàng tư vấn về cấu trúc thư mục, lựa chọn thư viện (vídụ: ORM, UI library) và các quyết định kiến trúc tổng thể.
 
+## Quy tắc Ghi nhận Task & Thay đổi
+
+Để quản lý task và các thay đổi trong dự án hiệu quả hơn:
+
+1.  **Task Đang Thực Hiện:** Mọi task được giao cho tôi sẽ được ghi nhận và cập nhật tiến độ trong file `document/doing-task.md`.
+2.  **Tóm tắt Thay đổi Mã nguồn (Code Changes Summary):** Phần `## Code Changes Summary` trong `GEMINI.md` này chỉ được cập nhật khi có các thay đổi **quan trọng** về kiến trúc, cấu hình cốt lõi, hoặc các quyết định kỹ thuật lớn ảnh hưởng đến toàn bộ dự án. Các thay đổi nhỏ, cục bộ sẽ không cần ghi vào đây.
+
 Luôn ưu tiên đọc và re-check lại các file sau:
 1. README.md
 2. GEMINI.md
@@ -41,13 +48,4 @@ Hãy tuân theo những quy định sau :
 3.  **Limit Modifications to Working Code:** When updating features, restrict changes to code that is already functioning perfectly. This helps maintain stability and prevents the reintroduction of bugs.
 4. Bạn đã có kinh nghiệm làm leader rồi, nên nếu fix bug thì sẽ không lặp đi lặp lại một cách cũ, bạn sẽ luôn thay đổi tư duy để project hoạt động tốt dù cách fix bug khiến mục tiêu của task chưa hoàn hảo như kì vọng ban đầu.
 5. Khi thực hiện một tính năng, phải luôn vào folder PRD và đọc file markdown tương ứng. Nếu trong quá trình hoàn thành tính năng mà có chút thay đổi so với mục tiêu ban đầu của file PRD thì hãy update vào file markdown tương ứng đó.
-
-## Code Changes Summary
-
-### Feature: Cấu hình cơ sở dữ liệu (Prisma Schema)
-- **File(s) modified**: `prisma/schema.prisma`
-- **Description**: Đã chuyển đổi quan hệ nhiều-nhiều giữa `User` và `Workspace` thành quan hệ tường minh bằng cách thêm `workspaceIds` vào `User` và `memberIds` vào `Workspace`, đồng thời cập nhật thuộc tính `@relation` để chỉ rõ các trường liên kết. Điều này khắc phục lỗi `@Unsupported("")` và đảm bảo tính nhất quán của schema.
-
-### Feature: Tài liệu hóa luồng dữ liệu
-- **File(s) created**: `databaseFlow.md`
-- **Description**: Đã tạo file `databaseFlow.md` chứa phân tích chi tiết về các models, trường và mối quan hệ trong `prisma/schema.prisma` để team dễ dàng đọc hiểu.
+6. Khi bạn update nội dung cho các file markdown ( các file có đuôi .md ) thì chỉ cần viết tên việc vừa làm, làm chức năng gì, tương tác với file nào. Không cần viết quá chi tiết, ngắn gọn nhưng đủ để người khác đọc hiểu
