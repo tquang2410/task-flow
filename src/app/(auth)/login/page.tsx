@@ -47,7 +47,7 @@ export default function LoginPage() {
         // chủ động refresh để cập nhật session
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setIsLoading(false);

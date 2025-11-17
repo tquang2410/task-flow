@@ -44,13 +44,16 @@ export async function POST(req: Request) {
       })
 
       return new NextResponse('User synced', { status: 200 })
-    } catch (error: any) {
+    } catch (error: unknown) {
+      // Ép kiểu error về dạng object có code và message để TS không báo lỗi
+      const prismaError = error as { code?: string; message: string };
+
       // Xử lý lỗi nếu user đã tồn tại (trùng email hoặc supabaseId)
-      if (error.code === 'P2002') {
+      if (prismaError.code === 'P2002') { 
         // P2002 của Prisma là lỗi "Unique constraint failed"
         return new NextResponse('User already exists', { status: 200 })
       }
-      return new NextResponse(`Error syncing user: ${error.message}`, {
+      return new NextResponse(`Error syncing user: ${prismaError.message}`, {
         status: 500,
       })
     }

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client"; // Client-side client
 
@@ -27,7 +26,6 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const router = useRouter();
   const supabase = createClient();
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -58,7 +56,7 @@ export default function RegisterPage() {
         // bắt người dùng phải xác thực email trước
         // router.refresh(); // Không cần refresh vì chưa đăng nhập
       }
-    } catch (err) {
+    } catch {
       setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setIsLoading(false);
