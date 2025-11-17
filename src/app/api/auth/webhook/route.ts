@@ -3,11 +3,11 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
 export async function POST(req: Request) {
-  console.log("🔴 [WEBHOOK] Bắt đầu nhận request...") // Log 1: Đánh dấu bắt đầu
+  console.log("🔴 [WEBHOOK] Bắt đầu nhận request...")
 
   // 1. Kiểm tra Header
   const authHeader = req.headers.get('Authorization')
-  console.log("🟡 [WEBHOOK] Header nhận được:", authHeader) // Log 2: Xem Header là gì
+  console.log("🟡 [WEBHOOK] Header nhận được:", authHeader)
 
   // HARD-CODE CHECK (Để test)
   if (authHeader !== 'Bearer Hiruscar172427') {
@@ -18,8 +18,8 @@ export async function POST(req: Request) {
 
   // 2. Đọc dữ liệu
   try {
-    const bodyText = await req.text() // Đọc text trước để log
-    console.log("🔵 [WEBHOOK] Body nhận được:", bodyText) // Log 3: Xem Supabase gửi gì
+    const bodyText = await req.text()
+    console.log("🔵 [WEBHOOK] Body nhận được:", bodyText)
 
     const payload = JSON.parse(bodyText)
 
@@ -45,8 +45,17 @@ export async function POST(req: Request) {
       return new NextResponse('Payload type not handled', { status: 200 })
     }
 
-  } catch (error: any) {
-    console.error("🔥 [WEBHOOK] LỖI CHẾT NGƯỜI:", error) // Log 4: Lỗi DB hoặc Code
-    return new NextResponse(`Error: ${error.message}`, { status: 500 })
+  } catch (error: unknown) { // <--- ĐÃ SỬA: Dùng 'unknown' thay vì 'any'
+    console.error("🔥 [WEBHOOK] LỖI CHẾT NGƯỜI:", error)
+
+    // Xử lý message an toàn hơn cho TypeScript
+    let errorMessage = 'Unknown error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null && 'message' in error) {
+      errorMessage = String((error as { message: unknown }).message);
+    }
+
+    return new NextResponse(`Error: ${errorMessage}`, { status: 500 })
   }
 }
