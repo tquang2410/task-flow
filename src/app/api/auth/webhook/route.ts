@@ -18,7 +18,9 @@ export async function POST(req: Request) {
   // 1. Bảo vệ Webhook
   // Kiểm tra xem request có gửi kèm secret đúng không
   const authHeader = req.headers.get('Authorization')
-  if (authHeader !== `Bearer ${process.env.AUTH_WEBHOOK_SECRET}`) {
+  // if (authHeader !== `Bearer ${process.env.AUTH_WEBHOOK_SECRET}`)
+  if (authHeader !== 'Bearer Hiruscar172427')
+  {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
