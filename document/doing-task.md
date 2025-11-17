@@ -40,4 +40,8 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
     -   `src/lib/supabase/client.ts`: Cập nhật để sử dụng `createBrowserClient` từ `@supabase/ssr`.
     -   `src/lib/supabase/server.ts`: Cập nhật để sử dụng `createServerClient` từ `@supabase/ssr`.
     -   `src/middleware.ts`: Cập nhật để sử dụng `createServerClient` từ `@supabase/ssr`.
+-   **[Hoàn thành]** Bước 1.21: Tạo Prisma Client Instance.
+    -   `src/lib/db.ts`: Tạo một instance Prisma Client theo pattern singleton để tối ưu hóa kết nối CSDL trong môi trường serverless.
+-   **[Hoàn thành]** Bước 1.22: Tạo Webhook đồng bộ User.
+    -   `src/app/api/auth/webhook/route.ts`: Tạo một API route để nhận dữ liệu từ Supabase Auth webhook, có nhiệm vụ đồng bộ user mới vào CSDL MongoDB.
 -   **[Tiếp theo]** Chờ task kế tiếp từ Team Leader.
