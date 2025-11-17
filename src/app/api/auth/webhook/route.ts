@@ -3,59 +3,125 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
 export async function POST(req: Request) {
-  console.log("🔴 [WEBHOOK] Bắt đầu nhận request...")
+  console.log("🔴 [WEBHOOK] ==================== BẮT ĐẦU ====================")
+  console.log("🔴 [WEBHOOK] Timestamp:", new Date().toISOString())
+  console.log("🔴 [WEBHOOK] URL:", req.url)
+  console.log("🔴 [WEBHOOK] Method:", req.method)
 
-  // 1. Kiểm tra Header
-  const authHeader = req.headers.get('Authorization')
-  console.log("🟡 [WEBHOOK] Header nhận được:", authHeader)
-
-  // HARD-CODE CHECK (Để test)
-  if (authHeader !== 'Bearer Hiruscar172427') {
-    console.error("❌ [WEBHOOK] Sai mật khẩu! Server nhận được: " + authHeader)
-    return new NextResponse('Unauthorized', { status: 401 })
-  }
-  console.log("✅ [WEBHOOK] Mật khẩu đúng!")
-
-  // 2. Đọc dữ liệu
   try {
+    // 1. Log tất cả headers
+    console.log("📋 [WEBHOOK] All Headers:")
+    req.headers.forEach((value, key) => {
+      console.log(`   ${key}: ${value}`)
+    })
+
+    // 2. Kiểm tra Authorization
+    const authHeader = req.headers.get('Authorization')
+    const expectedAuth = 'Bearer Hiruscar172427'
+
+    console.log("🔑 [WEBHOOK] Auth Check:")
+    console.log("   Expected:", expectedAuth)
+    console.log("   Received:", authHeader)
+    console.log("   Match:", authHeader === expectedAuth)
+
+    if (authHeader !== expectedAuth) {
+      console.error("❌ [WEBHOOK] UNAUTHORIZED!")
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+    console.log("✅ [WEBHOOK] Auth OK!")
+
+    // 3. Đọc và log body
     const bodyText = await req.text()
-    console.log("🔵 [WEBHOOK] Body nhận được:", bodyText)
+    console.log("📦 [WEBHOOK] Raw Body Length:", bodyText.length)
+    console.log("📦 [WEBHOOK] Raw Body:", bodyText)
 
     const payload = JSON.parse(bodyText)
+    console.log("📦 [WEBHOOK] Parsed Payload:", JSON.stringify(payload, null, 2))
 
-    // 3. Xử lý
-    if (payload.type === 'INSERT') {
-      console.log("🟢 [WEBHOOK] Loại sự kiện là INSERT. Đang xử lý...")
-      const { id: supabaseId, email } = payload.record
-      console.log(`🔸 [WEBHOOK] Thông tin user: ID=${supabaseId}, Email=${email}`)
+    // 4. Validate payload structure
+    console.log("🔍 [WEBHOOK] Payload Validation:")
+    console.log("   payload.type:", payload.type)
+    console.log("   payload.table:", payload.table)
+    console.log("   payload.record:", payload.record ? "exists" : "missing")
 
-      // 4. Ghi vào DB
-      console.log("🚀 [WEBHOOK] Đang gọi Prisma create...")
-      const newUser = await db.user.create({
-        data: {
-          supabaseId: supabaseId,
-          email: email,
-        },
-      })
-      console.log("🎉 [WEBHOOK] Tạo thành công! User ID Mongo:", newUser.id)
-
-      return new NextResponse('User synced', { status: 200 })
-    } else {
-      console.log("⚠️ [WEBHOOK] Bỏ qua sự kiện loại:", payload.type)
-      return new NextResponse('Payload type not handled', { status: 200 })
+    if (payload.type !== 'INSERT') {
+      console.log("⚠️ [WEBHOOK] Not INSERT event, skipping")
+      return NextResponse.json({ message: 'Event type not INSERT' }, { status: 200 })
     }
 
-  } catch (error: unknown) { // <--- ĐÃ SỬA: Dùng 'unknown' thay vì 'any'
-    console.error("🔥 [WEBHOOK] LỖI CHẾT NGƯỜI:", error)
+    if (payload.table !== 'users') {
+      console.log("⚠️ [WEBHOOK] Not users table, skipping")
+      return NextResponse.json({ message: 'Table not users' }, { status: 200 })
+    }
 
-    // Xử lý message an toàn hơn cho TypeScript
-    let errorMessage = 'Unknown error';
+    // 5. Extract user data
+    const { id: supabaseId, email } = payload.record
+    console.log("👤 [WEBHOOK] Extracted User Data:")
+    console.log("   supabaseId:", supabaseId)
+    console.log("   email:", email)
+
+    if (!supabaseId || !email) {
+      console.error("❌ [WEBHOOK] Missing supabaseId or email!")
+      return NextResponse.json({ error: 'Missing id or email' }, { status: 400 })
+    }
+
+    // 6. Check DATABASE_URL
+    console.log("💾 [WEBHOOK] Database Check:")
+    console.log("   DATABASE_URL exists:", !!process.env.DATABASE_URL)
+    console.log("   DATABASE_URL preview:", process.env.DATABASE_URL?.substring(0, 30) + "...")
+
+    // 7. Check existing user
+    console.log("🔍 [WEBHOOK] Checking if user exists...")
+    const existingUser = await db.user.findUnique({
+      where: { supabaseId }
+    })
+    console.log("🔍 [WEBHOOK] Existing user:", existingUser ? "FOUND" : "NOT FOUND")
+
+    if (existingUser) {
+      console.log("⚠️ [WEBHOOK] User already exists, skipping creation")
+      return NextResponse.json({
+        message: 'User already exists',
+        mongoId: existingUser.id
+      }, { status: 200 })
+    }
+
+    // 8. Create user
+    console.log("🚀 [WEBHOOK] Creating user in MongoDB...")
+    const newUser = await db.user.create({
+      data: {
+        supabaseId: supabaseId,
+        email: email,
+      },
+    })
+    console.log("🎉 [WEBHOOK] User created successfully!")
+    console.log("🎉 [WEBHOOK] MongoDB ID:", newUser.id)
+    console.log("🎉 [WEBHOOK] Supabase ID:", newUser.supabaseId)
+    console.log("🎉 [WEBHOOK] Email:", newUser.email)
+
+    return NextResponse.json({
+      success: true,
+      mongoId: newUser.id,
+      supabaseId: newUser.supabaseId
+    }, { status: 200 })
+
+  } catch (error: unknown) {
+    console.error("🔥 [WEBHOOK] ==================== ERROR ====================")
+    console.error("🔥 [WEBHOOK] Error Type:", typeof error)
+
     if (error instanceof Error) {
-      errorMessage = error.message;
-    } else if (typeof error === 'object' && error !== null && 'message' in error) {
-      errorMessage = String((error as { message: unknown }).message);
+      console.error("🔥 [WEBHOOK] Error Name:", error.name)
+      console.error("🔥 [WEBHOOK] Error Message:", error.message)
+      console.error("🔥 [WEBHOOK] Error Stack:", error.stack)
+    } else {
+      console.error("🔥 [WEBHOOK] Unknown Error:", error)
     }
 
-    return new NextResponse(`Error: ${errorMessage}`, { status: 500 })
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      errorType: error instanceof Error ? error.name : typeof error
+    }, { status: 500 })
+  } finally {
+    console.log("🔴 [WEBHOOK] ==================== KẾT THÚC ====================")
   }
 }
