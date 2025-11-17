@@ -44,4 +44,8 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
     -   `src/lib/db.ts`: Tạo một instance Prisma Client theo pattern singleton để tối ưu hóa kết nối CSDL trong môi trường serverless.
 -   **[Hoàn thành]** Bước 1.22: Tạo Webhook đồng bộ User.
     -   `src/app/api/auth/webhook/route.ts`: Tạo một API route để nhận dữ liệu từ Supabase Auth webhook, có nhiệm vụ đồng bộ user mới vào CSDL MongoDB.
+-   **[Hoàn thành]** Bước 1.24: Fix lỗi Linting để Build.
+    -   `src/app/api/auth/webhook/route.ts`: Sửa lỗi `any` trong khối `catch`.
+    -   `src/app/(auth)/login/page.tsx`: Xóa biến `err` không dùng trong khối `catch`.
+    -   `src/app/(auth)/register/page.tsx`: Xóa biến `router` và `err` không được sử dụng.
 -   **[Tiếp theo]** Chờ task kế tiếp từ Team Leader.
