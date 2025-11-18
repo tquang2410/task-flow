@@ -45,7 +45,7 @@ export default function AuthPage() {
             if (error) {
                 setLoginError(error.message);
             } else {
-                router.push("/app");
+                router.push("/");
                 router.refresh();
             }
         } catch {
