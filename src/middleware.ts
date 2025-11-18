@@ -32,14 +32,14 @@ export async function middleware(req: NextRequest) {
   // 3. Logic bảo vệ:
   // Nếu chưa đăng nhập VÀ đang cố vào trang `/app`
   if (!session && req.nextUrl.pathname.startsWith('/app')) {
-    // Redirect về trang /login
-    return NextResponse.redirect(new URL('/login', req.url))
+    // Redirect về trang /auth
+    return NextResponse.redirect(new URL('/auth', req.url))
   }
 
-  // Nếu ĐÃ đăng nhập VÀ đang ở trang /login hoặc /register
-  if (session && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/register')) {
+  // Nếu ĐÃ đăng nhập VÀ đang ở trang /auth
+  if (session && req.nextUrl.pathname === '/auth') {
     // Redirect về trang dashboard chính
-    return NextResponse.redirect(new URL('/app', req.url))
+    return NextResponse.redirect(new URL('/', req.url))
   }
 
   // Cho phép truy cập
@@ -50,7 +50,6 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/app/:path*', // Tất cả các trang con của /app
-    '/login',
-    '/register',
+    '/auth',
   ],
 }
