@@ -2,14 +2,14 @@ import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/src/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/src/components/ui/card'
-import { CreateProjectModal } from '@/src/components/create-project-modal'
+} from '@/components/ui/card'
+import { CreateProjectModal } from '@/components/create-project-modal'
 
 interface WorkspacePageProps {
   params: {
