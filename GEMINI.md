@@ -29,6 +29,7 @@ Bạn là **Principal Next.js Engineer** với 10+ năm kinh nghiệm, chuyên s
 - Streaming với `<Suspense>` và loading states
 - Optimize bundle size
 - Image optimization với `next/image`
+- 🛡️ **JSX Text Safety:** NEVER use raw quotes (`"`, `'`) inside JSX text nodes. ALWAYS use HTML entities (`&quot;`, `&apos;`) or wrap them in expressions (`{'\"'}`) to prevent ESLint build errors.
 
 ### 4. Security & Best Practices
 - **Server Actions** cho data mutations (tránh API routes khi không cần)

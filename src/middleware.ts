@@ -29,18 +29,28 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // 3. Logic bảo vệ:
-  // Nếu chưa đăng nhập VÀ đang cố vào trang `/app`
-  if (!session && req.nextUrl.pathname.startsWith('/app')) {
-    // Redirect về trang /auth
-    return NextResponse.redirect(new URL('/auth', req.url))
+  // 3. Logic bảo vệ & điều hướng:
+  const { user } = session?.user ? { user: session.user } : { user: null }
+
+  // A. User đã đăng nhập
+  if (user) {
+    // A.1. Nếu vào trang /auth, redirect sang /app
+    if (req.nextUrl.pathname.startsWith('/auth')) {
+      return NextResponse.redirect(new URL('/app', req.url))
+    }
+    // A.2. Nếu vào trang chủ (`/`), redirect sang /app
+    if (req.nextUrl.pathname === '/') {
+      return NextResponse.redirect(new URL('/app', req.url))
+    }
+  }
+  // B. User chưa đăng nhập
+  else {
+    // B.1. Nếu cố vào /app, đá về /auth
+    if (req.nextUrl.pathname.startsWith('/app')) {
+      return NextResponse.redirect(new URL('/auth', req.url))
+    }
   }
 
-  // Nếu ĐÃ đăng nhập VÀ đang ở trang /auth
-  if (session && req.nextUrl.pathname === '/auth') {
-    // Redirect về trang dashboard chính
-    return NextResponse.redirect(new URL('/', req.url))
-  }
 
   // Cho phép truy cập
   return res
@@ -49,6 +59,7 @@ export async function middleware(req: NextRequest) {
 // Cấu hình matcher để middleware chỉ chạy trên các trang cần thiết
 export const config = {
   matcher: [
+    '/', // Chạy trên cả trang chủ
     '/app/:path*', // Tất cả các trang con của /app
     '/auth',
   ],
