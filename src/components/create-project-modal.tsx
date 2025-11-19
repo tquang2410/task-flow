@@ -70,7 +70,7 @@ export function CreateProjectModal({ workspaceId, children }: CreateProjectModal
         <DialogHeader>
           <DialogTitle>Tạo dự án mới</DialogTitle>
           <DialogDescription>
-            Đặt tên cho dự án của bạn. Nhấn "Tạo" để hoàn tất.
+            Đặt tên cho dự án của bạn. Nhấn &quot;Tạo&quot; để hoàn tất.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
