@@ -12,13 +12,13 @@ import {
 import { CreateProjectModal } from '@/components/create-project-modal'
 
 interface WorkspacePageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function WorkspacePage({ params }: WorkspacePageProps) {
-  const workspaceId = params.id
+  const { id: workspaceId } = await params
 
   // 1. **Authentication & Data Fetching**
   const supabase = await createClient()
