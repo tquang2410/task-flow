@@ -5,7 +5,6 @@ import {
   CheckCircle,
   Inbox,
   Users,
-  Settings,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { UserProfile } from '@/components/dashboard/user-profile'

@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import type { Workspace } from '@prisma/client' // Import type from prisma
 
