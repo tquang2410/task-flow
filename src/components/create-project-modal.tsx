@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { Button } from '@/src/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/src/components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -22,8 +22,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/src/components/ui/form'
-import { Input } from '@/src/components/ui/input'
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { CreateProjectSchema } from '@/lib/schemas'
 import { createProject } from '@/app/actions'
 import { toast } from 'sonner' // Using sonner for toast notifications
