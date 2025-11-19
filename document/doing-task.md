@@ -21,6 +21,9 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
     -   `src/app/actions.ts`: Cập nhật lại các server actions đã tạo.
     -   Sửa lại đúng tên biến của Prisma Client từ `prisma` thành `db`.
     -   Sửa lại cách gọi hàm `createClient` của Supabase thành `await createClient()` vì đây là hàm bất đồng bộ.
+-   **[Hoàn thành]** Bước 2.5: Build Workspace Dashboard & Create Project UI.
+    -   `src/components/create-project-modal.tsx`: Tạo component modal để xử lý việc tạo project mới, sử dụng `Dialog` và `react-hook-form`.
+    -   `src/app/app/workspace/[id]/page.tsx`: Tạo trang dashboard cho từng workspace, hiển thị danh sách các project hiện có và tích hợp `CreateProjectModal` để người dùng có thể tạo project mới.
 
 ### Task đã hoàn thành: Epic 1 - Nền tảng & Xác thực
 
