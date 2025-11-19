@@ -11,6 +11,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 -   **[Hoàn thành]** Bước 2.1: Implement Server Action `createWorkspace`.
     -   `src/app/actions.ts`: Tạo file mới chứa các Server Actions của ứng dụng.
     -   Viết action `createWorkspace` để xử lý logic tạo Workspace mới, bao gồm: xác thực người dùng qua Supabase, kiểm tra dữ liệu đầu vào bằng Zod, tạo record `Workspace` và liên kết người dùng hiện tại làm thành viên đầu tiên thông qua Prisma.
+-   **[Hoàn thành]** Bước 2.2: Tạo trang UI cho "Create Workspace".
+    -   `src/app/app/create-workspace/page.tsx`: Tạo trang mới cho phép người dùng nhập tên và tạo một workspace.
+    -   Trang này là một Client Component, sử dụng `react-hook-form` và `zodResolver` để quản lý form và tương tác với server action `createWorkspace`. Giao diện được dựng bằng các component của Shadcn/UI.
+-   **[Hoàn thành]** Bước 2.3: Implement Server Action `createProject`.
+    -   `src/app/actions.ts`: Bổ sung `createProject` action vào file.
+    -   Action này bao gồm logic kiểm tra quyền hạn (user phải là thành viên của workspace) và tự động khởi tạo các cột Kanban mặc định (`To Do`, `In Progress`, `Done`) cho project mới.
+-   **[Hoàn thành]** Bước 2.4: Refactor Server Actions.
+    -   `src/app/actions.ts`: Cập nhật lại các server actions đã tạo.
+    -   Sửa lại đúng tên biến của Prisma Client từ `prisma` thành `db`.
+    -   Sửa lại cách gọi hàm `createClient` của Supabase thành `await createClient()` vì đây là hàm bất đồng bộ.
 
 ### Task đã hoàn thành: Epic 1 - Nền tảng & Xác thực
 
