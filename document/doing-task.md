@@ -4,9 +4,15 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ---
 
-## Cập nhật lần cuối: 17/11/2025
+## Cập nhật lần cuối: 19/11/2025
 
-### Task đang thực hiện: Epic 1 - Nền tảng & Xác thực
+### Task đang thực hiện: Epic 2 - Quản lý Workspace & Dự án
+
+-   **[Hoàn thành]** Bước 2.1: Implement Server Action `createWorkspace`.
+    -   `src/app/actions.ts`: Tạo file mới chứa các Server Actions của ứng dụng.
+    -   Viết action `createWorkspace` để xử lý logic tạo Workspace mới, bao gồm: xác thực người dùng qua Supabase, kiểm tra dữ liệu đầu vào bằng Zod, tạo record `Workspace` và liên kết người dùng hiện tại làm thành viên đầu tiên thông qua Prisma.
+
+### Task đã hoàn thành: Epic 1 - Nền tảng & Xác thực
 
 -   **[Hoàn thành]** Bước 1.5: Tạo Supabase Client (cho Client-side).
     -   `src/lib/supabase/client.ts`: Dùng để tạo Supabase client ở phía trình duyệt (trong các component "use client").
