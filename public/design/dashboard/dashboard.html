@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>TaskFlow Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#463df5",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#111022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                    'FILL' 0,
+                    'wght' 400,
+                    'GRAD' 0,
+                    'opsz' 24
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings:
+                    'FILL' 1,
+                    'wght' 400,
+                    'GRAD' 0,
+                    'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white antialiased">
+<div class="relative flex min-h-screen w-full">
+    <!-- Glassmorphism Sidebar -->
+    <aside class="fixed left-0 top-0 z-20 flex h-full w-20 flex-col items-center border-r border-white/10 bg-black/30 py-6 backdrop-blur-md">
+        <div class="mb-10" data-alt="TaskFlow app logo">
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAoqPnbygc_xatYZmyjqNXuvQsK7srJw2mZteO820bStpfNNhdKAF1uFfLaMP--NYM7ELGELPqnBymq00gu5tlNvgWNC62Ndn_7BG7oTwgyKSl59EUUzRGA0a8PgV9RvTPQsX1wmIA7HotvBa2b6JCEkFDeqr7nXlFf3lXUA-ETmnWsx4wr6mT1RsfXAyZ7IO5Z6OAT2_acNkZfHkEW1xbLcRkeUuwKojkJ3bmfmtE5Qm8cHTbkKxiczvTGex5ZkcJ8l1U-A2eA_9k");'></div>
+        </div>
+        <nav class="flex flex-col items-center gap-4">
+            <a class="group relative flex items-center justify-center rounded-lg p-2 text-white" href="#">
+                <div class="absolute left-0 h-8 w-1 rounded-r-full bg-primary transition-all"></div>
+                <span class="material-symbols-outlined fill text-2xl">dashboard</span>
+            </a>
+            <a class="group relative flex items-center justify-center rounded-lg p-2 text-gray-400 hover:text-white transition-colors" href="#">
+                <div class="absolute left-0 h-0 w-1 rounded-r-full bg-primary transition-all group-hover:h-6"></div>
+                <span class="material-symbols-outlined text-2xl">check_circle</span>
+            </a>
+            <a class="group relative flex items-center justify-center rounded-lg p-2 text-gray-400 hover:text-white transition-colors" href="#">
+                <div class="absolute left-0 h-0 w-1 rounded-r-full bg-primary transition-all group-hover:h-6"></div>
+                <span class="material-symbols-outlined text-2xl">inbox</span>
+            </a>
+            <a class="group relative flex items-center justify-center rounded-lg p-2 text-gray-400 hover:text-white transition-colors" href="#">
+                <div class="absolute left-0 h-0 w-1 rounded-r-full bg-primary transition-all group-hover:h-6"></div>
+                <span class="material-symbols-outlined text-2xl">grid_view</span>
+            </a>
+            <a class="group relative flex items-center justify-center rounded-lg p-2 text-gray-400 hover:text-white transition-colors" href="#">
+                <div class="absolute left-0 h-0 w-1 rounded-r-full bg-primary transition-all group-hover:h-6"></div>
+                <span class="material-symbols-outlined text-2xl">group</span>
+            </a>
+        </nav>
+        <div class="mt-auto flex flex-col items-center gap-4">
+            <a class="text-gray-400 hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-2xl">settings</span></a>
+            <img alt="Alex's profile picture" class="h-10 w-10 rounded-full border-2 border-white/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD89SJZYeqzWICo1gOSuYKmQ-lBXGyVJ99EHG5zX2DOlzgztGoKpbmRtb0gMemlEHey2gkWXx9aaFmmllR4asCx1W34BNOum8lzUw414Rqj0me_d7ba193koOtGlRDGySOzTjJR1nldFh6wojSgLosVnyLdsFFoIh7yh5Oqq9qKt2mSDgy6j2OihhDfIxr1M6TzbbWwWnCDnNxBCUjPm9mcEVDgBJhzHqQ1VMipWzzQQA-2IV9GkOwiwqF7BXBkwM_97lUMXcZMY8"/>
+        </div>
+    </aside>
+    <!-- Main Content -->
+    <main class="flex-1 pl-20">
+        <!-- Floating Header -->
+        <header class="sticky top-0 z-10 flex items-center justify-between gap-4 px-8 py-4 bg-background-dark/50 backdrop-blur-md">
+            <p class="text-white text-3xl font-black leading-tight tracking-[-0.033em]">Welcome back, Alex</p>
+            <div class="flex items-center gap-4">
+                <div class="w-96">
+                    <label class="flex flex-col min-w-40 h-11 w-full">
+                        <div class="flex w-full flex-1 items-stretch rounded-lg h-full border border-white/10 bg-white/5">
+                            <div class="text-gray-400 flex items-center justify-center pl-3">
+                                <span class="material-symbols-outlined text-2xl">search</span>
+                            </div>
+                            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-300 focus:outline-0 focus:ring-0 border-none bg-transparent h-full placeholder:text-gray-500 px-2 text-sm font-normal leading-normal" placeholder="Search tasks, projects... Cmd+K" value=""/>
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_1px_3px_rgba(0,0,0,0.5)] transition-transform hover:scale-105">
+                        <span class="truncate">Create Project</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <div class="p-8">
+            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Your Workspaces</h2>
+            <!-- Bento Grid Layout -->
+            <div class="grid grid-cols-3 grid-rows-2 gap-6">
+                <!-- Primary Card (Large) -->
+                <div class="group relative col-span-2 row-span-2 flex flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:scale-[1.02] hover:border-primary/50">
+                    <div class="absolute -inset-24 z-0 bg-primary/20 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style="background: radial-gradient(circle, rgba(70,61,245,0.15) 0%, rgba(17,16,34,0) 50%);"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-12" data-alt="Gradient icon for Product Launch workspace" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDcIYzLiDGy6W_DHDBL3nQiYM0psahl1t3X-N6aeGZW6PPHLiSZCv7CoTLAIbRu2oX1TgGHcY3Kj70-J-8k-YxGvuYJrKIX_4POMOzUCgQ90tf7u3gap7gfelUAaKMTfoF0Q-aBoq3ICjijBs6zJzycVOtMtDVKEVt8NrjkzZ4fcHb4YrZf3MLmVRuU8dErGDv6j6rc1kcEZP-o9tIS6aaVIAtJ0-oG4T0lBLJUPW1zVU_Z8E9TrGRHU4mAMAQpxzS3GJlWoXBO090");'></div>
+                            <div>
+                                <p class="text-white text-xl font-bold leading-tight tracking-[-0.015em]">Q4 Product Launch</p>
+                                <p class="text-gray-400 text-sm font-normal leading-normal">Web &amp; Mobile Redesign</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <p class="text-gray-400 text-sm">75% complete</p>
+                            <div class="w-full bg-white/10 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative z-10 flex items-end justify-between">
+                        <div class="flex -space-x-2 overflow-hidden">
+                            <img alt="User 1" class="inline-block h-8 w-8 rounded-full ring-2 ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPe1Ir88VUoDt4DRJS65JzOFauDovzH2Rby5Tk2wcSbyeCyUciYnLNIocTPIETdiDnMJIzS3_BG6RZ2Qonb3HKvdKfJbFxNef47akEwV1ATg0jvcjRDMSk5sTo8sOJ2krT2NDiFU0BZiJOiVPLPpyp2qkDooKUL-pOd9X36bjhvQcyp7jJRV7-yqOYlfDe2itmAYmS7YogSFDCoiLkxMQUJckqR9QkltXbkRMHAnPCfIlsGLzy8DTXhqP4ZrdEmu0PV09yzuzmecw"/>
+                            <img alt="User 2" class="inline-block h-8 w-8 rounded-full ring-2 ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWvSEQMlVKiu2j-xmWupq-ko-Yu9uJPm1KaX4STxcWVJ2FDRz30jMdEq47XylJlgM7ah0dLeAVr_MrXHmSy7EgckEr85GCEV4_qrCbDwwMvuT34Pc3T1F7ffRcRmbYQ0B87BNswm69sMJuH3e4SxWb3EQIRueHNdt92S-GdJgyHZ7uF8cJjfk0PRyeTkgbq6eUDMqsHteYiaTgujV1mfUKlhdMDqSqM8Fkv8NBoyWZEqMhPM58b6v5bruS16iwnEmKkDMdjw8Yjx8"/>
+                            <img alt="User 3" class="inline-block h-8 w-8 rounded-full ring-2 ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9TGEdqL1PVcF_4-nvNLPhE84P4-RdkmDH_4XbAK6s-irV_LcmsdrahvvAyowmhUnK2x0lLuKLxgynVaG2bjtSAXQNI9rxCmN6QunfDsqmWrlQmTkPrC_MGFegOAzIOElSvFsC1U0fXhUpooz-WBxthjdmq-lH6fJWo2FZKmO_YSar_7wXXn50LHnnfd9enFb0UqZdoFA6-RotGjD1N-EqsPBnfEux7-_gxaaZuzkwLU3KUyraV5HEaNucjV-90A5dQq3Ng6JDOnQ"/>
+                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-700 ring-2 ring-background-dark text-xs font-medium text-white">+5</div>
+                        </div>
+                        <!-- Mini Sparkline Chart -->
+                        <div class="w-1/2">
+                            <svg class="w-full" preserveaspectratio="none" viewbox="0 0 100 30">
+                                <path d="M 0 20 L 10 15 L 20 25 L 30 10 L 40 18 L 50 12 L 60 22 L 70 8 L 80 15 L 90 25 L 100 20" fill="none" stroke="#463DF5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                <path d="M 0 20 L 10 15 L 20 25 L 30 10 L 40 18 L 50 12 L 60 22 L 70 8 L 80 15 L 90 25 L 100 20" fill="url(#sparkline-gradient)" stroke="none"></path>
+                                <defs>
+                                    <lineargradient id="sparkline-gradient" x1="0" x2="0" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#463DF5" stop-opacity="0.2"></stop>
+                                        <stop offset="100%" stop-color="#463DF5" stop-opacity="0"></stop>
+                                    </lineargradient>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <!-- Secondary Card 1 -->
+                <div class="col-span-1 row-span-1 flex flex-col rounded-xl border border-white/10 bg-white/5 p-6 transition-all hover:border-primary/50">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-10" data-alt="Gradient icon for Design System workspace" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDc6ZcBc7FHaMHp4_Nz9GJak0pPcDh5XOH5jAD4jxhlvNSvYEQfS6RrSyQeilEataPPBqyzxxmpit4e2SgCYkQ-Lm4TJZq20bcNbO3tPMDhw22HnP-_zgD7cwdxUp4aa2HBGmRgIXynlDjxdccNOOBXn7iAzQqDJEA0elnsrc6NHe4dR3NvHVSEjcrLJljwyHzh132VIyVIrCbg9_fNclasA9WRAJSfX6oRoqJg4Qpqn-bu-xDNBZH_SzRkvJReonp2sI9mnxjid8g");'></div>
+                        <div class="flex -space-x-2 overflow-hidden">
+                            <img alt="User 4" class="inline-block h-6 w-6 rounded-full ring-2 ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC1HZ5SRUFld9XcFNVCge7JKDOBYix0LYVKlYyO_Si74FjLLqUty9KBGMXnj9NWvzUpGmYPmSwPbec3Tm5kU-deJOhpMQHh_7cKV-YUrCDsRQWJiaNW1MGtgwkWL6pnoSZ5eeWvhdICToFrGLKEG7mmhGjnCf-QhwmMAML-sdwUAoAuCG6KNTN5fw2ZCpwK-jNBvkcMs8M-w12psnZI36XIQ6Qz8UP5PBip6GtzrY8ISuQwkne8ct9pgcHG6ZqXvrtkqmW6tFZ3ec"/>
+                            <img alt="User 5" class="inline-block h-6 w-6 rounded-full ring-2 ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwNDVxt5D_EZhLoe_seoDjM5zdmXAb0K2WcmAxtvcQwSdk_56y9kXkFI7rT6FdnJ0h3Ladj81NDy3HSYMVtdKG8O7k2uhLP4TTOfIO2zvsiEGoe_819-WRlZktXkGoqrOIhnMW0dbLl2Yc5gO8Jee0EK8xYr3G6Vd3zim4YlEd4WaDUnMiSqW2BhN4Pl1khpewAeTIes1uWOIDtpiM20xIzjLK3s5E3AWMkVsPvPNvq-qeGZ4m09XO1jBLYnNfvZ56E8DDCE-97bw"/>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-white text-lg font-bold">Design System</p>
+                        <p class="text-gray-400 text-sm mb-2">Component Library</p>
+                        <div class="w-full bg-white/10 rounded-full h-1.5">
+                            <div class="bg-pink-500 h-1.5 rounded-full" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Secondary Card 2 -->
+                <div class="col-span-1 row-span-1 flex flex-col rounded-xl border border-white/10 bg-white/5 p-6 transition-all hover:border-primary/50">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-10" data-alt="Gradient icon for API Integration workspace" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAheug-usw5XIGRYVhIg5CPIg_PlwMMLGSYlyjGr1mX2nPFyTIt5SPdoA9jXWJuoC3psbEzDvUu-9gBVYpWNtsMO3xPaUIOXM_DmV8b_zgJUlR2fxa_VVPUmhDG0C815FQLS4-YXzVKNnMjGJTJTCOoBVeEoaoo2Typ1xis38S6ywdi_n_BvWhY0ofz9Ci8TDdWM2-9JtiwTzKpGOK-5w1dh-hYzCLUoOmqg5FK57K1W2KkZ-Eq6Ps8ynbGXEBp9q0eJtKPYNpquvc");'></div>
+                        <div class="flex -space-x-2 overflow-hidden">
+                            <img alt="User 6" class="inline-block h-6 w-6 rounded-full ring-2 ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbGsK19-ntQoOeW3iXVqGK-zIbHkijLqyR1St_m-zDmfK3KGE5Rwc3T4F7rBRO5_hi5MgF6F6xOaT8zqNovpoEUvbcCw62_SBww4a9kIGVPZ6cQw9h9aMxqV8UpanW4zWKznM7mU-HpdPxOmaC8qgtEv5xiHEUR55cJHAqevJ5SIoF0NUJVBT5tyTuQxtrZSuV-g-mRDiSDisFLOlqHwEI47PE_IMxPhOVp0lZqmmy17tD6U0Oy_FZZhdOs7l6f3cjNy_9XLBTexY"/>
+                            <img alt="User 7" class="inline-block h-6 w-6 rounded-full ring-2 ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB31i7X7UNhbxlgxZUoYq7YSmqxizJqIIiETX3q_FxrzXdI0j_4vRIlOyBcMgFzQhtqfSqxPw--IC6digc4LLm_G6rB_VuWRmwWAWCSnI52IStU0tCTUhmIbQ2T13KJjBe7rtYw7-C43bvsVf08suq1v__uxX5wo0M4y4_oCL7DOKoUl2svN1JpvSqAI-ohBGtxY0I5wlR6Db393_x-aFiLVEIiJLSoUi2hYPy9EW0g-xS5uzJ3TZHHpNWBPSio4dPQbyAw1jgQPwE"/>
+                            <img alt="User 8" class="inline-block h-6 w-6 rounded-full ring-2 ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCva8XLOhIDigL3bScJk38QOkeWvqbsf8YYqI6m-K6jpGdP-Vp1655xwhnV6y7iwwjk6N1xSEZthQCr3vsMtvMUhPmMrM3y3liuoqdqptOfgVjgTOlvy-JbcTiHwHuAR28CCN1X4oVH_er6RJSFkEtMmLe2jpbOKZbdiRwOD8wogrGYLVgoBSGv7Rl5QqBZ0v8voNtorHaa6ufqJBMtyqGlzxyN_D5pbjfFZa5tutlfLjywsTk5b651ST4zsVXbJyAlyEzKfIliPa8"/>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-white text-lg font-bold">API Integration</p>
+                        <p class="text-gray-400 text-sm mb-2">Backend Services</p>
+                        <div class="w-full bg-white/10 rounded-full h-1.5">
+                            <div class="bg-green-500 h-1.5 rounded-full" style="width: 90%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body></html>

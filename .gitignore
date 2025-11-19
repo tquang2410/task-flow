@@ -42,3 +42,4 @@ next-env.d.ts
 
 # IntelliJ
 .idea/
+\n# Design mockups and references\n/public/design

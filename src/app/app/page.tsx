@@ -1,96 +1,100 @@
-// @file: src/app/app/page.tsx
-"use client";
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Search, PlusCircle } from 'lucide-react'
+import { PrimaryWorkspaceCard } from '@/components/dashboard/primary-workspace-card'
+import { SecondaryWorkspaceCard } from '@/components/dashboard/secondary-workspace-card'
 
-import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+export default async function DashboardPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-// Note: This is the new Dashboard page, located at /app
-export default function DashboardPage() {
-  const router = useRouter();
-  const supabase = createClient();
-  const [email, setEmail] = useState<string>("");
-  const [loading, setLoading] = useState(false);
+  if (!user) {
+    return redirect('/auth')
+  }
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.email) {
-        setEmail(session.user.email);
-      }
-    };
-    getUser();
-  }, [supabase]);
+  const appUser = await db.user.findUnique({
+    where: {
+      supabaseId: user.id,
+    },
+    include: {
+      workspaces: {
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      },
+    },
+  })
 
-  const handleLogout = async () => {
-    setLoading(true);
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      // Luôn chạy dù thành công hay thất bại
-      router.replace("/auth");
-      router.refresh();
-      setLoading(false);
-    }
-  };
+  if (!appUser) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <p>Loading user data...</p>
+      </div>
+    )
+  }
+
+  const { workspaces } = appUser
+  const activeWorkspace = workspaces[0]
+  const otherWorkspaces = workspaces.slice(1)
+
+  // Empty State
+  if (workspaces.length === 0) {
+    return (
+      <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-slate-700 shadow-sm">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h3 className="text-2xl font-bold tracking-tight text-white">
+            You have no workspaces
+          </h3>
+          <p className="text-sm text-slate-400 mb-4">
+            Get started by creating a new workspace.
+          </p>
+          <Button asChild className="bg-dashboard-primary text-white hover:bg-dashboard-primary/90">
+            <Link href="/app/create-workspace">
+              <PlusCircle className="mr-2 h-4 w-4" /> Create Workspace
+            </Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              {/* Logo */}
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">T</span>
-                </div>
-                <h1 className="text-xl font-bold text-gray-900">TaskFlow</h1>
+    <div className="flex-1 space-y-6">
+      {/* Header Area */}
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 py-4 bg-dashboard-background/80 backdrop-blur-md">
+          <h1 className="text-3xl font-black leading-tight tracking-[-0.033em] text-white">
+            Welcome back, {appUser.name || user.email?.split('@')[0]}
+          </h1>
+          <div className="flex items-center gap-4">
+              <div className="relative w-96">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Input
+                      placeholder="Search tasks, projects..."
+                      className="h-11 w-full rounded-lg border border-white/10 bg-white/5 pl-10 text-sm text-gray-300 placeholder:text-gray-500 focus:ring-primary"
+                  />
               </div>
-
-              {/* Right side */}
-              <div className="flex items-center gap-4">
-                {/* User info */}
-                <div className="hidden sm:flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">{email}</p>
-                    <p className="text-xs text-gray-500">Member</p>
-                  </div>
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                    {email.charAt(0).toUpperCase()}
-                  </div>
-                </div>
-
-                {/* Logout button */}
-                <button
-                    onClick={handleLogout}
-                    disabled={loading}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {loading ? "Đang xuất..." : "Đăng xuất"}
-                </button>
+              <div>
+                  <Button className="h-11 px-5 text-sm font-bold bg-dashboard-primary text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_1px_3px_rgba(0,0,0,0.5)] transition-transform hover:scale-105">
+                      Create Project
+                  </Button>
               </div>
-            </div>
           </div>
-        </header>
+      </header>
 
-        {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-20">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Chào mừng đến với TaskFlow!
-            </h2>
-            <p className="text-lg text-gray-600 mb-8">
-              Dashboard đang được phát triển...
-            </p>
-            <div className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 rounded-lg">
-              <i className="bx bx-check-circle text-2xl text-green-500"></i>
-              <span className="text-gray-700">Bạn đã đăng nhập thành công!</span>
-            </div>
-          </div>
-        </main>
+      <div>
+        <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">Your Workspaces</h2>
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {activeWorkspace && <PrimaryWorkspaceCard workspace={activeWorkspace} />}
+          {otherWorkspaces.map((workspace) => (
+            <SecondaryWorkspaceCard key={workspace.id} workspace={workspace} />
+          ))}
+        </div>
       </div>
-  );
+    </div>
+  )
 }
