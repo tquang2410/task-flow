@@ -228,6 +228,11 @@ import { Suspense } from 'react'
 
 <!-- Log major changes here following the format above -->
 
+### Feature: Homepage UI and Authentication Flow
+**Date:** 2025-11-18
+**Files:** `src/app/page.tsx`, `src/app/(auth)/auth/page.tsx`, `src/middleware.ts`
+**Changes:** Designed the basic homepage UI, added a logout button, and updated the middleware to redirect authenticated users from login/register pages to the homepage.
+
 ### Feature: Supabase Migration to @supabase/ssr
 **Date:** 2025-11-17
 **Files:** `lib/supabase/client.ts`, `lib/supabase/server.ts`, `middleware.ts`
