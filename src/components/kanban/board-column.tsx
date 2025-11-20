@@ -1,0 +1,45 @@
+import { Badge } from "@/components/ui/badge"
+import { TaskCard } from "./task-card"
+import { CreateTaskDialog } from "./create-task-dialog"
+import type { Task } from "@prisma/client"
+import { z } from 'zod'
+
+const columnSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+})
+type Column = z.infer<typeof columnSchema>
+
+interface BoardColumnProps {
+    column: Column;
+    tasks: Task[];
+    projectId: string;
+}
+
+export function BoardColumn({ column, tasks, projectId }: BoardColumnProps) {
+    const tasksInColumn = tasks.filter(task => task.columnId === column.id);
+
+    return (
+        <div className="w-80 shrink-0 flex flex-col bg-secondary/50 rounded-xl h-full max-h-full">
+            {/* Column Header */}
+            <div className="p-4 font-semibold text-white flex items-center justify-between border-b border-white/10">
+                <div className="flex items-center gap-2">
+                    <span>{column.title}</span>
+                    <Badge variant="secondary" className="bg-white/10">{tasksInColumn.length}</Badge>
+                </div>
+                <CreateTaskDialog projectId={projectId} columnId={column.id} />
+            </div>
+            {/* Task List */}
+            <div className="flex-1 overflow-y-auto flex flex-col gap-3 mt-4 px-4 pb-4">
+                {tasksInColumn.map(task => (
+                    <TaskCard key={task.id} task={task} />
+                ))}
+                {tasksInColumn.length === 0 && (
+                    <div className="flex-1 flex items-center justify-center text-sm text-slate-500">
+                        <p>No tasks yet.</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}

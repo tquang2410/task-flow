@@ -6,14 +6,25 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 19/11/2025
 
-### Task đang thực hiện: Epic 2 - Quản lý Workspace & Dự án
+### Task đang thực hiện: Epic 3 - Quản lý Task & Kanban Board
 
--   **[Hoàn thành]** Bước 2.7: Implement "Ultra-Modern" Dashboard UI.
-    -   `src/app/app/layout.tsx`: Tạo layout mới cho khu vực `/app` với theme tối, bao gồm Sidebar cho desktop và Header/Sheet menu cho mobile.
-    -   `src/app/app/page.tsx`: Tái cấu trúc và thiết kế lại hoàn toàn trang dashboard chính với giao diện Bento Grid, Dark Mode, và hiển thị danh sách workspace theo phong cách mới.
+-   **[Hoàn thành]** Bước 3.1: Implement Kanban Task Management.
+    -   `src/app/actions.ts`: Thêm server action `createTask` với logic tính toán `order`.
+    -   `src/components/kanban/task-card.tsx`: Tạo component thẻ Task và áp dụng style chi tiết (hover, cursor, badge).
+    -   `src/components/kanban/create-task-dialog.tsx`: Tạo component dialog form để tạo task mới.
+    -   `src/components/kanban/board-column.tsx`: Tạo component Cột và áp dụng style chi tiết (kích thước, màu nền, cuộn dọc).
+    -   `src/app/app/project/[id]/page.tsx`: Tái cấu trúc trang project để sử dụng các component Kanban mới, render đúng danh sách task trong từng cột.
 
 ### Task đã hoàn thành
 
+-   **[Hoàn thành]** Bước 2.8: Implement Project Detail Page Skeleton.
+    -   `src/app/app/project/[id]/page.tsx`: Tạo trang chi tiết project động, là một Server Component.
+    -   Implement logic lấy dữ liệu project, kiểm tra quyền truy cập của user.
+    -   Xây dựng giao diện ban đầu bao gồm Breadcrumb, Header, và hệ thống Tabs (`Board`, `List`, `Settings`).
+    -   Dựng sườn cho bảng Kanban trong tab "Board", hiển thị các cột (column) từ dữ liệu JSON của project.
+-   **[Hoàn thành]** Bước 2.7: Implement "Ultra-Modern" Dashboard UI.
+    -   `src/app/app/layout.tsx`: Tạo layout mới cho khu vực `/app` với theme tối, bao gồm Sidebar cho desktop và Header/Sheet menu cho mobile.
+    -   `src/app/app/page.tsx`: Tái cấu trúc và thiết kế lại hoàn toàn trang dashboard chính với giao diện Bento Grid, Dark Mode, và hiển thị danh sách workspace theo phong cách mới.
 -   **[Hoàn thành]** Bước 2.6: Refactor Dashboard to Server Component.
     -   `src/components/dashboard-header.tsx`: Tách phần header (vốn là client-side) ra một component riêng để giữ lại logic logout.
     -   `src/app/app/page.tsx`: Chuyển đổi trang dashboard chính thành Server Component, thực hiện lấy dữ liệu workspace và render danh sách ngay trên server.

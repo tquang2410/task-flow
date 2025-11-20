@@ -2,8 +2,8 @@
 
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { CreateProjectSchema, CreateWorkspaceSchema } from '@/lib/schemas'
-import { db } from '@/lib/db' // Đã import đúng là 'db'
+import { CreateProjectSchema, CreateTaskSchema, CreateWorkspaceSchema } from '@/lib/schemas'
+import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 
 // Định nghĩa kiểu trả về chung cho Server Action
@@ -26,9 +26,8 @@ type CreateWorkspaceInput = z.infer<typeof CreateWorkspaceSchema>
  */
 export async function createWorkspace(
     input: CreateWorkspaceInput,
-): Promise<ActionResponse<Awaited<ReturnType<typeof db.workspace.create>>>> { // Sửa prisma -> db
-                                                                              // 1. **Authentication**: Lấy thông tin người dùng từ Supabase
-  const supabase = await createClient() // createClient là hàm async
+): Promise<ActionResponse<Awaited<ReturnType<typeof db.workspace.create>>>> {
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
@@ -38,7 +37,6 @@ export async function createWorkspace(
     }
   }
 
-  // 2. **Validation**: Kiểm tra dữ liệu đầu vào với Zod schema
   const validationResult = CreateWorkspaceSchema.safeParse(input)
   if (!validationResult.success) {
     const fieldErrors: Record<string, string> = {}
@@ -58,9 +56,7 @@ export async function createWorkspace(
   const { id: supabaseId } = user
 
   try {
-    // 3. **Database Logic**:
-    // Tìm user trong CSDL MongoDB bằng `supabaseId` để lấy `id` nội bộ (ObjectId)
-    const appUser = await db.user.findUnique({ // Sửa prisma -> db
+    const appUser = await db.user.findUnique({
       where: { supabaseId },
       select: { id: true },
     })
@@ -72,8 +68,7 @@ export async function createWorkspace(
       }
     }
 
-    // Tạo Workspace mới và tự động thêm User hiện tại vào danh sách `members`
-    const newWorkspace = await db.workspace.create({ // Sửa prisma -> db
+    const newWorkspace = await db.workspace.create({
       data: {
         name,
         members: {
@@ -84,10 +79,8 @@ export async function createWorkspace(
       },
     })
 
-    // 4. **Revalidation**: Cập nhật lại cache
     revalidatePath('/')
 
-    // 5. **Response**: Trả về kết quả thành công
     return {
       status: 'success',
       data: newWorkspace,
@@ -110,16 +103,14 @@ type CreateProjectInput = z.infer<typeof CreateProjectSchema>
  */
 export async function createProject(
     input: CreateProjectInput,
-): Promise<ActionResponse<Awaited<ReturnType<typeof db.project.create>>>> { // Sửa prisma -> db
-                                                                            // 1. **Authentication**
-  const supabase = await createClient() // createClient là hàm async
+): Promise<ActionResponse<Awaited<ReturnType<typeof db.project.create>>>> {
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
     return { status: 'error', message: 'Xác thực thất bại: Người dùng chưa đăng nhập.' }
   }
 
-  // 2. **Validation**
   const validationResult = CreateProjectSchema.safeParse(input)
   if (!validationResult.success) {
     const fieldErrors: Record<string, string> = {}
@@ -132,8 +123,7 @@ export async function createProject(
   const { name, workspaceId } = validationResult.data
 
   try {
-    // 3. **Authorization**: Kiểm tra user có phải là thành viên của workspace không
-    const appUser = await db.user.findUnique({ // Sửa prisma -> db
+    const appUser = await db.user.findUnique({
       where: { supabaseId: user.id },
       select: { id: true },
     })
@@ -142,35 +132,31 @@ export async function createProject(
       return { status: 'error', message: 'Người dùng không tồn tại trong hệ thống.' }
     }
 
-    const workspace = await db.workspace.findUnique({ // Sửa prisma -> db
+    const workspace = await db.workspace.findUnique({
       where: { id: workspaceId },
       select: { memberIds: true },
     })
 
-    // Kiểm tra quyền thành viên
     if (!workspace || !workspace.memberIds.includes(appUser.id)) {
       return { status: 'error', message: 'Không có quyền: Bạn không phải là thành viên của workspace này.' }
     }
 
-    // 4. **Database Logic**: Tạo project mới với cột mặc định
     const defaultColumns = [
       { id: 'column-1', title: 'To Do' },
       { id: 'column-2', title: 'In Progress' },
       { id: 'column-3', title: 'Done' },
     ]
 
-    const newProject = await db.project.create({ // Sửa prisma -> db
+    const newProject = await db.project.create({
       data: {
         name,
         workspaceId,
-        columns: defaultColumns, // Lưu dưới dạng Json
+        columns: defaultColumns,
       },
     })
 
-    // 5. **Revalidation**
     revalidatePath(`/app/workspace/${workspaceId}`)
 
-    // 6. **Response**
     return {
       status: 'success',
       data: newProject,
@@ -181,5 +167,70 @@ export async function createProject(
       status: 'error',
       message: 'Đã xảy ra lỗi không mong muốn từ máy chủ.',
     }
+  }
+}
+
+// --- Epic 3: Task Management ---
+
+type CreateTaskInput = z.infer<typeof CreateTaskSchema>
+
+export async function createTask(
+  input: CreateTaskInput
+): Promise<ActionResponse<Awaited<ReturnType<typeof db.task.create>>>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { status: "error", message: "Unauthorized" };
+  }
+  
+  const validationResult = CreateTaskSchema.safeParse(input);
+  if (!validationResult.success) {
+    return { status: "error", message: "Invalid data" };
+  }
+
+  const { title, projectId, columnId } = validationResult.data;
+
+  try {
+    // AuthZ check can be added here if needed (e.g., is user part of the project)
+
+    // Find the highest order in the target column
+    const maxOrderTask = await db.task.findFirst({
+      where: {
+        projectId,
+        columnId,
+      },
+      orderBy: {
+        order: 'desc',
+      },
+      select: {
+        order: true,
+      },
+    });
+
+    const newOrder = (maxOrderTask?.order ?? -1) + 1;
+
+    const newTask = await db.task.create({
+      data: {
+        title,
+        projectId,
+        columnId,
+        order: newOrder,
+        reporterId: user.id, // Associate the task with the creator
+      },
+    });
+
+    revalidatePath(`/app/project/${projectId}`);
+
+    return {
+      status: 'success',
+      data: newTask,
+    };
+  } catch (error) {
+    console.error("Error creating task:", error);
+    return {
+      status: 'error',
+      message: 'Failed to create task.',
+    };
   }
 }
