@@ -41,11 +41,12 @@ import {
 } from '@/components/ui/form'
 import { Separator } from '@/components/ui/separator'
 import { CommentSection } from './comment-section'
+import { AttachmentList } from './attachment-list'
 
-import { type TaskWithComments } from '@/types/prisma'
+import { type TaskWithDetails } from '@/types/prisma'
 
 interface TaskDetailSheetProps {
-  task: TaskWithComments
+  task: TaskWithDetails
   isOpen: boolean
   onClose: () => void
   currentUser: User | null
@@ -215,6 +216,12 @@ export function TaskDetailSheet({ task, isOpen, onClose, currentUser }: TaskDeta
                 </SheetFooter>
             </form>
             </Form>
+            <Separator className="my-6 bg-slate-800" />
+            <AttachmentList
+                taskId={task.id}
+                initialAttachments={task.attachments}
+                currentUser={currentUser}
+            />
             <Separator className="my-6 bg-slate-800" />
             <CommentSection 
                 taskId={task.id}

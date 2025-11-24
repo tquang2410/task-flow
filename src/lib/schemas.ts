@@ -61,3 +61,15 @@ export const CreateCommentSchema = z.object({
 export const DeleteCommentSchema = z.object({
     commentId: z.string(),
 });
+
+// Schema cho việc upload một Attachment
+export const UploadAttachmentSchema = z.object({
+    taskId: z.string(),
+    formData: z.instanceof(FormData),
+});
+
+// Schema cho việc xóa một Attachment
+export const DeleteAttachmentSchema = z.object({
+    attachmentId: z.string(),
+    path: z.string(), // Path in Supabase storage
+});

@@ -41,7 +41,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     db.project.findUnique({
       where: { id: id },
       include: {
-        tasks: { 
+        tasks: {
           orderBy: { order: 'asc' },
           include: {
             comments: {
@@ -50,6 +50,11 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
               },
               orderBy: {
                 createdAt: 'asc' // Show oldest comments first
+              }
+            },
+            attachments: {
+              include: {
+                uploader: true // Include the user who uploaded the file
               }
             }
           }

@@ -6,12 +6,12 @@ import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Priority, User } from "@prisma/client";
-import { type TaskWithComments } from "@/types/prisma";
+import { type TaskWithDetails } from "@/types/prisma";
 import { cn } from "@/lib/utils";
 import { TaskDetailSheet } from "./task-detail-sheet";
 
 interface TaskCardProps {
-  task: TaskWithComments;
+  task: TaskWithDetails;
   currentUser: User;
 }
 

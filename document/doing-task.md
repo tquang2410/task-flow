@@ -8,6 +8,15 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ### Task đang thực hiện: Epic 3 - Quản lý Task & Kanban Board
 
+-   **[Hoàn thành]** Bước 3.4: Implement Task Attachments.
+    -   `src/lib/schemas.ts`: Thêm các Zod schema cho việc upload và xóa file.
+    -   `src/app/actions.ts`: Thêm hai server action `uploadAttachment` và `deleteAttachment` để xử lý logic với Supabase Storage và CSDL.
+    -   `src/app/app/project/[id]/page.tsx`: Cập nhật câu query để lấy kèm danh sách `attachments` của task.
+    -   `src/components/kanban/attachment-list.tsx`: Tạo component client để hiển thị danh sách file, xử lý logic upload và xóa.
+    -   `src/components/kanban/task-detail-sheet.tsx`: Tích hợp `AttachmentList` vào giao diện chi tiết task.
+
+### Task đã hoàn thành
+
 -   **[Hoàn thành]** Bước 3.3: Implement Task Detail, Edit & Comments.
     -   Cài đặt các component shadcn và thư viện `date-fns` cần thiết.
     -   `src/lib/schemas.ts`: Thêm `UpdateTaskSchema`, `CreateCommentSchema`, `DeleteCommentSchema`.
@@ -15,10 +24,7 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
     -   `src/components/kanban/comment-section.tsx`: Tạo component client để hiển thị và tạo bình luận mới với `useOptimistic`.
     -   `src/components/kanban/task-detail-sheet.tsx`: Tạo component Sheet chứa form chỉnh sửa chi tiết task và tích hợp `CommentSection`.
     -   Cập nhật luồng dữ liệu từ page xuống các component con để truyền `comments` và `currentUser`.
-    -   `src/types/prisma.ts`: Tạo file type chung `TaskWithComments` để giải quyết lỗi type mismatch và đồng bộ hóa dữ liệu.
-
-### Task đã hoàn thành
-
+    -   `src/types/prisma.ts`: Tạo file type chung `TaskWithDetails` để giải quyết lỗi type mismatch và đồng bộ hóa dữ liệu.
 -   **[Hoàn thành]** Bước 3.2: Implement Kanban Drag & Drop.
     -   `src/app/actions.ts`: Thêm server action `moveTask` để cập nhật vị trí và cột của task trong CSDL.
     -   `src/components/kanban/task-card.tsx`: Tái cấu trúc để sử dụng hook `useSortable` của dnd-kit.

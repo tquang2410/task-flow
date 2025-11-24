@@ -115,6 +115,31 @@ Format:
 
 ---
 
+## Debugging & Bug Fixing Protocol (The "Sherlock Holmes" Method)
+
+Khi được yêu cầu sửa lỗi (Bug Fix), hãy tuân thủ nghiêm ngặt quy trình 5 bước sau thay vì đoán mò:
+
+1.  **Log Trace (Đặt bẫy):**
+    * Thêm `console.log` hoặc `console.error` tại các điểm chốt chặn (Key points): Đầu vào Server Action, Kết quả Query Database, Props của Client Component.
+    * *Lưu ý:* Ghi rõ nhãn để dễ đọc (VD: `console.log('[ServerAction:createTask] Input:', input)`).
+
+2.  **Reproduce & Verify (Tái hiện):**
+    * Vì dự án chưa có Unit Test tự động, hãy hướng dẫn User cách tái hiện lỗi trên UI hoặc chạy `npm run build` để kiểm tra lỗi Type/Build.
+    * Phân tích log để xác định nguyên nhân gốc rễ (Root cause).
+
+3.  **Fix & Patch (Sửa chữa):**
+    * Thực hiện sửa code dựa trên dữ liệu log đã thu thập.
+    * Nếu lỗi liên quan đến Logic phức tạp, hãy comment giải thích tại sao sửa như vậy.
+
+4.  **Re-Verify (Kiểm tra lại):**
+    * Yêu cầu User kiểm tra lại luồng (Flow) hoặc build lại để xác nhận lỗi đã hết.
+    * Nếu vẫn lỗi: Quay lại bước 1 với logging chi tiết hơn.
+
+5.  **Cleanup (Dọn dẹp):**
+    * **BẮT BUỘC:** Sau khi confirm đã fix xong, hãy nhắc nhở hoặc tự động xóa bỏ các dòng `console.log` tạm thời để giữ code sạch (Production Ready).
+
+---
+
 ## Code Standards
 
 ### TypeScript

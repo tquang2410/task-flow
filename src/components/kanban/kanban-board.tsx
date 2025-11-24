@@ -16,7 +16,7 @@ import { arrayMove } from "@dnd-kit/sortable"
 import { toast } from "sonner"
 
 import type { Project, User } from "@prisma/client"
-import { type TaskWithComments } from "@/types/prisma"
+import { type TaskWithDetails } from "@/types/prisma"
 import { BoardColumn } from "./board-column"
 import { TaskCard } from "./task-card"
 import { moveTask } from "@/app/actions"
@@ -27,7 +27,7 @@ type Column = {
 }
 
 interface KanbanBoardProps {
-  initialProject: Project & { tasks: TaskWithComments[] };
+  initialProject: Project & { tasks: TaskWithDetails[] };
   currentUser: User;
 }
 
@@ -40,7 +40,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
     }
   });
   const [tasks, setTasks] = useState(initialProject.tasks)
-  const [activeTask, setActiveTask] = useState<TaskWithComments | null>(null)
+  const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -52,7 +52,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
 
   function onDragStart(event: DragStartEvent) {
     if (event.active.data.current?.type === "Task") {
-      setActiveTask(event.active.data.current.task as TaskWithComments)
+      setActiveTask(event.active.data.current.task as TaskWithDetails)
     }
   }
 

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { TaskCard } from "./task-card"
 import { CreateTaskDialog } from "./create-task-dialog"
 import type { User } from "@prisma/client"
-import { type TaskWithComments } from "@/types/prisma"
+import { type TaskWithDetails } from "@/types/prisma"
 
 // Define Column type directly to avoid unused schema variables
 type Column = {
@@ -16,7 +16,7 @@ type Column = {
 
 interface BoardColumnProps {
     column: Column;
-    tasks: TaskWithComments[];
+    tasks: TaskWithDetails[];
     projectId: string;
     currentUser: User;
 }
