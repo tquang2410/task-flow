@@ -1,5 +1,3 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -7,7 +5,7 @@ import { useState } from 'react'
 import { CalendarIcon, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
-import type { Task, Priority } from '@prisma/client'
+import { Priority, type User } from '@prisma/client'
 
 import { cn } from '@/lib/utils'
 import { UpdateTaskSchema } from '@/lib/schemas'

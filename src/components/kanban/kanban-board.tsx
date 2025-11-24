@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import { createPortal } from "react-dom"
 import {
   DndContext,
   DragEndEvent,
@@ -12,28 +13,13 @@ import {
   DragOverlay,
 } from "@dnd-kit/core"
 import { arrayMove } from "@dnd-kit/sortable"
-import { createPortal } from "react-dom"
-
-import { useState } from "react"
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverEvent,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-} from "@dnd-kit/core"
-import { arrayMove } from "@dnd-kit/sortable"
-import { createPortal } from "react-dom"
+import { toast } from "sonner"
 
 import type { Project, User } from "@prisma/client"
 import { type TaskWithComments } from "@/types/prisma"
 import { BoardColumn } from "./board-column"
 import { TaskCard } from "./task-card"
 import { moveTask } from "@/app/actions"
-import { toast } from "sonner"
 
 type Column = {
   id: string;
@@ -136,7 +122,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
             projectId: initialProject.id,
         });
         toast.success("Task moved successfully.");
-    } catch (_error) {
+    } catch {
         toast.error("Failed to move task. Reverting.");
         // Revert to initial state on failure
         setTasks(initialProject.tasks);
