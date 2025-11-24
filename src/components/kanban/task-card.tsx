@@ -5,12 +5,18 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Task, Priority } from "@prisma/client";
+import type { Task, Priority, User, Comment } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { TaskDetailSheet } from "./task-detail-sheet";
 
+// Define a more detailed Task type for props
+type TaskWithComments = Task & {
+  comments: (Comment & { user: User })[];
+};
+
 interface TaskCardProps {
-  task: Task;
+  task: TaskWithComments;
+  currentUser: User;
 }
 
 const priorityStyles: Record<Priority, string> = {
@@ -19,7 +25,7 @@ const priorityStyles: Record<Priority, string> = {
   HIGH: "bg-red-500/20 text-red-400 border-red-500/30",
 };
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ task, currentUser }: TaskCardProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const {
@@ -42,11 +48,7 @@ export function TaskCard({ task }: TaskCardProps) {
     transform: CSS.Transform.toString(transform),
   };
 
-  // We need to separate the drag listeners from the onClick event.
-  // The listeners will be applied to a specific drag handle.
-  // For now, let's apply onClick to the whole card and see if the sensor constraint is enough.
   const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent event from bubbling up to dnd-kit listeners if it's a simple click
     e.stopPropagation();
     setIsSheetOpen(true);
   }
@@ -83,6 +85,7 @@ export function TaskCard({ task }: TaskCardProps) {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         task={task}
+        currentUser={currentUser}
       />
     </>
   );

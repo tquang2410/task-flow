@@ -51,4 +51,13 @@ export const UpdateTaskSchema = z.object({
     dueDate: z.date().optional().nullable(),
 });
 
-// (Chúng ta sẽ thêm các schema khác như CreateComment... vào đây sau)
+// Schema cho việc tạo một Comment
+export const CreateCommentSchema = z.object({
+    taskId: z.string(),
+    text: z.string().min(1, { message: "Comment cannot be empty." }),
+});
+
+// Schema cho việc xóa một Comment
+export const DeleteCommentSchema = z.object({
+    commentId: z.string(),
+});

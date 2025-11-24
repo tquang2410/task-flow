@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { CreateProjectSchema, CreateTaskSchema, CreateWorkspaceSchema, UpdateTaskSchema } from '@/lib/schemas'
+import { CreateProjectSchema, CreateTaskSchema, CreateWorkspaceSchema, UpdateTaskSchema, CreateCommentSchema, DeleteCommentSchema } from '@/lib/schemas'
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 
@@ -362,4 +362,98 @@ export async function deleteTask(
     console.error("Error deleting task:", error);
     return { status: 'error', message: 'Failed to delete task.' };
   }
+}
+
+// --- Epic 3: Comment Management ---
+
+type CreateCommentInput = z.infer<typeof CreateCommentSchema>;
+
+export async function createComment(
+  input: CreateCommentInput
+): Promise<ActionResponse<Awaited<ReturnType<typeof db.comment.create>>>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { status: "error", message: "Unauthorized" };
+  }
+
+  const validationResult = CreateCommentSchema.safeParse(input);
+  if (!validationResult.success) {
+    return { status: "error", message: "Invalid data" };
+  }
+
+  const { taskId, text } = validationResult.data;
+
+  try {
+    const task = await db.task.findUnique({
+        where: { id: taskId },
+        select: { projectId: true }
+    });
+
+    if (!task) {
+        return { status: 'error', message: 'Task not found.' };
+    }
+
+    const newComment = await db.comment.create({
+      data: {
+        text,
+        taskId,
+        userId: user.id,
+      },
+    });
+
+    revalidatePath(`/app/project/${task.projectId}`);
+
+    return { status: 'success', data: newComment };
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    return { status: 'error', message: 'Failed to create comment.' };
+  }
+}
+
+type DeleteCommentInput = z.infer<typeof DeleteCommentSchema>;
+
+export async function deleteComment(
+    input: DeleteCommentInput
+): Promise<ActionResponse<string>> {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { status: "error", message: "Unauthorized" };
+    }
+
+    const validationResult = DeleteCommentSchema.safeParse(input);
+    if (!validationResult.success) {
+        return { status: "error", message: "Invalid data" };
+    }
+
+    const { commentId } = validationResult.data;
+
+    try {
+        const comment = await db.comment.findUnique({
+            where: { id: commentId },
+            select: { userId: true, task: { select: { projectId: true } } },
+        });
+
+        if (!comment) {
+            return { status: 'error', message: 'Comment not found.' };
+        }
+
+        if (comment.userId !== user.id) {
+            return { status: 'error', message: 'You are not authorized to delete this comment.' };
+        }
+
+        await db.comment.delete({
+            where: { id: commentId },
+        });
+
+        revalidatePath(`/app/project/${comment.task.projectId}`);
+
+        return { status: 'success', data: "Comment deleted successfully." };
+    } catch (error) {
+        console.error("Error deleting comment:", error);
+        return { status: 'error', message: 'Failed to delete comment.' };
+    }
 }

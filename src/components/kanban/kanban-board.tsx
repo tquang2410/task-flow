@@ -14,7 +14,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable"
 import { createPortal } from "react-dom"
 
-import type { Project, Task } from "@prisma/client"
+import type { Project, Task, User } from "@prisma/client"
 import { BoardColumn } from "./board-column"
 import { TaskCard } from "./task-card"
 import { moveTask } from "@/app/actions"
@@ -26,10 +26,11 @@ type Column = {
 }
 
 interface KanbanBoardProps {
-  initialProject: Project & { tasks: Task[] }
+  initialProject: Project & { tasks: Task[] };
+  currentUser: User;
 }
 
-export function KanbanBoard({ initialProject }: KanbanBoardProps) {
+export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   const [columns] = useState<Column[]>(() => {
     // This is a safe way to parse JSON from Prisma
     try {
@@ -142,12 +143,13 @@ export function KanbanBoard({ initialProject }: KanbanBoardProps) {
             column={col}
             tasks={tasks}
             projectId={initialProject.id}
+            currentUser={currentUser}
           />
         ))}
         {createPortal(
           <DragOverlay>
             {activeTask && (
-              <TaskCard task={activeTask} />
+              <TaskCard task={activeTask} currentUser={currentUser} />
             )}
           </DragOverlay>,
           document.body

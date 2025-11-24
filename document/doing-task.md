@@ -8,12 +8,13 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ### Task đang thực hiện: Epic 3 - Quản lý Task & Kanban Board
 
--   **[Hoàn thành]** Bước 3.3: Implement Task Detail & Edit Feature.
-    -   `npm install date-fns` và cài đặt các component shadcn: `sheet`, `select`, `textarea`, `calendar`, `popover`.
-    -   `src/lib/schemas.ts`: Thêm `UpdateTaskSchema` để validate dữ liệu cập nhật.
-    -   `src/app/actions.ts`: Thêm hai server action `updateTask` và `deleteTask`.
-    -   `src/components/kanban/task-detail-sheet.tsx`: Tạo component Sheet lớn chứa form chỉnh sửa chi tiết task (title, description, priority, due date).
-    -   `src/components/kanban/task-card.tsx`: Cập nhật lại để tích hợp, khi click vào card sẽ mở `TaskDetailSheet`.
+-   **[Hoàn thành]** Bước 3.3: Implement Task Detail, Edit & Comments.
+    -   Cài đặt các component shadcn và thư viện `date-fns` cần thiết.
+    -   `src/lib/schemas.ts`: Thêm `UpdateTaskSchema`, `CreateCommentSchema`, `DeleteCommentSchema`.
+    -   `src/app/actions.ts`: Thêm các server action `updateTask`, `deleteTask`, `createComment`, `deleteComment`.
+    -   `src/components/kanban/comment-section.tsx`: Tạo component client để hiển thị và tạo bình luận mới với `useOptimistic`.
+    -   `src/components/kanban/task-detail-sheet.tsx`: Tạo component Sheet chứa form chỉnh sửa chi tiết task và tích hợp `CommentSection`.
+    -   Cập nhật luồng dữ liệu từ page xuống các component con để truyền `comments` và `currentUser`.
 
 ### Task đã hoàn thành
 

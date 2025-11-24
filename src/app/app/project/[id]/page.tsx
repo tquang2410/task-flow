@@ -35,12 +35,25 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     return redirect('/auth')
   }
 
+  // Fetch both the app user (full object) and the project in parallel
   const [appUser, project] = await Promise.all([
-    db.user.findUnique({ where: { supabaseId: user.id }, select: { id: true } }),
+    db.user.findUnique({ where: { supabaseId: user.id } }),
     db.project.findUnique({
-      where: { id: id }, // Use the awaited id
+      where: { id: id },
       include: {
-        tasks: { orderBy: { order: 'asc' } },
+        tasks: { 
+          orderBy: { order: 'asc' },
+          include: {
+            comments: {
+              include: {
+                user: true // Include the user who made the comment
+              },
+              orderBy: {
+                createdAt: 'asc' // Show oldest comments first
+              }
+            }
+          }
+        },
         workspace: { select: { id: true, name: true, memberIds: true } },
       },
     }),
@@ -111,7 +124,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
 
         {/* Board Content is now handled by the client component */}
         <TabsContent value="board" className="flex-grow overflow-hidden">
-            <KanbanBoard initialProject={project} />
+            <KanbanBoard initialProject={project} currentUser={appUser} />
         </TabsContent>
         <TabsContent value="list">List view coming soon...</TabsContent>
         <TabsContent value="timeline">Timeline view coming soon...</TabsContent>

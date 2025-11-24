@@ -5,7 +5,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Badge } from "@/components/ui/badge"
 import { TaskCard } from "./task-card"
 import { CreateTaskDialog } from "./create-task-dialog"
-import type { Task } from "@prisma/client"
+import type { Task, User } from "@prisma/client"
 
 // Define Column type directly to avoid unused schema variables
 type Column = {
@@ -17,9 +17,10 @@ interface BoardColumnProps {
     column: Column;
     tasks: Task[];
     projectId: string;
+    currentUser: User;
 }
 
-export function BoardColumn({ column, tasks, projectId }: BoardColumnProps) {
+export function BoardColumn({ column, tasks, projectId, currentUser }: BoardColumnProps) {
     const tasksInColumn = tasks.filter(task => task.columnId === column.id);
     const taskIds = tasksInColumn.map(task => task.id);
 
@@ -45,7 +46,7 @@ export function BoardColumn({ column, tasks, projectId }: BoardColumnProps) {
             <div className="flex-1 overflow-y-auto flex flex-col gap-3 mt-4 px-4 pb-4">
                 <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
                     {tasksInColumn.map(task => (
-                        <TaskCard key={task.id} task={task} />
+                        <TaskCard key={task.id} task={task} currentUser={currentUser} />
                     ))}
                 </SortableContext>
                 {tasksInColumn.length === 0 && (
