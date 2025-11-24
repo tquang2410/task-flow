@@ -38,7 +38,7 @@ export async function uploadAttachment(
   const filePath = `${user.id}/${taskId}/${Date.now()}-${file.name}`;
 
   const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('attachments')
+    .from('ATTACHMENTS')
     .upload(filePath, file);
 
   if (uploadError) {
@@ -47,7 +47,7 @@ export async function uploadAttachment(
   }
 
   const { data: { publicUrl } } = supabase.storage
-    .from('attachments')
+    .from('ATTACHMENTS')
     .getPublicUrl(filePath);
 
   try {
