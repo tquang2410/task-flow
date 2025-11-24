@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import {
   DndContext,
   DragEndEvent,
@@ -15,32 +15,31 @@ import { arrayMove } from "@dnd-kit/sortable"
 import { createPortal } from "react-dom"
 
 import type { Project, Task } from "@prisma/client"
-import { z } from "zod"
-
 import { BoardColumn } from "./board-column"
 import { TaskCard } from "./task-card"
 import { moveTask } from "@/app/actions"
 import { toast } from "sonner"
 
-const columnSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-})
-type Column = z.infer<typeof columnSchema>
+type Column = {
+  id: string;
+  title: string;
+}
 
 interface KanbanBoardProps {
   initialProject: Project & { tasks: Task[] }
 }
 
 export function KanbanBoard({ initialProject }: KanbanBoardProps) {
-  const [columns, setColumns] = useState<Column[]>(() => {
-    const parsed = z.array(columnSchema).safeParse(initialProject.columns);
-    return parsed.success ? parsed.data : [];
+  const [columns] = useState<Column[]>(() => {
+    // This is a safe way to parse JSON from Prisma
+    try {
+      return JSON.parse(initialProject.columns as string) as Column[];
+    } catch (_e) {
+      return [];
+    }
   });
   const [tasks, setTasks] = useState(initialProject.tasks)
   const [activeTask, setActiveTask] = useState<Task | null>(null)
-
-  const columnsId = useMemo(() => columns.map((col) => col.id), [columns])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -122,7 +121,7 @@ export function KanbanBoard({ initialProject }: KanbanBoardProps) {
             projectId: initialProject.id,
         });
         toast.success("Task moved successfully.");
-    } catch (error) {
+    } catch (_error) {
         toast.error("Failed to move task. Reverting.");
         // Revert to initial state on failure
         setTasks(initialProject.tasks);

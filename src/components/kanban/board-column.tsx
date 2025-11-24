@@ -6,13 +6,12 @@ import { Badge } from "@/components/ui/badge"
 import { TaskCard } from "./task-card"
 import { CreateTaskDialog } from "./create-task-dialog"
 import type { Task } from "@prisma/client"
-import { z } from 'zod'
 
-const columnSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-})
-type Column = z.infer<typeof columnSchema>
+// Define Column type directly to avoid unused schema variables
+type Column = {
+  id: string;
+  title: string;
+}
 
 interface BoardColumnProps {
     column: Column;

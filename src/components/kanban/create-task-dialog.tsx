@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { PlusCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -34,7 +33,6 @@ interface CreateTaskDialogProps {
 }
 
 export function CreateTaskDialog({ projectId, columnId }: CreateTaskDialogProps) {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 

@@ -21,8 +21,13 @@ import {
 import { KanbanBoard } from '@/components/kanban/kanban-board'
 import { PlusCircle, Share } from 'lucide-react'
 
-export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+interface ProjectDetailPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   // 1. DATA FETCHING
+  const { id } = await params; // Await params to get the id
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -33,7 +38,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
   const [appUser, project] = await Promise.all([
     db.user.findUnique({ where: { supabaseId: user.id }, select: { id: true } }),
     db.project.findUnique({
-      where: { id: params.id },
+      where: { id: id }, // Use the awaited id
       include: {
         tasks: { orderBy: { order: 'asc' } },
         workspace: { select: { id: true, name: true, memberIds: true } },
