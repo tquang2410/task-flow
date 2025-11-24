@@ -192,9 +192,6 @@ export async function createTask(
   const { title, projectId, columnId } = validationResult.data;
 
   try {
-    // AuthZ check can be added here if needed (e.g., is user part of the project)
-
-    // Find the highest order in the target column
     const maxOrderTask = await db.task.findFirst({
       where: {
         projectId,
@@ -233,4 +230,56 @@ export async function createTask(
       message: 'Failed to create task.',
     };
   }
+}
+
+const MoveTaskSchema = z.object({
+  taskId: z.string(),
+  newColumnId: z.string(),
+  newOrder: z.number().min(0),
+  projectId: z.string(),
+});
+
+type MoveTaskInput = z.infer<typeof MoveTaskSchema>
+
+export async function moveTask(
+  input: MoveTaskInput
+): Promise<ActionResponse<Awaited<ReturnType<typeof db.task.update>>>> {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { status: "error", message: "Unauthorized" };
+    }
+
+    const validationResult = MoveTaskSchema.safeParse(input);
+    if (!validationResult.success) {
+        return { status: "error", message: "Invalid data" };
+    }
+
+    const { taskId, newColumnId, newOrder, projectId } = validationResult.data;
+
+    try {
+        const updatedTask = await db.task.update({
+            where: {
+                id: taskId,
+            },
+            data: {
+                columnId: newColumnId,
+                order: newOrder,
+            },
+        });
+
+        revalidatePath(`/app/project/${projectId}`);
+
+        return {
+            status: 'success',
+            data: updatedTask,
+        };
+    } catch (error) {
+        console.error("Error moving task:", error);
+        return {
+            status: 'error',
+            message: 'Failed to move task.',
+        };
+    }
 }

@@ -1,0 +1,159 @@
+'use client'
+
+import { useState, useMemo } from "react"
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core"
+import { arrayMove } from "@dnd-kit/sortable"
+import { createPortal } from "react-dom"
+
+import type { Project, Task } from "@prisma/client"
+import { z } from "zod"
+
+import { BoardColumn } from "./board-column"
+import { TaskCard } from "./task-card"
+import { moveTask } from "@/app/actions"
+import { toast } from "sonner"
+
+const columnSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+})
+type Column = z.infer<typeof columnSchema>
+
+interface KanbanBoardProps {
+  initialProject: Project & { tasks: Task[] }
+}
+
+export function KanbanBoard({ initialProject }: KanbanBoardProps) {
+  const [columns, setColumns] = useState<Column[]>(() => {
+    const parsed = z.array(columnSchema).safeParse(initialProject.columns);
+    return parsed.success ? parsed.data : [];
+  });
+  const [tasks, setTasks] = useState(initialProject.tasks)
+  const [activeTask, setActiveTask] = useState<Task | null>(null)
+
+  const columnsId = useMemo(() => columns.map((col) => col.id), [columns])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 3, // 3px drag needed to start
+      },
+    })
+  )
+
+  function onDragStart(event: DragStartEvent) {
+    if (event.active.data.current?.type === "Task") {
+      setActiveTask(event.active.data.current.task)
+    }
+  }
+
+  function onDragOver(event: DragOverEvent) {
+    const { active, over } = event
+    if (!over) return
+
+    const activeId = active.id
+    const overId = over.id
+
+    if (activeId === overId) return
+
+    const isActiveATask = active.data.current?.type === "Task"
+    const isOverATask = over.data.current?.type === "Task"
+    const isOverAColumn = over.data.current?.type === "Column"
+
+    // Dropping a Task over another Task (reordering)
+    if (isActiveATask && isOverATask) {
+      setTasks((currentTasks) => {
+        const activeIndex = currentTasks.findIndex((t) => t.id === activeId)
+        const overIndex = currentTasks.findIndex((t) => t.id === overId)
+
+        if (currentTasks[activeIndex].columnId != currentTasks[overIndex].columnId) {
+          currentTasks[activeIndex].columnId = currentTasks[overIndex].columnId
+          return arrayMove(currentTasks, activeIndex, overIndex - 1)
+        }
+
+        return arrayMove(currentTasks, activeIndex, overIndex)
+      })
+    }
+
+    // Dropping a Task over a column (moving to new column)
+    if (isActiveATask && isOverAColumn) {
+        setTasks((currentTasks) => {
+            const activeIndex = currentTasks.findIndex((t) => t.id === activeId);
+            currentTasks[activeIndex].columnId = String(overId);
+            return arrayMove(currentTasks, activeIndex, activeIndex);
+        });
+    }
+  }
+
+  async function onDragEnd(event: DragEndEvent) {
+    setActiveTask(null);
+    const { active, over } = event;
+    if (!over) return;
+  
+    const activeId = active.id;
+    const overId = over.id;
+  
+    if (activeId === overId) return;
+  
+    const activeTask = tasks.find((t) => t.id === activeId);
+    if (!activeTask) return;
+  
+    // Find the final column and order
+    const overColumn = columns.find(c => c.id === over.id) || 
+                       columns.find(c => c.id === over.data.current?.task?.columnId);
+
+    if (!overColumn) return;
+
+    // Call server action
+    try {
+        await moveTask({
+            taskId: activeTask.id,
+            newColumnId: activeTask.columnId, // Optimistically updated in onDragOver
+            newOrder: tasks.filter(t => t.columnId === activeTask.columnId).findIndex(t => t.id === activeId),
+            projectId: initialProject.id,
+        });
+        toast.success("Task moved successfully.");
+    } catch (error) {
+        toast.error("Failed to move task. Reverting.");
+        // Revert to initial state on failure
+        setTasks(initialProject.tasks);
+    }
+  }
+
+  return (
+    <div className="flex gap-6 h-full overflow-x-auto p-1">
+      <DndContext
+        sensors={sensors}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+      >
+        {columns.map((col) => (
+          <BoardColumn
+            key={col.id}
+            column={col}
+            tasks={tasks}
+            projectId={initialProject.id}
+          />
+        ))}
+        {createPortal(
+          <DragOverlay>
+            {activeTask && (
+              <TaskCard task={activeTask} />
+            )}
+          </DragOverlay>,
+          document.body
+        )}
+      </DndContext>
+    </div>
+  )
+}

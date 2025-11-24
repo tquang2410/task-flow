@@ -8,15 +8,21 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ### Task đang thực hiện: Epic 3 - Quản lý Task & Kanban Board
 
+-   **[Hoàn thành]** Bước 3.2: Implement Kanban Drag & Drop.
+    -   `src/app/actions.ts`: Thêm server action `moveTask` để cập nhật vị trí và cột của task trong CSDL.
+    -   `src/components/kanban/task-card.tsx`: Tái cấu trúc để sử dụng hook `useSortable` của dnd-kit.
+    -   `src/components/kanban/board-column.tsx`: Tái cấu trúc để sử dụng hook `useDroppable` và `SortableContext`.
+    -   `src/components/kanban/kanban-board.tsx`: Tạo component client chính chứa toàn bộ logic kéo-thả, quản lý state và xử lý optimistic UI.
+    -   `src/app/app/project/[id]/page.tsx`: Cập nhật để sử dụng component `KanbanBoard` thay cho logic render tĩnh.
+
+### Task đã hoàn thành
+
 -   **[Hoàn thành]** Bước 3.1: Implement Kanban Task Management.
     -   `src/app/actions.ts`: Thêm server action `createTask` với logic tính toán `order`.
     -   `src/components/kanban/task-card.tsx`: Tạo component thẻ Task và áp dụng style chi tiết (hover, cursor, badge).
     -   `src/components/kanban/create-task-dialog.tsx`: Tạo component dialog form để tạo task mới.
     -   `src/components/kanban/board-column.tsx`: Tạo component Cột và áp dụng style chi tiết (kích thước, màu nền, cuộn dọc).
     -   `src/app/app/project/[id]/page.tsx`: Tái cấu trúc trang project để sử dụng các component Kanban mới, render đúng danh sách task trong từng cột.
-
-### Task đã hoàn thành
-
 -   **[Hoàn thành]** Bước 2.8: Implement Project Detail Page Skeleton.
     -   `src/app/app/project/[id]/page.tsx`: Tạo trang chi tiết project động, là một Server Component.
     -   Implement logic lấy dữ liệu project, kiểm tra quyền truy cập của user.

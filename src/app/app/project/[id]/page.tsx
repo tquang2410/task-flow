@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,16 +18,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import { BoardColumn } from '@/components/kanban/board-column'
+import { KanbanBoard } from '@/components/kanban/kanban-board'
 import { PlusCircle, Share } from 'lucide-react'
-import { z } from 'zod'
-
-// Define the type for a column based on our JSON structure
-const columnSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-})
-type Column = z.infer<typeof columnSchema>
 
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
   // 1. DATA FETCHING
@@ -54,10 +45,6 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
   if (!project || !appUser || !project.workspace.memberIds.includes(appUser.id)) {
     return redirect('/app')
   }
-
-  // Safely parse the columns JSON
-  const columnsParse = z.array(columnSchema).safeParse(project.columns)
-  const columns: Column[] = columnsParse.success ? columnsParse.data : []
 
   return (
     <div className="flex flex-col h-full">
@@ -117,26 +104,13 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
-        {/* Board Content */}
+        {/* Board Content is now handled by the client component */}
         <TabsContent value="board" className="flex-grow overflow-hidden">
-          <div className="flex gap-6 h-full overflow-x-auto p-1">
-            {columns.map(column => (
-              <BoardColumn
-                key={column.id}
-                column={column}
-                tasks={project.tasks}
-                projectId={project.id}
-              />
-            ))}
-             {/* Add a new column button */}
-             <div className="w-72 flex-shrink-0">
-                <Button variant="ghost" className="w-full">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Add another column
-                </Button>
-             </div>
-          </div>
+            <KanbanBoard initialProject={project} />
         </TabsContent>
-        <TabsContent value="list">Change your password here.</TabsContent>
+        <TabsContent value="list">List view coming soon...</TabsContent>
+        <TabsContent value="timeline">Timeline view coming soon...</TabsContent>
+        <TabsContent value="settings">Settings coming soon...</TabsContent>
       </Tabs>
     </div>
   )
