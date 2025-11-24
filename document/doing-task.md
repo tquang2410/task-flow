@@ -15,6 +15,7 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
     -   `src/components/kanban/comment-section.tsx`: Tạo component client để hiển thị và tạo bình luận mới với `useOptimistic`.
     -   `src/components/kanban/task-detail-sheet.tsx`: Tạo component Sheet chứa form chỉnh sửa chi tiết task và tích hợp `CommentSection`.
     -   Cập nhật luồng dữ liệu từ page xuống các component con để truyền `comments` và `currentUser`.
+    -   `src/types/prisma.ts`: Tạo file type chung `TaskWithComments` để giải quyết lỗi type mismatch và đồng bộ hóa dữ liệu.
 
 ### Task đã hoàn thành
 

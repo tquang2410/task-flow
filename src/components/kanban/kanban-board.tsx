@@ -14,7 +14,22 @@ import {
 import { arrayMove } from "@dnd-kit/sortable"
 import { createPortal } from "react-dom"
 
-import type { Project, Task, User } from "@prisma/client"
+import { useState } from "react"
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core"
+import { arrayMove } from "@dnd-kit/sortable"
+import { createPortal } from "react-dom"
+
+import type { Project, User } from "@prisma/client"
+import { type TaskWithComments } from "@/types/prisma"
 import { BoardColumn } from "./board-column"
 import { TaskCard } from "./task-card"
 import { moveTask } from "@/app/actions"
@@ -26,21 +41,20 @@ type Column = {
 }
 
 interface KanbanBoardProps {
-  initialProject: Project & { tasks: Task[] };
+  initialProject: Project & { tasks: TaskWithComments[] };
   currentUser: User;
 }
 
 export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   const [columns] = useState<Column[]>(() => {
-    // This is a safe way to parse JSON from Prisma
     try {
       return JSON.parse(initialProject.columns as string) as Column[];
-    } catch (_e) {
+    } catch {
       return [];
     }
   });
   const [tasks, setTasks] = useState(initialProject.tasks)
-  const [activeTask, setActiveTask] = useState<Task | null>(null)
+  const [activeTask, setActiveTask] = useState<TaskWithComments | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -52,7 +66,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
 
   function onDragStart(event: DragStartEvent) {
     if (event.active.data.current?.type === "Task") {
-      setActiveTask(event.active.data.current.task)
+      setActiveTask(event.active.data.current.task as TaskWithComments)
     }
   }
 

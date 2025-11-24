@@ -5,14 +5,10 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Task, Priority, User, Comment } from "@prisma/client";
+import type { Priority, User } from "@prisma/client";
+import { type TaskWithComments } from "@/types/prisma";
 import { cn } from "@/lib/utils";
 import { TaskDetailSheet } from "./task-detail-sheet";
-
-// Define a more detailed Task type for props
-type TaskWithComments = Task & {
-  comments: (Comment & { user: User })[];
-};
 
 interface TaskCardProps {
   task: TaskWithComments;

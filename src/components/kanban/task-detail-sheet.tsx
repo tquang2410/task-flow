@@ -44,10 +44,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { CommentSection } from './comment-section'
 
-// Define a more detailed Task type for props
-type TaskWithComments = Task & {
-  comments: (Comment & { user: User })[];
-};
+import { type TaskWithComments } from '@/types/prisma'
 
 interface TaskDetailSheetProps {
   task: TaskWithComments
