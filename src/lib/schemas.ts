@@ -1,6 +1,7 @@
 // @file: lib/schemas.ts
 
 import { z } from 'zod'; // Import thư viện Zod
+import { Priority } from '@prisma/client';
 
 /**
  * Định nghĩa các quy tắc (schema) để xác thực
@@ -41,4 +42,13 @@ export const CreateTaskSchema = z.object({
     columnId: z.string(),
 });
 
-// (Chúng ta sẽ thêm các schema khác như UpdateTask, CreateComment... vào đây sau)
+// Schema cho việc cập nhật một Task
+export const UpdateTaskSchema = z.object({
+    id: z.string(),
+    title: z.string().min(1, { message: "Title cannot be empty." }).optional(),
+    description: z.string().optional().nullable(),
+    priority: z.nativeEnum(Priority).optional(),
+    dueDate: z.date().optional().nullable(),
+});
+
+// (Chúng ta sẽ thêm các schema khác như CreateComment... vào đây sau)

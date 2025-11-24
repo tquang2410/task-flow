@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { CreateProjectSchema, CreateTaskSchema, CreateWorkspaceSchema } from '@/lib/schemas'
+import { CreateProjectSchema, CreateTaskSchema, CreateWorkspaceSchema, UpdateTaskSchema } from '@/lib/schemas'
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 
@@ -282,4 +282,84 @@ export async function moveTask(
             message: 'Failed to move task.',
         };
     }
+}
+
+type UpdateTaskInput = z.infer<typeof UpdateTaskSchema>
+
+export async function updateTask(
+  input: UpdateTaskInput
+): Promise<ActionResponse<Awaited<ReturnType<typeof db.task.update>>>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' };
+  }
+
+  const validationResult = UpdateTaskSchema.safeParse(input);
+  if (!validationResult.success) {
+    return { status: 'error', message: 'Invalid data' };
+  }
+  
+  const { id, ...dataToUpdate } = validationResult.data;
+
+  try {
+    const task = await db.task.findUnique({
+      where: { id },
+      select: { projectId: true }
+    });
+
+    if (!task) {
+      return { status: 'error', message: 'Task not found.' };
+    }
+
+    const updatedTask = await db.task.update({
+      where: { id: id },
+      data: dataToUpdate,
+    });
+
+    revalidatePath(`/app/project/${task.projectId}`);
+
+    return { status: 'success', data: updatedTask };
+  } catch (error) {
+    console.error("Error updating task:", error);
+    return { status: 'error', message: 'Failed to update task.' };
+  }
+}
+
+const DeleteTaskSchema = z.object({
+    taskId: z.string(),
+    projectId: z.string(),
+});
+type DeleteTaskInput = z.infer<typeof DeleteTaskSchema>;
+
+export async function deleteTask(
+  input: DeleteTaskInput
+): Promise<ActionResponse<string>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' };
+  }
+  
+  const validationResult = DeleteTaskSchema.safeParse(input);
+  if (!validationResult.success) {
+    return { status: "error", message: "Invalid data" };
+  }
+
+  const { taskId, projectId } = validationResult.data;
+
+  try {
+    await db.task.delete({
+      where: { id: taskId },
+    });
+
+    revalidatePath(`/app/project/${projectId}`);
+
+    return { status: 'success', data: "Task deleted successfully." };
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return { status: 'error', message: 'Failed to delete task.' };
+  }
 }
