@@ -152,6 +152,7 @@ model Attachment {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   url  String // URL của file (ví dụ: lưu trên S3, Vercel Blob)
   name String // Tên file gốc
+  path String // Đường dẫn của file trong Supabase Storage
 
   // Một Attachment thuộc về MỘT Task
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)

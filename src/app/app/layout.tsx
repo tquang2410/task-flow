@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { UserProfile } from '@/components/dashboard/user-profile'
+import { Toaster } from 'sonner'
 
 export default async function AppLayout({
   children,
@@ -25,6 +26,7 @@ export default async function AppLayout({
   return (
     // Using the new 'dashboard-background' color from tailwind.config.ts
     <div className="relative flex min-h-screen w-full bg-dashboard-background text-white">
+      <Toaster theme="dark" position="top-right" />
       {/* Glassmorphism Sidebar from template */}
       <aside className="fixed left-0 top-0 z-20 flex h-full w-20 flex-col items-center border-r border-white/10 bg-black/30 py-6 backdrop-blur-md">
         <div className="mb-10">

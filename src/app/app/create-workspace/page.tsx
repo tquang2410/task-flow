@@ -62,7 +62,7 @@ export default function CreateWorkspacePage() {
         for (const fieldName in result.fieldErrors) {
           form.setError(fieldName as keyof typeof values, {
             type: 'server',
-            message: result.fieldErrors[fieldName],
+            message: result.fieldErrors[fieldName]?.[0],
           })
         }
       }

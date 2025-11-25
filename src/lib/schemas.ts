@@ -73,3 +73,42 @@ export const DeleteAttachmentSchema = z.object({
     attachmentId: z.string(),
     path: z.string(), // Path in Supabase storage
 });
+
+
+// --- Column Management Schemas (Epic 3) ---
+
+// Schema cho việc tạo một cột (Column) mới
+export const CreateColumnSchema = z.object({
+  projectId: z.string(),
+  title: z
+    .string()
+    .min(1, { message: "Column title cannot be empty." })
+    .max(50, { message: "Column title cannot exceed 50 characters." }),
+});
+
+// Schema cho việc cập nhật tên một cột
+export const UpdateColumnSchema = z.object({
+  projectId: z.string(),
+  columnId: z.string(),
+  title: z
+    .string()
+    .min(1, { message: "Column title cannot be empty." })
+    .max(50, { message: "Column title cannot exceed 50 characters." }),
+});
+
+// Schema cho việc xóa một cột
+export const DeleteColumnSchema = z.object({
+  projectId: z.string(),
+  columnId: z.string(),
+});
+
+// --- Workspace Member Management ---
+export const AddMemberSchema = z.object({
+  workspaceId: z.string(),
+  email: z.string().email({ message: 'Invalid email address.' }),
+});
+
+export const RemoveMemberSchema = z.object({
+  workspaceId: z.string(),
+  userId: z.string(),
+});

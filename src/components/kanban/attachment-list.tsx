@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
 import type { Attachment, User } from '@prisma/client'
 import { toast } from 'sonner'
 import { Paperclip, Trash2, UploadCloud, Loader2 } from 'lucide-react'
