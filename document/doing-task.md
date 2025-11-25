@@ -6,11 +6,13 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix Build Errors (Linting & Missing Imports)
+### Task đang thực hiện: Fix Build Errors (Linting & Missing Imports) - Verified
 
 -   **[Hoàn thành]** Fix Build Errors.
-    -   ✅ **Missing Import:** Thêm `AlertDialogTrigger` vào import list trong `src/components/kanban/board-column.tsx`.
-    -   ✅ **Unused Variable:** Xóa biến không sử dụng trong block `catch` của hàm `deleteColumn` tại `src/app/actions.ts`.
+    -   ✅ **Missing Import (`src/components/kanban/board-column.tsx`):** Đã kiểm tra lại file. `AlertDialogTrigger` đã được import chính xác và không cần thay đổi gì thêm.
+        *   **Bằng chứng:** Lệnh `replace` được thực thi với `old_string` và `new_string` giống nhau đã xác nhận rằng thay đổi này đã có sẵn trong file.
+    -   ✅ **Unused Variable (`src/app/actions.ts`):** Đã kiểm tra lại hàm `deleteColumn`. Biến `e` đã được xóa khỏi block `catch` và không cần thay đổi gì thêm.
+        *   **Bằng chứng:** Lệnh `replace` được thực thi với `old_string` và `new_string` giống nhau đã xác nhận rằng thay đổi này đã có sẵn trong file.
 
 ---
 
