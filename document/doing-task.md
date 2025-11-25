@@ -6,25 +6,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Epic 2 - Quản lý Thành viên Workspace
+### Task đang thực hiện: Fix Vercel Build Error
 
--   **[Hoàn thành]** Implement Workspace Member Management (Invite & List).
-    -   **Phase 1: Server Actions:**
-        -   ✅ Thêm Zod schemas: `AddMemberSchema`, `RemoveMemberSchema`.
-        -   ✅ Tạo server action `addMemberToWorkspace` trong `src/app/actions.ts`.
-        -   ✅ Tạo server action `removeMemberFromWorkspace` trong `src/app/actions.ts`, xử lý quyền admin.
-        -   ✅ Sửa lỗi data consistency trong action `createWorkspace`.
-    -   **Phase 2: UI Component:**
-        -   ✅ Tạo file component mới `src/components/workspace/member-list-dialog.tsx`.
-        -   ✅ Dựng giao diện Dialog với form mời và danh sách thành viên.
-    -   **Phase 3: Integration:**
-        -   ✅ Tạo component client `workspace-header-actions.tsx` để quản lý state.
-        -   ✅ Update trang `workspace/[id]/page.tsx` để lấy dữ liệu members và tích hợp component mới.
-        -   ✅ Sửa lỗi authorization check trong `workspace/[id]/page.tsx`.
+-   **[Hoàn thành]** Fix Vercel Build Error (Syntax Error in Board Column).
+    -   ✅ Sửa lỗi cú pháp trong `src/components/kanban/board-column.tsx` từ `</ApiResponse>` thành `</AlertDialogDescription>`.
+    -   ✅ Kiểm tra và xác nhận không có import `ApiResponse` không sử dụng.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Epic 2 - Quản lý Thành viên Workspace.
 -   **[Hoàn thành]** Epic 3 - Quản lý Cột Kanban (Column Management).
 -   **[Hoàn thành]** Bước 3.4: Implement Task Attachments.
 -   **[Hoàn thành]** Bước 3.3: Implement Task Detail, Edit & Comments.

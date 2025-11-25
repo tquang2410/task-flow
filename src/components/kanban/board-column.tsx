@@ -138,7 +138,7 @@ function ColumnHeader({ column, taskCount, projectId }: ColumnHeaderProps) {
                     <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete the
                     column. Any tasks in this column will need to be moved first.
-                    </ApiResponse>
+                    </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
