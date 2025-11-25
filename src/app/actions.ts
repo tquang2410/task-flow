@@ -389,7 +389,7 @@ export async function deleteColumn(
 
     revalidatePath(`/app/project/${projectId}`)
     return { status: 'success', data: 'Column deleted successfully.' }
-  } catch (e) {
+  } catch {
     return { status: 'error', message: 'Failed to delete column.' }
   }
 }

@@ -6,15 +6,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix Vercel Build Error
+### Task đang thực hiện: Fix Build Errors (Linting & Missing Imports)
 
--   **[Hoàn thành]** Fix Vercel Build Error (Syntax Error in Board Column).
-    -   ✅ Sửa lỗi cú pháp trong `src/components/kanban/board-column.tsx` từ `</ApiResponse>` thành `</AlertDialogDescription>`.
-    -   ✅ Kiểm tra và xác nhận không có import `ApiResponse` không sử dụng.
+-   **[Hoàn thành]** Fix Build Errors.
+    -   ✅ **Missing Import:** Thêm `AlertDialogTrigger` vào import list trong `src/components/kanban/board-column.tsx`.
+    -   ✅ **Unused Variable:** Xóa biến không sử dụng trong block `catch` của hàm `deleteColumn` tại `src/app/actions.ts`.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Fix Vercel Build Error (Syntax Error).
 -   **[Hoàn thành]** Epic 2 - Quản lý Thành viên Workspace.
 -   **[Hoàn thành]** Epic 3 - Quản lý Cột Kanban (Column Management).
 -   **[Hoàn thành]** Bước 3.4: Implement Task Attachments.
