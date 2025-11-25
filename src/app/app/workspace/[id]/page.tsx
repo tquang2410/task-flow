@@ -13,13 +13,13 @@ import { CreateProjectModal } from '@/components/create-project-modal'
 import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-actions'
 
 interface WorkspacePageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function WorkspacePage({ params }: WorkspacePageProps) {
-  const { id: workspaceId } = params
+  const { id: workspaceId } = await params
 
   // 1. **Authentication & Data Fetching**
   const supabase = await createClient()

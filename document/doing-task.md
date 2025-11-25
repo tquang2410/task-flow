@@ -6,17 +6,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix Build Errors (Linting & Missing Imports) - Verified
+### Task đang thực hiện: Fix Vercel Build Error (Next.js 15 Params Type Mismatch)
 
--   **[Hoàn thành]** Fix Build Errors.
-    -   ✅ **Missing Import (`src/components/kanban/board-column.tsx`):** Đã kiểm tra lại file. `AlertDialogTrigger` đã được import chính xác và không cần thay đổi gì thêm.
-        *   **Bằng chứng:** Lệnh `replace` được thực thi với `old_string` và `new_string` giống nhau đã xác nhận rằng thay đổi này đã có sẵn trong file.
-    -   ✅ **Unused Variable (`src/app/actions.ts`):** Đã kiểm tra lại hàm `deleteColumn`. Biến `e` đã được xóa khỏi block `catch` và không cần thay đổi gì thêm.
-        *   **Bằng chứng:** Lệnh `replace` được thực thi với `old_string` và `new_string` giống nhau đã xác nhận rằng thay đổi này đã có sẵn trong file.
+-   **[Hoàn thành]** Fix Vercel Build Error (Next.js 15 Params Type Mismatch).
+    -   ✅ Cập nhật interface `WorkspacePageProps` để `params` là `Promise<{ id: string }>`.
+    -   ✅ Thêm `await` khi truy cập `params` trong hàm `WorkspacePage`.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Fix Build Errors (Linting & Missing Imports).
 -   **[Hoàn thành]** Fix Vercel Build Error (Syntax Error).
 -   **[Hoàn thành]** Epic 2 - Quản lý Thành viên Workspace.
 -   **[Hoàn thành]** Epic 3 - Quản lý Cột Kanban (Column Management).
