@@ -65,7 +65,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   ])
 
   // 2. SECURITY & VALIDATION
-  if (!project || !appUser || !project.workspace.memberIds.includes(appUser.id)) {
+  if (!project || !appUser || !project.workspace.memberIds.includes(user.id)) {
     return redirect('/app')
   }
 

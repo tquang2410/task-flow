@@ -6,15 +6,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix Vercel Build Error (Next.js 15 Params Type Mismatch)
+### Task đang thực hiện: FORCE FIX Next.js 15 `params` Type Mismatch
 
--   **[Hoàn thành]** Fix Vercel Build Error (Next.js 15 Params Type Mismatch).
-    -   ✅ Cập nhật interface `WorkspacePageProps` để `params` là `Promise<{ id: string }>`.
-    -   ✅ Thêm `await` khi truy cập `params` trong hàm `WorkspacePage`.
+-   **[Hoàn thành]** FORCE FIX Next.js 15 `params` Type Mismatch (Breaking Change).
+    -   ✅ **File 1 (`workspace/[id]/page.tsx`):** Đã ghi đè (overwrite) file để đảm bảo `params` được định nghĩa là `Promise` và có `await`.
+    -   ✅ **File 2 (`project/[id]/page.tsx`):** Đã kiểm tra và ghi đè file để đảm bảo `params` được định nghĩa là `Promise` và có `await`.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Fix Vercel Build Error (Next.js 15 Params Type Mismatch).
 -   **[Hoàn thành]** Fix Build Errors (Linting & Missing Imports).
 -   **[Hoàn thành]** Fix Vercel Build Error (Syntax Error).
 -   **[Hoàn thành]** Epic 2 - Quản lý Thành viên Workspace.
