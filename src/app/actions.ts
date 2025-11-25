@@ -29,6 +29,16 @@ export async function createWorkspace(
     return { status: 'error', message: 'Unauthorized' }
   }
 
+  // First, get the internal app user ID
+  const appUser = await db.user.findUnique({
+    where: { supabaseId: user.id },
+    select: { id: true },
+  })
+
+  if (!appUser) {
+    return { status: 'error', message: 'Authenticated user not found in database.' }
+  }
+
   const validationResult = CreateWorkspaceSchema.safeParse(input)
   if (!validationResult.success) {
     return {
@@ -42,10 +52,7 @@ export async function createWorkspace(
     const newWorkspace = await db.workspace.create({
       data: {
         name: validationResult.data.name,
-        // The creator's Supabase ID is used, but the schema links to the User's ObjectId.
-        // This assumes a user sync mechanism is in place.
-        // For this action, we'll stick to the Supabase ID as the identifier.
-        memberIds: [user.id], 
+        memberIds: [appUser.id], // Use the internal MongoDB ObjectId
       },
     })
     // Also update the user's workspace list
@@ -72,6 +79,12 @@ export async function addMemberToWorkspace(
   if (!currentUser) {
     return { status: 'error', message: 'Unauthorized' }
   }
+  
+  const appCurrentUser = await db.user.findUnique({ where: { supabaseId: currentUser.id }, select: { id: true }});
+  if (!appCurrentUser) {
+      return { status: 'error', message: 'Authenticated user not found in database.' }
+  }
+
 
   const validationResult = AddMemberSchema.safeParse(input)
   if (!validationResult.success) {
@@ -86,20 +99,20 @@ export async function addMemberToWorkspace(
       select: { memberIds: true },
     })
 
-    if (!workspace || !workspace.memberIds.includes(currentUser.id)) {
+    if (!workspace || !workspace.memberIds.includes(appCurrentUser.id)) {
       return { status: 'error', message: 'Not authorized to perform this action.' }
     }
 
     const userToAdd = await db.user.findUnique({
       where: { email },
-      select: { id: true, supabaseId: true },
+      select: { id: true },
     })
 
     if (!userToAdd) {
       return { status: 'error', message: 'This user is not registered on TaskFlow.' }
     }
 
-    if (workspace.memberIds.includes(userToAdd.supabaseId)) {
+    if (workspace.memberIds.includes(userToAdd.id)) {
       return { status: 'error', message: 'This user is already a member of the workspace.' }
     }
 
@@ -107,7 +120,7 @@ export async function addMemberToWorkspace(
     await db.$transaction([
       db.workspace.update({
         where: { id: workspaceId },
-        data: { memberIds: { push: userToAdd.supabaseId } },
+        data: { memberIds: { push: userToAdd.id } }, // Use internal ObjectId
       }),
       db.user.update({
         where: { id: userToAdd.id },
@@ -132,12 +145,18 @@ export async function removeMemberFromWorkspace(
     return { status: 'error', message: 'Unauthorized' }
   }
 
+  const appCurrentUser = await db.user.findUnique({ where: { supabaseId: currentUser.id }, select: { id: true }});
+  if (!appCurrentUser) {
+      return { status: 'error', message: 'Authenticated user not found in database.' }
+  }
+
   const validationResult = RemoveMemberSchema.safeParse(input)
   if (!validationResult.success) {
     return { status: 'error', message: 'Invalid data.' }
   }
 
-  const { workspaceId, userId: userToRemoveId } = validationResult.data
+  // Note: userToRemoveId is the SupabaseID from the client
+  const { workspaceId, userId: userToRemoveSupabaseId } = validationResult.data
 
   try {
     const workspace = await db.workspace.findUnique({
@@ -145,27 +164,13 @@ export async function removeMemberFromWorkspace(
       select: { memberIds: true },
     })
 
-    if (!workspace || !workspace.memberIds.includes(currentUser.id)) {
+    // Auth check using internal ID
+    if (!workspace || !workspace.memberIds.includes(appCurrentUser.id)) {
       return { status: 'error', message: 'Not authorized to perform this action.' }
-    }
-
-    // The first member is the admin
-    const adminId = workspace.memberIds[0]
-    const isCurrentUserAdmin = currentUser.id === adminId
-    const isRemovingSelf = currentUser.id === userToRemoveId
-
-    // Admin cannot remove themselves
-    if (isCurrentUserAdmin && isRemovingSelf) {
-      return { status: 'error', message: "Admin cannot be removed from the workspace." }
-    }
-
-    // A member can only remove themself
-    if (!isCurrentUserAdmin && !isRemovingSelf) {
-      return { status: 'error', message: "You don't have permission to remove this member." }
     }
     
     const userToRemove = await db.user.findUnique({
-        where: { supabaseId: userToRemoveId },
+        where: { supabaseId: userToRemoveSupabaseId },
         select: { id: true, workspaceIds: true }
     });
 
@@ -173,7 +178,19 @@ export async function removeMemberFromWorkspace(
         return { status: 'error', message: "User to remove not found." };
     }
 
-    const newMemberIds = workspace.memberIds.filter(id => id !== userToRemoveId);
+    const adminId = workspace.memberIds[0] // Internal ObjectId of admin
+    const isCurrentUserAdmin = appCurrentUser.id === adminId
+    const isRemovingSelf = appCurrentUser.id === userToRemove.id
+
+    if (isCurrentUserAdmin && isRemovingSelf) {
+      return { status: 'error', message: "Admin cannot be removed from the workspace." }
+    }
+
+    if (!isCurrentUserAdmin && !isRemovingSelf) {
+      return { status: 'error', message: "You don't have permission to remove this member." }
+    }
+
+    const newMemberIds = workspace.memberIds.filter(id => id !== userToRemove.id);
     const newUserWorkspaceIds = userToRemove.workspaceIds.filter(id => id !== workspaceId);
 
     // Using a transaction to ensure data consistency
@@ -196,6 +213,7 @@ export async function removeMemberFromWorkspace(
     return { status: 'error', message: 'Failed to remove member.' }
   }
 }
+
 
 
 // --- Project Management ---

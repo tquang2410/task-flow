@@ -29,6 +29,16 @@ export default async function WorkspacePage({ params }: WorkspacePageProps) {
     return redirect('/login') // Should be handled by middleware, but as a fallback
   }
 
+  // Get the internal user application ID
+  const appUser = await db.user.findUnique({
+    where: { supabaseId: user.id },
+    select: { id: true },
+  })
+  
+  if (!appUser) {
+    return redirect('/app') // User in Supabase but not in our DB
+  }
+
   // Fetch workspace details, its projects, and its members
   const workspace = await db.workspace.findUnique({
     where: {
@@ -45,8 +55,8 @@ export default async function WorkspacePage({ params }: WorkspacePageProps) {
   })
 
   // 2. **Security Check & Authorization**
-  // Corrected Bug: Check against the user's Supabase ID (user.id), not the internal DB ID.
-  if (!workspace || !workspace.memberIds.includes(user.id)) {
+  // Use the internal appUser.id (ObjectId) to check for membership
+  if (!workspace || !workspace.memberIds.includes(appUser.id)) {
     // User is not a member of this workspace, redirect them.
     return redirect('/app')
   }
