@@ -41,12 +41,20 @@ export function MemberListDialog({
       toast.error('Email cannot be empty.')
       return
     }
+
+    const promise = addMemberToWorkspace({ workspaceId, email }).then((res) => {
+      if (res.status === 'error') {
+        throw new Error(res.message)
+      }
+      return res.data
+    })
+
     startTransition(() => {
-      toast.promise(addMemberToWorkspace({ workspaceId, email }), {
+      toast.promise(promise, {
         loading: 'Adding member...',
-        success: (res) => {
+        success: (data) => {
           setEmail('')
-          return res.data
+          return data
         },
         error: (err) => err.message || 'Failed to add member.',
       })
@@ -54,10 +62,19 @@ export function MemberListDialog({
   }
 
   const handleRemoveMember = (userId: string) => {
+    const promise = removeMemberFromWorkspace({ workspaceId, userId }).then(
+      (res) => {
+        if (res.status === 'error') {
+          throw new Error(res.message)
+        }
+        return res.data
+      }
+    )
+
     startTransition(() => {
-      toast.promise(removeMemberFromWorkspace({ workspaceId, userId }), {
+      toast.promise(promise, {
         loading: 'Removing member...',
-        success: (res) => res.data,
+        success: (data) => data,
         error: (err) => err.message || 'Failed to remove member.',
       })
     })
