@@ -6,15 +6,17 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix Dashboard Create Project Button
+### Task đang thực hiện: Fix Task Click Navigation
 
--   **[Hoàn thành]** Fix Dashboard Create Project Button.
-    -   ✅ Import component `CreateProjectModal` vào `src/app/app/page.tsx`.
-    -   ✅ Bọc nút "Create Project" trong `CreateProjectModal` và truyền `workspaceId` của workspace đầu tiên trong danh sách.
+-   **[Hoàn thành]** Fix lỗi điều hướng khi click vào Task Card.
+    -   ✅ **Refactor Task Card:** Sửa `task-card.tsx` để không tự mở Sheet, thay vào đó cập nhật URL với query param `?taskId=...`.
+    -   ✅ **Tách Client Component:** Tạo `project-kanban-view.tsx` để quản lý state phía client (đọc query param, điều khiển Sheet).
+    -   ✅ **Cập nhật Project Page:** Sửa `project/[id]/page.tsx` để render client component mới, tách biệt logic server và client.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Refactor Kanban Drag & Drop Logic (Critical).
 -   **[Hoàn thành]** Refactor Core Kanban Logic (Drag & Drop + Ordering).
 -   **[Hoàn thành]** Cập nhật tài liệu README.md.
 -   **[Hoàn thành]** Fix Critical Redirect Bug on Workspace Page.

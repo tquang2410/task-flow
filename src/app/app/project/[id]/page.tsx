@@ -1,25 +1,4 @@
-import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { db } from '@/lib/db'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
-import { KanbanBoard } from '@/components/kanban/kanban-board'
-import { PlusCircle, Share } from 'lucide-react'
+import { ProjectKanbanView } from '@/components/kanban/project-kanban-view';
 
 interface ProjectDetailPageProps {
   params: Promise<{ id: string }>;
@@ -65,12 +44,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   ])
 
   // 2. SECURITY & VALIDATION
-  if (!project || !appUser || !project.workspace.memberIds.includes(user.id)) {
+  if (!project || !appUser || !project.workspace.memberIds.includes(appUser.id)) {
     return redirect('/app')
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full p-6">
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
@@ -129,7 +108,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
 
         {/* Board Content is now handled by the client component */}
         <TabsContent value="board" className="flex-grow overflow-hidden">
-            <KanbanBoard initialProject={project} currentUser={appUser} />
+            <ProjectKanbanView project={project} currentUser={appUser} />
         </TabsContent>
         <TabsContent value="list">List view coming soon...</TabsContent>
         <TabsContent value="timeline">Timeline view coming soon...</TabsContent>
