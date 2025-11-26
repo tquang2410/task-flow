@@ -187,7 +187,7 @@ export function KanbanBoard({ initialProject }: KanbanBoardProps) {
       moveTask({
         taskId: movedTask.id,
         newColumnId: newColumnId,
-        newOrder: newIndex,
+        newIndex: newIndex,
         projectId: initialProject.id,
       }),
       {

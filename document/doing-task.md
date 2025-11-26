@@ -6,19 +6,20 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Force Replace `moveTask` with Transaction Logic
+### Task đang thực hiện: Force Replace `moveTask` Logic (Final Attempt)
 
--   **[Bắt đầu]** Thay thế hoàn toàn logic `moveTask` theo chỉ định.
-    -   **Phase 1: `actions.ts`:**
-        -   Thay thế hàm `moveTask` cũ bằng code re-indexing mới được cung cấp.
-    -   **Phase 2: `kanban-board.tsx`:**
-        -   Cập nhật lại cách gọi `moveTask` trong `onDragEnd` để phù hợp với input mới.
-    -   **Phase 3: `schemas.ts`:**
-        -   Cập nhật `MoveTaskSchema` để phù hợp.
+-   **[Bắt đầu]** Thay thế hoàn toàn logic `moveTask` theo chỉ định cuối cùng.
+    -   **Phase 1: `schemas.ts`:**
+        -   Cập nhật `MoveTaskSchema` để sử dụng `newIndex` thay vì `newOrder`.
+    -   **Phase 2: `actions.ts`:**
+        -   Thay thế hàm `moveTask` cũ bằng code re-indexing mới nhất được cung cấp.
+    -   **Phase 3: `kanban-board.tsx`:**
+        -   Cập nhật lại cách gọi `moveTask` trong `onDragEnd` để gửi đúng tham số `newIndex`.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Fix Build Errors & Sync Drag Logic.
 -   **[Hoàn thành]** Fix Kanban State Sync & Reorder Logic.
 -   **[Hoàn thành]** Fix Hydration Mismatch Error on Kanban Board.
 -   **[Hoàn thành]** Fix "document is not defined" Error.

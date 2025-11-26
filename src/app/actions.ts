@@ -515,44 +515,48 @@ export async function moveTask(
 ): Promise<ActionResponse<string>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { status: 'error', message: 'Unauthorized' }
 
-  const validationResult = MoveTaskSchema.safeParse(input);
-  if (!validationResult.success) {
-      return { status: 'error', message: 'Invalid data' }
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' }
   }
 
-  const { taskId, newColumnId, newOrder, projectId } = validationResult.data
+  const validationResult = MoveTaskSchema.safeParse(input)
+  if (!validationResult.success) {
+    return { status: 'error', message: 'Invalid data' }
+  }
+
+  const { taskId, newColumnId, newIndex, projectId } = validationResult.data;
 
   try {
-    // 1. Lấy danh sách task trong cột đích (trừ task đang di chuyển)
+    // 1. Lấy danh sách TẤT CẢ task trong cột đích (trừ task đang di chuyển)
     const tasksInDestination = await db.task.findMany({
       where: {
         projectId,
         columnId: newColumnId,
-        id: { not: taskId } // Loại trừ chính nó
+        id: { not: taskId } // Loại trừ chính nó ra để tránh duplicate
       },
       orderBy: { order: 'asc' },
       select: { id: true } // Chỉ cần lấy ID để tối ưu
     })
 
-    // 2. Tạo mảng ID theo thứ tự mới
+    // 2. Tính toán danh sách ID mới theo đúng thứ tự mong muốn
     const newOrderedIds = tasksInDestination.map(t => t.id)
-    // Chèn task đang di chuyển vào đúng vị trí index (newOrder)
-    newOrderedIds.splice(newOrder, 0, taskId)
+    
+    // Chèn ID của task đang di chuyển vào đúng vị trí index (newIndex)
+    newOrderedIds.splice(newIndex, 0, taskId)
 
-    // 3. Tạo Transaction: Cập nhật lại toàn bộ cột
+    // 3. Tạo Transaction để cập nhật lại toàn bộ cột
     const updates = newOrderedIds.map((id, index) => {
       return db.task.update({
         where: { id },
         data: {
-          columnId: newColumnId, // Đảm bảo task sang cột mới
-          order: index           // Reset order: 0, 1, 2, 3...
+          columnId: newColumnId, // Đảm bảo task đã sang cột mới
+          order: index           // Reset order: 0, 1, 2, 3... liên tục
         }
       })
     })
 
-    // 4. Thực thi tất cả update cùng lúc
+    // 4. Thực thi transaction
     await db.$transaction(updates)
 
     revalidatePath(`/app/project/${projectId}`)

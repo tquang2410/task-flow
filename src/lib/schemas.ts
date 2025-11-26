@@ -55,7 +55,7 @@ export const UpdateTaskSchema = z.object({
 export const MoveTaskSchema = z.object({
   taskId: z.string(),
   newColumnId: z.string(),
-  newOrder: z.number(),
+  newIndex: z.number(),
   projectId: z.string(),
 });
 
