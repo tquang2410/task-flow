@@ -433,6 +433,8 @@ export async function createTask(
     const { title, projectId, columnId } = validationResult.data
 
     try {
+        // This logic is correct: it finds the highest order and adds 1,
+        // ensuring the new task is always at the bottom.
         const highestOrderTask = await db.task.findFirst({
             where: { projectId, columnId },
             orderBy: { order: 'desc' },

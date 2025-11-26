@@ -6,20 +6,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Refactor Core Kanban Logic (Drag & Drop + Ordering)
+### Task đang thực hiện: Fix Dashboard Create Project Button
 
--   **[Hoàn thành]** Refactor Core Kanban Logic.
-    -   **Phase 1: Server Actions (`src/app/actions.ts`):**
-        -   ✅ Kiểm tra và xác nhận logic của `createTask` đã chính xác.
-        -   ✅ Viết lại hoàn toàn `moveTask` để xử lý việc sắp xếp lại `order` trong một transaction, áp dụng cho cả việc kéo thả trong cùng một cột và khác cột.
-        -   ✅ Thêm `MoveTaskSchema` vào `src/lib/schemas.ts` để validate input mới.
-    -   **Phase 2: Frontend Component (`src/components/kanban/kanban-board.tsx`):**
-        -   ✅ Refactor lại toàn bộ logic D&D: `onDragStart` (lưu state), `onDragOver` (cập nhật UI tạm thời), và `onDragEnd` (gọi action và xử lý rollback).
-        -   ✅ Đảm bảo component gửi đúng và đủ payload (`taskId`, `activeColumnId`, `newColumnId`, `newIndex`) cho server action `moveTask` mới.
+-   **[Hoàn thành]** Fix Dashboard Create Project Button.
+    -   ✅ Import component `CreateProjectModal` vào `src/app/app/page.tsx`.
+    -   ✅ Bọc nút "Create Project" trong `CreateProjectModal` và truyền `workspaceId` của workspace đầu tiên trong danh sách.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Refactor Core Kanban Logic (Drag & Drop + Ordering).
 -   **[Hoàn thành]** Cập nhật tài liệu README.md.
 -   **[Hoàn thành]** Fix Critical Redirect Bug on Workspace Page.
 -   **[Hoàn thành]** FORCE FIX Build Error (TypeScript Union Type Issue).

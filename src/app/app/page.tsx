@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Search, PlusCircle } from 'lucide-react'
 import { PrimaryWorkspaceCard } from '@/components/dashboard/primary-workspace-card'
 import { SecondaryWorkspaceCard } from '@/components/dashboard/secondary-workspace-card'
+import { CreateProjectModal } from '@/components/create-project-modal'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -77,11 +78,11 @@ export default async function DashboardPage() {
                       className="h-11 w-full rounded-lg border border-white/10 bg-white/5 pl-10 text-sm text-gray-300 placeholder:text-gray-500 focus:ring-primary"
                   />
               </div>
-              <div>
+              <CreateProjectModal workspaceId={workspaces[0].id}>
                   <Button className="h-11 px-5 text-sm font-bold bg-dashboard-primary text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_1px_3px_rgba(0,0,0,0.5)] transition-transform hover:scale-105">
                       Create Project
                   </Button>
-              </div>
+              </CreateProjectModal>
           </div>
       </header>
 
