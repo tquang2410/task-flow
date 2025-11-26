@@ -16,7 +16,7 @@ import { arrayMove } from '@dnd-kit/sortable'
 import { toast } from 'sonner'
 import { PlusIcon } from '@radix-ui/react-icons'
 
-import type { Project, User } from '@prisma/client'
+import type { Project } from '@prisma/client'
 import { type TaskWithDetails } from '@/types/prisma'
 import { BoardColumn } from './board-column'
 import { TaskCard } from './task-card'
@@ -88,11 +88,10 @@ function AddColumn({ projectId }: { projectId: string }) {
 }
 
 interface KanbanBoardProps {
-  initialProject: Project & { tasks: TaskWithDetails[] }
-  currentUser: User
+  initialProject: Project & { tasks: TaskWithDetails[] };
 }
 
-export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
+export function KanbanBoard({ initialProject }: KanbanBoardProps) {
   const [columns] = useState<Column[]>(() => {
     try {
       return initialProject.columns as unknown as Column[];
@@ -103,7 +102,6 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   const [tasks, setTasks] = useState(initialProject.tasks)
   const [tasksBeforeDrag, setTasksBeforeDrag] = useState(initialProject.tasks)
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null)
-  const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -127,7 +125,6 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
     if (event.active.data.current?.type === 'Task') {
       const task = event.active.data.current.task as TaskWithDetails;
       setActiveTask(task)
-      setActiveColumnId(task.columnId);
       setTasksBeforeDrag(tasks);
     }
   }
@@ -144,7 +141,6 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
     const isActiveATask = active.data.current?.type === 'Task'
     const isOverAColumn = over.data.current?.type === 'Column'
     
-    // Handle dropping a task over a column
     if (isActiveATask && isOverAColumn) {
       setTasks((currentTasks) => {
         const activeIndex = currentTasks.findIndex((t) => t.id === activeId);
@@ -156,7 +152,6 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
       });
     }
 
-    // Handle dropping a task over another task
     const isOverATask = over.data.current?.type === 'Task'
     if (isActiveATask && isOverATask) {
         setTasks((currentTasks) => {
@@ -175,37 +170,30 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
 
   function onDragEnd(event: DragEndEvent) {
     setActiveTask(null);
-    setActiveColumnId(null);
     
     const { active, over } = event;
     if (!over || active.id === over.id) {
-      // Revert if dropped in a non-droppable area or on itself
       if (active.id !== over?.id) setTasks(tasksBeforeDrag);
       return;
     }
 
     const movedTask = tasks.find(t => t.id === active.id);
-    const originalColumnId = activeColumnId;
-    
-    if (!movedTask || !originalColumnId) return;
+    if (!movedTask) return;
 
     const newColumnId = movedTask.columnId;
     const newIndex = tasks.filter(t => t.columnId === newColumnId).findIndex(t => t.id === active.id);
 
-    // Call server action with the new, robust payload
     toast.promise(
       moveTask({
         taskId: movedTask.id,
-        activeColumnId: originalColumnId,
         newColumnId: newColumnId,
-        newIndex: newIndex,
+        newOrder: newIndex,
         projectId: initialProject.id,
       }),
       {
         loading: 'Moving task...',
         success: 'Task moved successfully!',
         error: (err) => {
-          // Revert on error
           setTasks(tasksBeforeDrag);
           return err.message || 'Failed to move task. Reverting.';
         },
@@ -228,14 +216,13 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
             column={col}
             tasks={tasks}
             projectId={initialProject.id}
-            currentUser={currentUser}
           />
         ))}
         <AddColumn projectId={initialProject.id} />
         {portalContainer && createPortal(
           <DragOverlay>
             {activeTask && (
-              <TaskCard task={activeTask} currentUser={currentUser} />
+              <TaskCard task={activeTask} />
             )}
           </DragOverlay>,
           portalContainer

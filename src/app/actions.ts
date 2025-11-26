@@ -515,49 +515,44 @@ export async function moveTask(
 ): Promise<ActionResponse<string>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { status: 'error', message: 'Unauthorized' }
 
-  if (!user) {
-    return { status: 'error', message: 'Unauthorized' }
-  }
-
-  const validationResult = MoveTaskSchema.safeParse(input)
+  const validationResult = MoveTaskSchema.safeParse(input);
   if (!validationResult.success) {
-    return { status: 'error', message: 'Invalid data' }
+      return { status: 'error', message: 'Invalid data' }
   }
 
-  const { taskId, newColumnId, newIndex, projectId } = validationResult.data;
+  const { taskId, newColumnId, newOrder, projectId } = validationResult.data
 
   try {
-    // 1. Get all tasks in dest column (excluding current)
-    // Sắp xếp theo thứ tự order hiện tại để đảm bảo tính ổn định
+    // 1. Lấy danh sách task trong cột đích (trừ task đang di chuyển)
     const tasksInDestination = await db.task.findMany({
       where: {
         projectId,
         columnId: newColumnId,
-        id: { not: taskId } // Loại trừ task đang kéo
+        id: { not: taskId } // Loại trừ chính nó
       },
-      orderBy: { order: 'asc' }
+      orderBy: { order: 'asc' },
+      select: { id: true } // Chỉ cần lấy ID để tối ưu
     })
 
-    // 2. Chèn task đang kéo vào đúng vị trí mong muốn (newIndex)
-    // Chúng ta chỉ cần ID để đại diện cho task trong mảng này
-    const newOrderedList = [...tasksInDestination]
-    // splice(start, deleteCount, item)
-    newOrderedList.splice(newIndex, 0, { id: taskId } as any)
+    // 2. Tạo mảng ID theo thứ tự mới
+    const newOrderedIds = tasksInDestination.map(t => t.id)
+    // Chèn task đang di chuyển vào đúng vị trí index (newOrder)
+    newOrderedIds.splice(newOrder, 0, taskId)
 
-    // 3. Tạo transaction để update lại toàn bộ Order cho cột này
-    // Mỗi task sẽ có order = index của nó trong mảng mới
-    const updates = newOrderedList.map((task, index) => {
+    // 3. Tạo Transaction: Cập nhật lại toàn bộ cột
+    const updates = newOrderedIds.map((id, index) => {
       return db.task.update({
-        where: { id: task.id },
+        where: { id },
         data: {
-          columnId: newColumnId, // Đảm bảo task đã sang cột mới
-          order: index           // Order mới liền mạch: 0, 1, 2...
+          columnId: newColumnId, // Đảm bảo task sang cột mới
+          order: index           // Reset order: 0, 1, 2, 3...
         }
       })
     })
 
-    // 4. Thực thi transaction
+    // 4. Thực thi tất cả update cùng lúc
     await db.$transaction(updates)
 
     revalidatePath(`/app/project/${projectId}`)

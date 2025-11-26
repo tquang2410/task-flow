@@ -55,9 +55,8 @@ export const UpdateTaskSchema = z.object({
 export const MoveTaskSchema = z.object({
   taskId: z.string(),
   newColumnId: z.string(),
-  newIndex: z.number(),
+  newOrder: z.number(),
   projectId: z.string(),
-  activeColumnId: z.string(),
 });
 
 // Schema cho việc tạo một Comment

@@ -6,13 +6,12 @@ import { useRouter, usePathname } from 'next/navigation';
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Priority, User } from "@prisma/client";
+import type { Priority } from "@prisma/client";
 import { type TaskWithDetails } from "@/types/prisma";
 import { cn } from "@/lib/utils";
 
 interface TaskCardProps {
   task: TaskWithDetails;
-  currentUser: User;
 }
 
 const priorityStyles: Record<Priority, string> = {
@@ -21,7 +20,7 @@ const priorityStyles: Record<Priority, string> = {
   HIGH: "bg-red-500/20 text-red-400 border-red-500/30",
 };
 
-export function TaskCard({ task, currentUser }: TaskCardProps) {
+export function TaskCard({ task }: TaskCardProps) {
   const router = useRouter();
   const pathname = usePathname();
 

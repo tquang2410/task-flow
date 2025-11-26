@@ -6,15 +6,20 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix Kanban State Sync & Reorder Logic (Critical)
+### Task đang thực hiện: Force Replace `moveTask` with Transaction Logic
 
--   **[Hoàn thành]** Sửa lỗi đồng bộ state và logic sắp xếp của Kanban.
-    -   ✅ **Fix Client State Sync:** Đã thêm `useEffect` vào `kanban-board.tsx` để đồng bộ state với props từ server.
-    -   ✅ **Refactor Server Reorder Logic:** Đã kiểm tra và ghi đè lại file `actions.ts` để đảm bảo logic `moveTask` sử dụng transaction và re-index là chính xác.
+-   **[Bắt đầu]** Thay thế hoàn toàn logic `moveTask` theo chỉ định.
+    -   **Phase 1: `actions.ts`:**
+        -   Thay thế hàm `moveTask` cũ bằng code re-indexing mới được cung cấp.
+    -   **Phase 2: `kanban-board.tsx`:**
+        -   Cập nhật lại cách gọi `moveTask` trong `onDragEnd` để phù hợp với input mới.
+    -   **Phase 3: `schemas.ts`:**
+        -   Cập nhật `MoveTaskSchema` để phù hợp.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Fix Kanban State Sync & Reorder Logic.
 -   **[Hoàn thành]** Fix Hydration Mismatch Error on Kanban Board.
 -   **[Hoàn thành]** Fix "document is not defined" Error.
 -   **[Hoàn thành]** Fix Missing Imports in Project Page.

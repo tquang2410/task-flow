@@ -31,7 +31,6 @@ import { TaskCard } from './task-card'
 import { CreateTaskDialog } from './create-task-dialog'
 
 import { updateColumn, deleteColumn } from '@/app/actions'
-import type { User } from '@prisma/client'
 import { type TaskWithDetails } from '@/types/prisma'
 import { cn } from '@/lib/utils'
 
@@ -162,14 +161,12 @@ interface BoardColumnProps {
   column: Column
   tasks: TaskWithDetails[]
   projectId: string
-  currentUser: User
 }
 
 export function BoardColumn({
   column,
   tasks,
   projectId,
-  currentUser,
 }: BoardColumnProps) {
   const tasksInColumn = tasks.filter((task) => task.columnId === column.id)
   const taskIds = tasksInColumn.map((task) => task.id)
@@ -204,7 +201,7 @@ export function BoardColumn({
           strategy={verticalListSortingStrategy}
         >
           {tasksInColumn.map((task) => (
-            <TaskCard key={task.id} task={task} currentUser={currentUser} />
+            <TaskCard key={task.id} task={task} />
           ))}
         </SortableContext>
         {tasksInColumn.length === 0 && (
