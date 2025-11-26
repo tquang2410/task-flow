@@ -110,6 +110,11 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
     setPortalContainer(document.body);
   }, []);
 
+  // Sync local state with server state when props change
+  useEffect(() => {
+    setTasks(initialProject.tasks);
+  }, [initialProject.tasks]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {

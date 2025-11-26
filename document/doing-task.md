@@ -6,15 +6,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix Hydration Mismatch Error on Kanban Board
+### Task đang thực hiện: Fix Kanban State Sync & Reorder Logic (Critical)
 
--   **[Bắt đầu]** Fix lỗi `Hydration Mismatch` khi kéo thả task.
-    -   **Phân tích:** Lỗi xảy ra do `dnd-kit` tạo ra các ID cho `aria-describedby` khác nhau giữa server và client render, gây ra hydration error.
-    -   **Hành động:** Thêm thuộc tính `suppressHydrationWarning` vào component `Card` bên trong `task-card.tsx` để bỏ qua lỗi không nghiêm trọng này, giúp build thành công mà không ảnh hưởng đến chức năng.
+-   **[Hoàn thành]** Sửa lỗi đồng bộ state và logic sắp xếp của Kanban.
+    -   ✅ **Fix Client State Sync:** Đã thêm `useEffect` vào `kanban-board.tsx` để đồng bộ state với props từ server.
+    -   ✅ **Refactor Server Reorder Logic:** Đã kiểm tra và ghi đè lại file `actions.ts` để đảm bảo logic `moveTask` sử dụng transaction và re-index là chính xác.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Fix Hydration Mismatch Error on Kanban Board.
 -   **[Hoàn thành]** Fix "document is not defined" Error.
 -   **[Hoàn thành]** Fix Missing Imports in Project Page.
 -   **[Hoàn thành]** Fix Task Click Navigation.
