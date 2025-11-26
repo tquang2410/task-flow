@@ -525,79 +525,45 @@ export async function moveTask(
     return { status: 'error', message: 'Invalid data' }
   }
 
-  const { taskId, activeColumnId, newColumnId, newIndex, projectId } = validationResult.data;
+  const { taskId, newColumnId, newIndex, projectId } = validationResult.data;
 
   try {
-    await db.$transaction(async (tx) => {
-      // If moving within the same column
-      if (activeColumnId === newColumnId) {
-        const tasksInColumn = await tx.task.findMany({
-          where: { projectId, columnId: newColumnId },
-          orderBy: { order: 'asc' },
-        });
+    // 1. Get all tasks in dest column (excluding current)
+    // Sắp xếp theo thứ tự order hiện tại để đảm bảo tính ổn định
+    const tasksInDestination = await db.task.findMany({
+      where: {
+        projectId,
+        columnId: newColumnId,
+        id: { not: taskId } // Loại trừ task đang kéo
+      },
+      orderBy: { order: 'asc' }
+    })
 
-        const movedTask = tasksInColumn.find(t => t.id === taskId);
-        if (!movedTask) throw new Error('Task not found');
-        
-        const remainingTasks = tasksInColumn.filter(t => t.id !== taskId);
-        remainingTasks.splice(newIndex, 0, movedTask);
+    // 2. Chèn task đang kéo vào đúng vị trí mong muốn (newIndex)
+    // Chúng ta chỉ cần ID để đại diện cho task trong mảng này
+    const newOrderedList = [...tasksInDestination]
+    // splice(start, deleteCount, item)
+    newOrderedList.splice(newIndex, 0, { id: taskId } as any)
 
-        // Create update promises for the reordered list
-        const updatePromises = remainingTasks.map((task, index) => {
-          return tx.task.update({
-            where: { id: task.id },
-            data: { order: index },
-          });
-        });
-        
-        await Promise.all(updatePromises);
-      } else {
-        // If moving to a different column
-        // 1. Reorder the source column
-        const sourceColumnTasks = await tx.task.findMany({
-          where: { projectId, columnId: activeColumnId },
-          orderBy: { order: 'asc' },
-        });
+    // 3. Tạo transaction để update lại toàn bộ Order cho cột này
+    // Mỗi task sẽ có order = index của nó trong mảng mới
+    const updates = newOrderedList.map((task, index) => {
+      return db.task.update({
+        where: { id: task.id },
+        data: {
+          columnId: newColumnId, // Đảm bảo task đã sang cột mới
+          order: index           // Order mới liền mạch: 0, 1, 2...
+        }
+      })
+    })
 
-        const remainingSourceTasks = sourceColumnTasks.filter(t => t.id !== taskId);
-        const sourceUpdatePromises = remainingSourceTasks.map((task, index) => {
-          return tx.task.update({
-            where: { id: task.id },
-            data: { order: index },
-          });
-        });
-
-        // 2. Update the moved task and reorder the destination column
-        const movedTask = await tx.task.findUnique({ where: { id: taskId }});
-        if (!movedTask) throw new Error('Task not found');
-
-        const destColumnTasks = await tx.task.findMany({
-          where: { projectId, columnId: newColumnId },
-          orderBy: { order: 'asc' },
-        });
-        
-        destColumnTasks.splice(newIndex, 0, movedTask);
-
-        const destUpdatePromises = destColumnTasks.map((task, index) => {
-          return tx.task.update({
-            where: { id: task.id },
-            data: { 
-              order: index,
-              // Ensure the moved task's columnId is updated
-              ...(task.id === taskId && { columnId: newColumnId }),
-            },
-          });
-        });
-        
-        // Execute all promises for both columns
-        await Promise.all([...sourceUpdatePromises, ...destUpdatePromises]);
-      }
-    });
+    // 4. Thực thi transaction
+    await db.$transaction(updates)
 
     revalidatePath(`/app/project/${projectId}`)
-    return { status: 'success', data: 'Task moved successfully.' }
+    return { status: 'success', data: 'Task moved and reordered' }
   } catch (error) {
-    console.error('Move task error:', error);
+    console.error('Move Task Error:', error)
     return { status: 'error', message: 'Failed to move task.' }
   }
 }
