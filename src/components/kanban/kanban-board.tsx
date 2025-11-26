@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
   DndContext,
@@ -104,6 +104,11 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   const [tasksBeforeDrag, setTasksBeforeDrag] = useState(initialProject.tasks)
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null)
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPortalContainer(document.body);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -222,13 +227,13 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
           />
         ))}
         <AddColumn projectId={initialProject.id} />
-        {createPortal(
+        {portalContainer && createPortal(
           <DragOverlay>
             {activeTask && (
               <TaskCard task={activeTask} currentUser={currentUser} />
             )}
           </DragOverlay>,
-          document.body
+          portalContainer
         )}
       </DndContext>
     </div>

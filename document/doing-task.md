@@ -6,15 +6,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix Missing Imports in Project Page
+### Task đang thực hiện: Fix "document is not defined" Error
 
--   **[Bắt đầu]** Thêm lại các import bị thiếu trong file `src/app/app/project/[id]/page.tsx`.
-    -   **Phân tích:** Lỗi xảy ra do thao tác `replace` trước đó đã vô tình xóa các câu lệnh import cần thiết.
-    -   **Hành động:** Thêm lại đầy đủ các import cho `Link`, `redirect`, `db`, và các UI component (`Button`, `Avatar`, `Breadcrumb`, `Tabs`, `lucide-react` icons).
+-   **[Bắt đầu]** Fix lỗi `document is not defined` trong `kanban-board.tsx`.
+    -   **Phân tích:** Lỗi xảy ra do `createPortal` của `dnd-kit` cố gắng truy cập `document.body` phía server-side.
+    -   **Hành động:** Sử dụng `useEffect` và `useState` để đảm bảo `document.body` chỉ được truy cập sau khi component đã được mount ở phía client.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Fix Missing Imports in Project Page.
 -   **[Hoàn thành]** Fix Task Click Navigation.
 -   **[Hoàn thành]** Refactor Kanban Drag & Drop Logic (Critical).
 -   **[Hoàn thành]** Refactor Core Kanban Logic (Drag & Drop + Ordering).
