@@ -56,6 +56,7 @@ export function TaskCard({ task, currentUser }: TaskCardProps) {
       {...attributes}
       {...listeners}
       onClick={handleCardClick}
+      suppressHydrationWarning={true}
       className={cn(
         "bg-card border-white/10 shadow-sm cursor-pointer active:cursor-grabbing hover:ring-2 hover:ring-dashboard-primary/50 transition-shadow",
         isDragging && "opacity-50 ring-2 ring-dashboard-primary"

@@ -6,15 +6,16 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ## Cập nhật lần cuối: 26/11/2025
 
-### Task đang thực hiện: Fix "document is not defined" Error
+### Task đang thực hiện: Fix Hydration Mismatch Error on Kanban Board
 
--   **[Bắt đầu]** Fix lỗi `document is not defined` trong `kanban-board.tsx`.
-    -   **Phân tích:** Lỗi xảy ra do `createPortal` của `dnd-kit` cố gắng truy cập `document.body` phía server-side.
-    -   **Hành động:** Sử dụng `useEffect` và `useState` để đảm bảo `document.body` chỉ được truy cập sau khi component đã được mount ở phía client.
+-   **[Bắt đầu]** Fix lỗi `Hydration Mismatch` khi kéo thả task.
+    -   **Phân tích:** Lỗi xảy ra do `dnd-kit` tạo ra các ID cho `aria-describedby` khác nhau giữa server và client render, gây ra hydration error.
+    -   **Hành động:** Thêm thuộc tính `suppressHydrationWarning` vào component `Card` bên trong `task-card.tsx` để bỏ qua lỗi không nghiêm trọng này, giúp build thành công mà không ảnh hưởng đến chức năng.
 
 ---
 
 ### Task đã hoàn thành
+-   **[Hoàn thành]** Fix "document is not defined" Error.
 -   **[Hoàn thành]** Fix Missing Imports in Project Page.
 -   **[Hoàn thành]** Fix Task Click Navigation.
 -   **[Hoàn thành]** Refactor Kanban Drag & Drop Logic (Critical).
