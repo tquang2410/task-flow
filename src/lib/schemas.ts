@@ -51,6 +51,15 @@ export const UpdateTaskSchema = z.object({
     dueDate: z.date().optional().nullable(),
 });
 
+// Schema for the refactored moveTask action
+export const MoveTaskSchema = z.object({
+  taskId: z.string(),
+  newColumnId: z.string(),
+  newIndex: z.number(),
+  projectId: z.string(),
+  activeColumnId: z.string(),
+});
+
 // Schema cho việc tạo một Comment
 export const CreateCommentSchema = z.object({
     taskId: z.string(),

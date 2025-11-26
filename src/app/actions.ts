@@ -7,6 +7,7 @@ import {
   CreateTaskSchema,
   CreateWorkspaceSchema,
   UpdateTaskSchema,
+  MoveTaskSchema,
   CreateCommentSchema,
   DeleteAttachmentSchema,
   AddMemberSchema,
@@ -507,12 +508,9 @@ export async function deleteTask(input: { taskId: string, projectId: string }): 
     }
 }
 
-export async function moveTask(input: {
-  taskId: string
-  newColumnId: string
-  newOrder: number
-  projectId: string
-}): Promise<ActionResponse<string>> {
+export async function moveTask(
+  input: z.infer<typeof MoveTaskSchema>
+): Promise<ActionResponse<string>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -520,17 +518,84 @@ export async function moveTask(input: {
     return { status: 'error', message: 'Unauthorized' }
   }
 
+  const validationResult = MoveTaskSchema.safeParse(input)
+  if (!validationResult.success) {
+    return { status: 'error', message: 'Invalid data' }
+  }
+
+  const { taskId, activeColumnId, newColumnId, newIndex, projectId } = validationResult.data;
+
   try {
-    await db.task.update({
-      where: { id: input.taskId },
-      data: {
-        columnId: input.newColumnId,
-        order: input.newOrder,
-      },
-    })
-    revalidatePath(`/app/project/${input.projectId}`)
-    return { status: 'success', data: 'Task moved' }
-  } catch {
+    await db.$transaction(async (tx) => {
+      // If moving within the same column
+      if (activeColumnId === newColumnId) {
+        const tasksInColumn = await tx.task.findMany({
+          where: { projectId, columnId: newColumnId },
+          orderBy: { order: 'asc' },
+        });
+
+        const movedTask = tasksInColumn.find(t => t.id === taskId);
+        if (!movedTask) throw new Error('Task not found');
+        
+        const remainingTasks = tasksInColumn.filter(t => t.id !== taskId);
+        remainingTasks.splice(newIndex, 0, movedTask);
+
+        // Create update promises for the reordered list
+        const updatePromises = remainingTasks.map((task, index) => {
+          return tx.task.update({
+            where: { id: task.id },
+            data: { order: index },
+          });
+        });
+        
+        await Promise.all(updatePromises);
+      } else {
+        // If moving to a different column
+        // 1. Reorder the source column
+        const sourceColumnTasks = await tx.task.findMany({
+          where: { projectId, columnId: activeColumnId },
+          orderBy: { order: 'asc' },
+        });
+
+        const remainingSourceTasks = sourceColumnTasks.filter(t => t.id !== taskId);
+        const sourceUpdatePromises = remainingSourceTasks.map((task, index) => {
+          return tx.task.update({
+            where: { id: task.id },
+            data: { order: index },
+          });
+        });
+
+        // 2. Update the moved task and reorder the destination column
+        const movedTask = await tx.task.findUnique({ where: { id: taskId }});
+        if (!movedTask) throw new Error('Task not found');
+
+        const destColumnTasks = await tx.task.findMany({
+          where: { projectId, columnId: newColumnId },
+          orderBy: { order: 'asc' },
+        });
+        
+        destColumnTasks.splice(newIndex, 0, movedTask);
+
+        const destUpdatePromises = destColumnTasks.map((task, index) => {
+          return tx.task.update({
+            where: { id: task.id },
+            data: { 
+              order: index,
+              // Ensure the moved task's columnId is updated
+              ...(task.id === taskId && { columnId: newColumnId }),
+            },
+          });
+        });
+        
+        // Execute all promises for both columns
+        await Promise.all([...sourceUpdatePromises, ...destUpdatePromises]);
+      }
+    });
+
+    revalidatePath(`/app/project/${projectId}`)
+    return { status: 'success', data: 'Task moved successfully.' }
+  } catch (error) {
+    console.error('Move task error:', error);
     return { status: 'error', message: 'Failed to move task.' }
   }
 }

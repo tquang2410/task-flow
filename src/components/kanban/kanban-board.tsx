@@ -95,14 +95,15 @@ interface KanbanBoardProps {
 export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   const [columns] = useState<Column[]>(() => {
     try {
-      // Note: `initialProject.columns` is now trusted to be the correct JSON structure
       return initialProject.columns as unknown as Column[];
     } catch {
       return []
     }
   })
   const [tasks, setTasks] = useState(initialProject.tasks)
+  const [tasksBeforeDrag, setTasksBeforeDrag] = useState(initialProject.tasks)
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null)
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -114,7 +115,10 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
 
   function onDragStart(event: DragStartEvent) {
     if (event.active.data.current?.type === 'Task') {
-      setActiveTask(event.active.data.current.task as TaskWithDetails)
+      const task = event.active.data.current.task as TaskWithDetails;
+      setActiveTask(task)
+      setActiveColumnId(task.columnId);
+      setTasksBeforeDrag(tasks);
     }
   }
 
@@ -128,74 +132,77 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
     if (activeId === overId) return
 
     const isActiveATask = active.data.current?.type === 'Task'
-    const isOverATask = over.data.current?.type === 'Task'
     const isOverAColumn = over.data.current?.type === 'Column'
-
-    // Dropping a Task over another Task (reordering)
-    if (isActiveATask && isOverATask) {
-      setTasks((currentTasks) => {
-        const activeIndex = currentTasks.findIndex((t) => t.id === activeId)
-        const overIndex = currentTasks.findIndex((t) => t.id === overId)
-
-        if (
-          currentTasks[activeIndex].columnId !=
-          currentTasks[overIndex].columnId
-        ) {
-          currentTasks[activeIndex].columnId = currentTasks[overIndex].columnId
-          return arrayMove(currentTasks, activeIndex, overIndex - 1)
-        }
-
-        return arrayMove(currentTasks, activeIndex, overIndex)
-      })
-    }
-
-    // Dropping a Task over a column (moving to new column)
+    
+    // Handle dropping a task over a column
     if (isActiveATask && isOverAColumn) {
       setTasks((currentTasks) => {
-        const activeIndex = currentTasks.findIndex((t) => t.id === activeId)
-        currentTasks[activeIndex].columnId = String(overId)
-        return arrayMove(currentTasks, activeIndex, activeIndex)
-      })
+        const activeIndex = currentTasks.findIndex((t) => t.id === activeId);
+        if (currentTasks[activeIndex].columnId !== overId) {
+            currentTasks[activeIndex].columnId = String(overId);
+            return arrayMove(currentTasks, activeIndex, activeIndex);
+        }
+        return currentTasks;
+      });
+    }
+
+    // Handle dropping a task over another task
+    const isOverATask = over.data.current?.type === 'Task'
+    if (isActiveATask && isOverATask) {
+        setTasks((currentTasks) => {
+            const activeIndex = currentTasks.findIndex((t) => t.id === activeId);
+            const overIndex = currentTasks.findIndex((t) => t.id === overId);
+            
+            if (currentTasks[activeIndex].columnId !== currentTasks[overIndex].columnId) {
+                currentTasks[activeIndex].columnId = currentTasks[overIndex].columnId;
+                return arrayMove(currentTasks, activeIndex, overIndex);
+            }
+    
+            return arrayMove(currentTasks, activeIndex, overIndex);
+        });
     }
   }
 
-  async function onDragEnd(event: DragEndEvent) {
-    setActiveTask(null)
-    const { active, over } = event
-    if (!over) return
+  function onDragEnd(event: DragEndEvent) {
+    setActiveTask(null);
+    setActiveColumnId(null);
+    
+    const { active, over } = event;
+    if (!over || active.id === over.id) {
+      // Revert if dropped in a non-droppable area or on itself
+      if (active.id !== over?.id) setTasks(tasksBeforeDrag);
+      return;
+    }
 
-    const activeId = active.id
-    const overId = over.id
+    const movedTask = tasks.find(t => t.id === active.id);
+    const originalColumnId = activeColumnId;
+    
+    if (!movedTask || !originalColumnId) return;
 
-    if (activeId === overId) return
+    const newColumnId = movedTask.columnId;
+    const newIndex = tasks.filter(t => t.columnId === newColumnId).findIndex(t => t.id === active.id);
 
-    const activeTask = tasks.find((t) => t.id === activeId)
-    if (!activeTask) return
-
-    // Find the final column and order
-    const overColumn =
-      columns.find((c) => c.id === over.id) ||
-      columns.find((c) => c.id === over.data.current?.task?.columnId)
-
-    if (!overColumn) return
-
-    // Call server action
+    // Call server action with the new, robust payload
     toast.promise(
-        moveTask({
-            taskId: activeTask.id,
-            newColumnId: activeTask.columnId, // Optimistically updated in onDragOver
-            newOrder: tasks
-            .filter((t) => t.columnId === activeTask.columnId)
-            .findIndex((t) => t.id === activeId),
-            projectId: initialProject.id,
-        }),
-        {
-            loading: "Moving task...",
-            success: "Task moved successfully.",
-            error: "Failed to move task. Reverting.",
-        }
-    )
+      moveTask({
+        taskId: movedTask.id,
+        activeColumnId: originalColumnId,
+        newColumnId: newColumnId,
+        newIndex: newIndex,
+        projectId: initialProject.id,
+      }),
+      {
+        loading: 'Moving task...',
+        success: 'Task moved successfully!',
+        error: (err) => {
+          // Revert on error
+          setTasks(tasksBeforeDrag);
+          return err.message || 'Failed to move task. Reverting.';
+        },
+      }
+    );
   }
+
 
   return (
     <div className="flex gap-6 h-full overflow-x-auto p-1">
