@@ -285,6 +285,11 @@ import { Suspense } from 'react'
 **Files:** `src/components/kanban/task-card.tsx`
 **Changes:** Modified the `className` of the `TooltipContent` to change the background to white and the text color to black, improving readability as requested.
 
+### Feature: Fix Vercel Build Failure
+**Date:** 2025-11-27
+**Files:** `src/components/kanban/board-column.tsx`, `src/components/kanban/task-card.tsx`, `src/components/kanban/kanban-board.tsx`
+**Changes:** Fixed a TypeScript type error by correctly passing the `currentUser` prop from `KanbanBoard` down to `BoardColumn` and then to `TaskCard`. Resolved an ESLint warning for an unused variable in `kanban-board.tsx`.
+
 ---
 
 **Last Updated:** 2025-11-17

@@ -41,7 +41,7 @@ function AddColumn({ projectId }: { projectId: string }) {
       toast.success('Column created')
       setIsAdding(false)
       setTitle('')
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to create column')
     }
   }
