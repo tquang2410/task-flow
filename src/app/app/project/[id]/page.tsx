@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
 import { Button } from '@/components/ui/button'
@@ -18,7 +19,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import { ProjectKanbanView } from '@/components/kanban/project-kanban-view';
+import { ProjectBoard } from '@/components/kanban/project-board'
+import { BoardSkeleton } from '@/components/kanban/board-skeleton'
 import { PlusCircle, Share } from 'lucide-react'
 
 interface ProjectDetailPageProps {
@@ -26,8 +28,8 @@ interface ProjectDetailPageProps {
 }
 
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
-  // 1. DATA FETCHING
-  const { id } = await params; // Await params to get the id
+  // 1. DATA FETCHING (Simplified for fast initial load)
+  const { id } = await params;
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -35,30 +37,15 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     return redirect('/auth')
   }
 
-  // Fetch both the app user (full object) and the project in parallel
+  // Fetch only the data needed for the shell UI (header, breadcrumbs)
   const [appUser, project] = await Promise.all([
-    db.user.findUnique({ where: { supabaseId: user.id } }),
+    db.user.findUnique({ where: { supabaseId: user.id }, select: { id: true, memberIds: true } }),
     db.project.findUnique({
       where: { id: id },
-      include: {
-        tasks: {
-          orderBy: { order: 'asc' },
-          include: {
-            comments: {
-              include: {
-                user: true // Include the user who made the comment
-              },
-              orderBy: {
-                createdAt: 'asc' // Show oldest comments first
-              }
-            },
-            attachments: {
-              include: {
-                uploader: true // Include the user who uploaded the file
-              }
-            }
-          }
-        },
+      select: {
+        id: true,
+        name: true,
+        description: true,
         workspace: { select: { id: true, name: true, memberIds: true } },
       },
     }),
@@ -127,9 +114,11 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
-        {/* Board Content is now handled by the client component */}
+        {/* Board Content with Streaming */}
         <TabsContent value="board" className="flex-grow overflow-hidden">
-            <ProjectKanbanView project={project} currentUser={appUser} />
+          <Suspense fallback={<BoardSkeleton />}>
+            <ProjectBoard projectId={project.id} />
+          </Suspense>
         </TabsContent>
         <TabsContent value="list">List view coming soon...</TabsContent>
         <TabsContent value="timeline">Timeline view coming soon...</TabsContent>
