@@ -28,7 +28,7 @@ const priorityStyles: Record<Priority, string> = {
   HIGH: "bg-red-500/20 text-red-400 border-red-500/30",
 };
 
-export function TaskCard({ task, currentUser }: TaskCardProps) {
+export function TaskCard({ task, currentUser: _currentUser }: TaskCardProps) {
   const router = useRouter();
   const pathname = usePathname();
 

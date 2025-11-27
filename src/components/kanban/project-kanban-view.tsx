@@ -25,7 +25,7 @@ export function ProjectKanbanView({ project, currentUser }: ProjectKanbanViewPro
 
   return (
     <>
-      <KanbanBoard initialProject={project} />
+      <KanbanBoard initialProject={project} currentUser={currentUser} />
       
       {selectedTask && (
         <TaskDetailSheet

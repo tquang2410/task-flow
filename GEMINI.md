@@ -287,8 +287,8 @@ import { Suspense } from 'react'
 
 ### Feature: Fix Vercel Build Failure
 **Date:** 2025-11-27
-**Files:** `src/components/kanban/board-column.tsx`, `src/components/kanban/task-card.tsx`, `src/components/kanban/kanban-board.tsx`
-**Changes:** Fixed a TypeScript type error by correctly passing the `currentUser` prop from `KanbanBoard` down to `BoardColumn` and then to `TaskCard`. Resolved an ESLint warning for an unused variable in `kanban-board.tsx`.
+**Files:** `src/components/kanban/project-kanban-view.tsx`, `src/components/kanban/board-column.tsx`, `src/components/kanban/task-card.tsx`, `src/components/kanban/kanban-board.tsx`
+**Changes:** Fixed a TypeScript type error by correctly passing the `currentUser` prop from `KanbanBoard` down to `BoardColumn` and then to `TaskCard`. Resolved an ESLint warning for an unused variable in `kanban-board.tsx` and `task-card.tsx`.
 
 ---
 
