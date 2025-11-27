@@ -87,7 +87,7 @@ export function TaskCard({ task }: TaskCardProps) {
             </CardContent>
           </Card>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="text-xs text-muted-foreground bg-popover/90 backdrop-blur-sm">
+        <TooltipContent side="bottom" className="text-xs text-black bg-white">
           <p>Drag to move this task</p>
         </TooltipContent>
       </Tooltip>

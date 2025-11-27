@@ -280,6 +280,11 @@ import { Suspense } from 'react'
 **Files:** `src/components/kanban/task-card.tsx`, `src/components/ui/tooltip.tsx`
 **Changes:** Installed Shadcn UI tooltip component, imported it into `task-card.tsx`, and wrapped the `TaskCard` content with the Tooltip structure to provide a hover tooltip with custom styling and delay.
 
+### Feature: Update Tooltip Style on Task Card
+**Date:** 2025-11-27
+**Files:** `src/components/kanban/task-card.tsx`
+**Changes:** Modified the `className` of the `TooltipContent` to change the background to white and the text color to black, improving readability as requested.
+
 ---
 
 **Last Updated:** 2025-11-17
