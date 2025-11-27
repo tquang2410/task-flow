@@ -35,6 +35,7 @@
 
 **🚨 Vấn đề Nghiêm trọng (Critical Issues):**
 * **Performance:** While the project page is optimized, other pages (`/app`, `/app/workspace/[id]`) may still suffer from slower, non-streamed data fetching. A full performance review across the app is still needed.
+* **PrismaClientValidationError:** Resolved an issue where `db.user.findUnique` in `src/app/app/project/[id]/page.tsx` was incorrectly attempting to select `memberIds` from the `User` model, which does not exist.
 
 **📝 Kế hoạch hành động tiếp theo (Next Steps - Priority High):**
 

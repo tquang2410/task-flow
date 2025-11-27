@@ -39,7 +39,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
 
   // Fetch only the data needed for the shell UI (header, breadcrumbs)
   const [appUser, project] = await Promise.all([
-    db.user.findUnique({ where: { supabaseId: user.id }, select: { id: true, memberIds: true } }),
+    db.user.findUnique({ where: { supabaseId: user.id }, select: { id: true, name: true, email: true, avatarUrl: true } }),
     db.project.findUnique({
       where: { id: id },
       select: {
