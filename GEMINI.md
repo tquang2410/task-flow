@@ -29,7 +29,7 @@ Bạn là **Principal Next.js Engineer** với 10+ năm kinh nghiệm, chuyên s
 - Streaming với `<Suspense>` và loading states
 - Optimize bundle size
 - Image optimization với `next/image`
-- 🛡️ **JSX Text Safety:** NEVER use raw quotes (`"`, `'`) inside JSX text nodes. ALWAYS use HTML entities (`&quot;`, `&apos;`) or wrap them in expressions (`{'\"'}`) to prevent ESLint build errors.
+- 🛡️ **JSX Text Safety:** NEVER use raw quotes (`"`, `'`) inside JSX text nodes. ALWAYS use HTML entities (`&quot;`, `&apos;`) or wrap them in expressions (`{'"'}`) to prevent ESLint build errors.
 
 ### 4. Security & Best Practices
 - **Server Actions** cho data mutations (tránh API routes khi không cần)
@@ -89,6 +89,7 @@ Format:
 **Changes:** Mô tả ngắn gọn (1-2 câu)
 ```
 
+
 ### 3. Git Commit Messages
 - **Ngôn ngữ:** English
 - **Format:** Conventional Commits
@@ -98,6 +99,7 @@ Format:
   refactor: simplify data fetching logic
   docs: update API documentation
   ```
+
 
 ### 4. PRD Updates
 - Khi hoàn thành feature, update file `document/PRD/<epic>.md` nếu có thay đổi so với mục tiêu ban đầu
@@ -267,6 +269,16 @@ import { Suspense } from 'react'
 ### Feature: Authentication (Migration)
 *   **File(s) modified:** `package.json`, `src/lib/supabase/client.ts`, `src/lib/supabase/server.ts`, `src/middleware.ts`
 *   **Description:** Đã di chuyển từ `@supabase/auth-helpers-nextjs` sang `@supabase/ssr`. Các file `package.json`, `src/lib/supabase/client.ts`, `src/lib/supabase/server.ts`, và `src/middleware.ts` đã được cập nhật để sử dụng thư viện `@supabase/ssr` mới.
+
+### Feature: Debugging Drag & Drop
+**Date:** 2025-11-27
+**Files:** `src/components/kanban/kanban-board.tsx`
+**Changes:** Replaced the entire content of `kanban-board.tsx` with new debugging logic, enhanced logging, and potentially fixed transaction logic for drag & drop functionality.
+
+### Feature: Add Tooltip to Task Card
+**Date:** 2025-11-27
+**Files:** `src/components/kanban/task-card.tsx`, `src/components/ui/tooltip.tsx`
+**Changes:** Installed Shadcn UI tooltip component, imported it into `task-card.tsx`, and wrapped the `TaskCard` content with the Tooltip structure to provide a hover tooltip with custom styling and delay.
 
 ---
 

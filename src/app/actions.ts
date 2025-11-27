@@ -513,6 +513,7 @@ export async function deleteTask(input: { taskId: string, projectId: string }): 
 export async function moveTask(
   input: z.infer<typeof MoveTaskSchema>
 ): Promise<ActionResponse<string>> {
+  console.log('[moveTask] Server received input:', input); // Log input
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -562,8 +563,9 @@ export async function moveTask(
     revalidatePath(`/app/project/${projectId}`)
     return { status: 'success', data: 'Task moved and reordered' }
   } catch (error) {
-    console.error('Move Task Error:', error)
-    return { status: 'error', message: 'Failed to move task.' }
+    console.error('Move Task DB Error:', error) // More specific log
+    const errorMessage = error instanceof Error ? error.message : 'An unknown database error occurred.'
+    return { status: 'error', message: `Failed to move task. ${errorMessage}` }
   }
 }
 

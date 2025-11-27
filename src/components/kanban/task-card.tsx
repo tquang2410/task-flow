@@ -1,5 +1,12 @@
 'use client';
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useRouter, usePathname } from 'next/navigation';
@@ -49,32 +56,41 @@ export function TaskCard({ task }: TaskCardProps) {
   }
 
   return (
-    <Card
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={handleCardClick}
-      suppressHydrationWarning={true}
-      className={cn(
-        "bg-card border-white/10 shadow-sm cursor-pointer active:cursor-grabbing hover:ring-2 hover:ring-dashboard-primary/50 transition-shadow",
-        isDragging && "opacity-50 ring-2 ring-dashboard-primary"
-      )}
-    >
-      <CardContent className="p-3 space-y-2">
-        <p className="text-sm font-medium text-white">{task.title}</p>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-slate-400">
-            {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "No due date"}
-          </span>
-          <Badge
-            variant="outline"
-            className={`text-xs ${priorityStyles[task.priority]}`}
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          <Card
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            onClick={handleCardClick}
+            suppressHydrationWarning={true}
+            className={cn(
+              "bg-card border-white/10 shadow-sm cursor-pointer active:cursor-grabbing hover:ring-2 hover:ring-dashboard-primary/50 transition-shadow",
+              isDragging && "opacity-50 ring-2 ring-dashboard-primary"
+            )}
           >
-            {task.priority}
-          </Badge>
-        </div>
-      </CardContent>
-    </Card>
+            <CardContent className="p-3 space-y-2">
+              <p className="text-sm font-medium text-white">{task.title}</p>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400">
+                  {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "No due date"}
+                </span>
+                <Badge
+                  variant="outline"
+                  className={`text-xs ${priorityStyles[task.priority]}`}
+                >
+                  {task.priority}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="text-xs text-muted-foreground bg-popover/90 backdrop-blur-sm">
+          <p>Drag to move this task</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
