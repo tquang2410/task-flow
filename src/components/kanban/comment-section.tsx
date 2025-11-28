@@ -1,6 +1,6 @@
 'use client'
 
-import { useOptimistic, useRef } from 'react'
+import { useOptimistic, useRef, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,6 +25,8 @@ interface CommentSectionProps {
 
 export function CommentSection({ taskId, initialComments, currentUser }: CommentSectionProps) {
   const formRef = useRef<HTMLFormElement>(null)
+  const [isPending, startTransition] = useTransition();
+
   const [optimisticComments, addOptimisticComment] = useOptimistic<CommentWithUser[], string>(
     initialComments,
     (state, newCommentText) => [
@@ -50,12 +52,21 @@ export function CommentSection({ taskId, initialComments, currentUser }: Comment
   })
 
   async function onSubmit(values: z.infer<typeof CreateCommentSchema>) {
-    addOptimisticComment(values.text)
+    if (!values.text.trim()) {
+      return;
+    }
+    
+    startTransition(() => {
+      addOptimisticComment(values.text)
+    });
+    
     form.reset()
     const result = await createComment(values)
 
     if (result.status === 'error') {
       toast.error(result.message)
+      // In a production app, you might want to remove the optimistic comment here
+      // or use a more robust state management that handles automatic rollbacks.
     }
   }
 
@@ -109,13 +120,14 @@ export function CommentSection({ taskId, initialComments, currentUser }: Comment
                     className="bg-slate-800 border-slate-700 focus-visible:ring-dashboard-primary"
                     rows={1}
                     {...field}
+                    disabled={isPending}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit" size="icon" className="bg-dashboard-primary hover:bg-dashboard-primary/90 mt-1">
+          <Button type="submit" size="icon" className="bg-dashboard-primary hover:bg-dashboard-primary/90 mt-1" disabled={isPending}>
             <Send className="h-4 w-4" />
           </Button>
         </form>

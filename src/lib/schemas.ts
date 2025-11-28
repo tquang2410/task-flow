@@ -82,6 +82,21 @@ export const DeleteAttachmentSchema = z.object({
     path: z.string(), // Path in Supabase storage
 });
 
+// Schema for creating an attachment record in the DB after direct upload
+export const CreateAttachmentRecordSchema = z.object({
+  taskId: z.string(),
+  name: z.string(),
+  path: z.string(),
+});
+
+// Schema for getting a signed URL
+export const GetSignedUrlSchema = z.object({
+  taskId: z.string(),
+  fileName: z.string(),
+  fileType: z.string(),
+  fileSize: z.number(),
+});
+
 
 // --- Column Management Schemas (Epic 3) ---
 
