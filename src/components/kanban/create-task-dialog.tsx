@@ -57,7 +57,6 @@ export function CreateTaskDialog({ projectId, columnId, onAddTask }: CreateTaskD
       order: 9999, // Will be corrected by the server
       priority: 'MEDIUM',
       type: 'TASK',
-      status: 'TODO', // Default status
       description: null,
       dueDate: null,
       assigneeId: null,

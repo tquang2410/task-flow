@@ -33,10 +33,10 @@
     * Implemented route-level loading skeletons (`loading.tsx`) for instant UI feedback.
     * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
     * Implemented an optimistic UI for task creation, making new tasks appear instantly on the board.
+* **Build & Code Health:** Resolved a critical `PrismaClientValidationError` and cleaned up all ESLint warnings to ensure a stable and clean build.
 
 **🚨 Vấn đề Nghiêm trọng (Critical Issues):**
 * **Performance:** While the project page is optimized, other pages (`/app`, `/app/workspace/[id]`) may still suffer from slower, non-streamed data fetching. A full performance review across the app is still needed.
-* **PrismaClientValidationError:** Resolved an issue where `db.user.findUnique` in `src/app/app/project/[id]/page.tsx` was incorrectly attempting to select `memberIds` from the `User` model, which does not exist.
 
 **📝 Kế hoạch hành động tiếp theo (Next Steps - Priority High):**
 

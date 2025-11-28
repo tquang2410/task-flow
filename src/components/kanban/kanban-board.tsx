@@ -41,7 +41,7 @@ function AddColumn({ projectId }: { projectId: string }) {
       toast.success('Column created')
       setIsAdding(false)
       setTitle('')
-    } catch (_error) {
+    } catch {
       toast.error('Failed to create column')
     }
   }
@@ -237,7 +237,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
         <AddColumn projectId={initialProject.id} />
         {portalContainer && createPortal(
           <DragOverlay>
-            {activeTask && <TaskCard task={activeTask} currentUser={currentUser} />}
+            {activeTask && <TaskCard task={activeTask} />}
           </DragOverlay>,
           portalContainer
         )}
