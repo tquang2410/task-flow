@@ -231,7 +231,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   }
 
   return (
-    <div className="flex gap-6 h-full overflow-x-auto p-1">
+    <div className="flex h-full gap-6 overflow-x-auto p-4 items-start">
       <DndContext
         sensors={sensors}
         onDragStart={onDragStart}
