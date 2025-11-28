@@ -35,7 +35,7 @@
     * Implemented route-level loading skeletons (`loading.tsx`) for instant UI feedback.
     * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
     * Implemented an optimistic UI for task creation, making new tasks appear instantly on the board.
-* **Build & Code Health:** Resolved a critical `PrismaClientValidationError` and cleaned up all ESLint warnings to ensure a stable and clean build. All temporary debugging logs have been commented out.
+* **Build & Code Health:** Resolved critical build errors (`no-explicit-any`) and cleaned up all code quality warnings (`no-unused-vars`, `no-img-element`) to ensure a stable and clean build. All temporary debugging logs have also been commented out.
 * **Layout:** Implemented an "app-like" layout (`h-screen overflow-hidden`) at the root level (`src/app/app/layout.tsx`) to prevent body scrolling. This fixes a critical bug where the background would break when the Kanban board overflowed horizontally.
 
 **🚨 Vấn đề Nghiêm trọng (Critical Issues):**

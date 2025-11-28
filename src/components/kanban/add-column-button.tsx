@@ -34,8 +34,9 @@ export function AddColumnButton({ projectId }: AddColumnButtonProps) {
       toast.success('Column created');
       setOpen(false);
       setTitle('');
-    } catch (e: any) {
-      toast.error(e.message || 'Failed to create column');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to create column';
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
