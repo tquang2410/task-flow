@@ -26,6 +26,7 @@ export async function ProjectBoard({ projectId }: ProjectBoardProps) {
         tasks: {
           orderBy: { order: 'asc' },
           include: {
+            assignee: true, // Include the full user object for the assignee
             comments: {
               include: {
                 user: true // Include the user who made the comment
@@ -41,7 +42,11 @@ export async function ProjectBoard({ projectId }: ProjectBoardProps) {
             }
           }
         },
-        workspace: { select: { id: true, name: true, memberIds: true } },
+        workspace: {
+          include: {
+            members: true // Include full member objects
+          }
+        },
       },
     }),
   ])

@@ -8,6 +8,7 @@ import { Prisma } from '@prisma/client'
  */
 export type TaskWithDetails = Prisma.TaskGetPayload<{
   include: {
+    assignee: true, // Include the full user object for the assignee
     comments: {
       include: {
         user: true

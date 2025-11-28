@@ -44,15 +44,17 @@ import { CommentSection } from './comment-section'
 import { AttachmentList } from './attachment-list'
 
 import { type TaskWithDetails } from '@/types/prisma'
+import { MemberSelect } from './member-select'
 
 interface TaskDetailSheetProps {
   task: TaskWithDetails
   isOpen: boolean
   onClose: () => void
   currentUser: User | null
+  members: User[]
 }
 
-export function TaskDetailSheet({ task, isOpen, onClose, currentUser }: TaskDetailSheetProps) {
+export function TaskDetailSheet({ task, isOpen, onClose, currentUser, members }: TaskDetailSheetProps) {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const form = useForm<z.infer<typeof UpdateTaskSchema>>({
@@ -63,6 +65,7 @@ export function TaskDetailSheet({ task, isOpen, onClose, currentUser }: TaskDeta
       description: task.description || '',
       priority: task.priority,
       dueDate: task.dueDate,
+      assigneeId: task.assigneeId,
     },
   })
 
@@ -134,7 +137,24 @@ export function TaskDetailSheet({ task, isOpen, onClose, currentUser }: TaskDeta
                     </FormItem>
                 )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="assigneeId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Assignee</FormLabel>
+                          <FormControl>
+                            <MemberSelect
+                              members={members}
+                              value={field.value}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <FormField
                     control={form.control}
                     name="priority"
