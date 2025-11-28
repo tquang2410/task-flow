@@ -27,6 +27,23 @@ TaskFlow là một nền tảng quản lý tác vụ (task management) giúp cá
 
 ---
 
+## ⚡️ Phương pháp tối ưu (Performance Optimizations)
+
+Để giải quyết vấn đề tốc độ tải trang chậm, dự án đã áp dụng các kỹ thuật tối ưu hiệu năng hiện đại của Next.js:
+
+### 1. Phản hồi giao diện tức thì (Instant UI Feedback)
+- **Route-level Loading Skeletons:** Sử dụng file `loading.tsx` cho các route chính (`/app`, `/app/workspace/[id]`, `/app/project/[id]`). Next.js tự động hiển thị một giao diện khung (skeleton) ngay lập tức trong khi dữ liệu của trang đang được tải ở server. Điều này loại bỏ màn hình trắng và cải thiện trải nghiệm người dùng.
+
+### 2. Streaming với React Suspense
+- **Tách biệt Data Fetching:** Trang chi tiết Project (`/app/project/[id]`) đã được refactor. Thay vì đợi toàn bộ dữ liệu (tasks, comments,...) tải xong mới hiển thị, trang giờ đây chỉ fetch dữ liệu nhẹ (tên dự án, mô tả) để render phần "vỏ" giao diện (page shell).
+- **Tải bất đồng bộ:** Dữ liệu nặng của bảng Kanban được chuyển vào một Server Component riêng (`<ProjectBoard />`). Component này được bọc trong thẻ `<Suspense>`, cho phép nó tải dữ liệu một cách độc lập.
+- **Kết quả:** Người dùng thấy layout chính của trang ngay lập tức, trong khi bảng Kanban (phần tốn thời gian nhất) hiển thị một skeleton và "stream" nội dung vào ngay khi sẵn sàng. Kỹ thuật này giúp tránh việc render bị chặn (render-blocking) bởi các truy vấn CSDL chậm.
+
+### 3. Fetch dữ liệu song song (Parallel Data Fetching)
+- **Sử dụng `Promise.all`:** Ở những nơi cần lấy nhiều nguồn dữ liệu độc lập (ví dụ: thông tin user và thông tin project), code đã được tối ưu để sử dụng `Promise.all`. Điều này cho phép các truy vấn được gửi đi song song thay vì tuần tự (waterfall), giúp giảm tổng thời gian chờ dữ liệu.
+
+---
+
 ## 🚀 Bắt đầu (Getting Started)
 
 Làm theo các bước sau để thiết lập và chạy dự án trên máy local của bạn.
@@ -71,7 +88,7 @@ Bạn cần có [Node.js](https://nodejs.org/) (phiên bản 18.x trở lên) v�
 4.  **Chạy Prisma:**
 
     Sau khi thiết lập `DATABASE_URL`, hãy chạy các lệnh sau để đồng bộ schema của bạn với CSDL MongoDB và tạo Prisma Client:
-
+ 
     ```bash
     # Tạo Prisma Client (dựa trên file schema.prisma)
     npx prisma generate
