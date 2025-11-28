@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { createPortal } from 'react-dom'
 import {
   DndContext,
@@ -29,20 +29,24 @@ type Column = {
   title: string
 }
 
-// Component AddColumn giữ nguyên
 function AddColumn({ projectId }: { projectId: string }) {
   const [isAdding, setIsAdding] = useState(false)
   const [title, setTitle] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleCreateColumn = async () => {
-    if (title.trim() === '') return toast.error('Title required')
+    if (isSubmitting || title.trim() === '') return;
+
+    setIsSubmitting(true);
     try {
-      await createColumn({ projectId, title })
-      toast.success('Column created')
-      setIsAdding(false)
-      setTitle('')
+      await createColumn({ projectId, title });
+      toast.success('Column created');
+      setIsAdding(false);
+      setTitle('');
     } catch {
-      toast.error('Failed to create column')
+      toast.error('Failed to create column');
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -54,10 +58,15 @@ function AddColumn({ projectId }: { projectId: string }) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleCreateColumn()}
+          disabled={isSubmitting}
         />
         <div className="flex items-center gap-2">
-          <Button onClick={handleCreateColumn}>Add</Button>
-          <Button variant="ghost" onClick={() => setIsAdding(false)}>Cancel</Button>
+          <Button onClick={handleCreateColumn} disabled={isSubmitting}>
+            {isSubmitting ? 'Adding...' : 'Add'}
+          </Button>
+          <Button variant="ghost" onClick={() => setIsAdding(false)} disabled={isSubmitting}>
+            Cancel
+          </Button>
         </div>
       </div>
     )
@@ -78,7 +87,7 @@ interface KanbanBoardProps {
 
 export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   // --- 1. Init State ---
-  const [columns] = useState<Column[]>(() => {
+  const [columns, setColumns] = useState<Column[]>(() => {
     try { return initialProject.columns as unknown as Column[] } catch { return [] }
   })
   const [tasks, setTasks] = useState(initialProject.tasks)
@@ -95,7 +104,12 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   useEffect(() => {
     console.log('[Sync] Tasks updated from Server:', initialProject.tasks.length)
     setTasks(initialProject.tasks)
-  }, [initialProject.tasks])
+  }, [initialProject.tasks]);
+
+  useEffect(() => {
+    const cols = (initialProject.columns as unknown as Column[]) || [];
+    setColumns(cols);
+  }, [initialProject.columns]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 3 } })

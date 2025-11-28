@@ -28,7 +28,7 @@
     * Task CRUD: Tạo, Sửa, Xóa.
     * Comments: Đã có UI và logic.
     * Attachments: Đã tích hợp Supabase Storage (Bucket `ATTACHMENTS`) và UI upload/list.
-    * Column Management: Đã có logic thêm/sửa cột.
+    * Column Management: Đã có logic thêm/sửa cột (đã fix lỗi không đồng bộ state và spam click).
 * **Performance & UX:**
     * Implemented route-level loading skeletons (`loading.tsx`) for instant UI feedback.
     * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
