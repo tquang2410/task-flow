@@ -85,6 +85,10 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null)
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
 
+  const addOptimisticTask = (newTask: TaskWithDetails) => {
+    setTasks((prev) => [...prev, newTask]);
+  };
+
   useEffect(() => { setPortalContainer(document.body) }, [])
   
   // Sync state khi server trả data mới (quan trọng cho việc F5)
@@ -227,6 +231,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
             tasks={tasks.filter(t => t.columnId === col.id)}
             projectId={initialProject.id}
             currentUser={currentUser}
+            onAddTask={addOptimisticTask}
           />
         ))}
         <AddColumn projectId={initialProject.id} />

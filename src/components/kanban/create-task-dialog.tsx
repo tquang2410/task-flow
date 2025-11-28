@@ -25,16 +25,17 @@ import {
 import { Input } from '@/components/ui/input'
 import { CreateTaskSchema } from '@/lib/schemas'
 import { createTask } from '@/app/actions'
+import { type TaskWithDetails } from '@/types/prisma'
 
 
 interface CreateTaskDialogProps {
   projectId: string;
   columnId: string;
+  onAddTask: (task: TaskWithDetails) => void;
 }
 
-export function CreateTaskDialog({ projectId, columnId }: CreateTaskDialogProps) {
+export function CreateTaskDialog({ projectId, columnId, onAddTask }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<z.infer<typeof CreateTaskSchema>>({
     resolver: zodResolver(CreateTaskSchema),
@@ -46,18 +47,51 @@ export function CreateTaskDialog({ projectId, columnId }: CreateTaskDialogProps)
   })
 
   async function onSubmit(values: z.infer<typeof CreateTaskSchema>) {
-    setIsSubmitting(true);
-    const result = await createTask(values);
-    setIsSubmitting(false);
+    // Step 1: Create a temporary task object for optimistic update
+    const tempId = `temp-${Date.now()}`;
+    const tempTask: TaskWithDetails = {
+      id: tempId,
+      title: values.title,
+      columnId: values.columnId,
+      projectId: values.projectId,
+      order: 9999, // Will be corrected by the server
+      priority: 'MEDIUM',
+      type: 'TASK',
+      status: 'TODO', // Default status
+      description: null,
+      dueDate: null,
+      assigneeId: null,
+      reporterId: 'temp-user', // Will be corrected by server
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      comments: [],
+      attachments: [],
+    };
 
-    if (result.status === 'success') {
-      toast.success("Task has been created successfully.");
-      setOpen(false);
-      form.reset();
-      // No need to call router.refresh() here as revalidatePath in the action will handle it
-    } else {
-      toast.error(result.message);
-    }
+    // Step 2: Optimistically update the UI
+    onAddTask(tempTask);
+
+    // Step 3: Close the modal and reset the form immediately
+    setOpen(false);
+    form.reset();
+
+    // Step 4: Call the server action in the background
+    toast.promise(
+      createTask(values),
+      {
+        loading: 'Creating task...',
+        success: (result) => {
+          if (result.status === 'error') {
+            toast.error(result.message);
+          }
+          return "Task created successfully.";
+        },
+        error: (err) => {
+          console.error("Failed to create task:", err);
+          return "Could not create task.";
+        },
+      }
+    );
   }
 
   return (
@@ -85,8 +119,8 @@ export function CreateTaskDialog({ projectId, columnId }: CreateTaskDialogProps)
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-dashboard-primary text-white" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Create Task'}
+            <Button type="submit" className="w-full bg-dashboard-primary text-white">
+              Create Task
             </Button>
           </form>
         </Form>
