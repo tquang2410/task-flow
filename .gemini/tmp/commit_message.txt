@@ -1,0 +1,14 @@
+fix: Resolve PrismaClientValidationError in Project Detail Page
+
+This commit fixes a `PrismaClientValidationError` that occurred in the Project Detail Page
+(`src/app/app/project/[id]/page.tsx`). The error was caused by attempting to select
+the non-existent `memberIds` field from the `User` model during a `db.user.findUnique` query.
+
+The `select` clause for `db.user.findUnique` has been corrected to retrieve
+`id`, `name`, `email`, and `avatarUrl` fields, which are valid fields on the `User` model.
+The security check logic, which compares `appUser.id` with `workspace.memberIds`,
+remains functionally correct as `workspace.memberIds` was always correctly fetched.
+
+Files affected:
+- `GEMINI.md`: Updated to include this fix in the "Critical Issues" section.
+- `src/app/app/project/[id]/page.tsx`: Modified `db.user.findUnique` select clause.

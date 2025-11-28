@@ -44,9 +44,10 @@ interface ColumnHeaderProps {
   column: Column
   taskCount: number
   projectId: string
+  onAddTask: (task: TaskWithDetails) => void;
 }
 
-function ColumnHeader({ column, taskCount, projectId }: ColumnHeaderProps) {
+function ColumnHeader({ column, taskCount, projectId, onAddTask }: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState(column.title)
   const [isPending, startTransition] = useTransition()
@@ -109,7 +110,7 @@ function ColumnHeader({ column, taskCount, projectId }: ColumnHeaderProps) {
         )}
       </div>
       <div className="flex items-center gap-1">
-        <CreateTaskDialog projectId={projectId} columnId={column.id} />
+        <CreateTaskDialog projectId={projectId} columnId={column.id} onAddTask={onAddTask} />
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -163,13 +164,15 @@ interface BoardColumnProps {
   tasks: TaskWithDetails[]
   projectId: string
   currentUser: User
+  onAddTask: (task: TaskWithDetails) => void;
 }
 
 export function BoardColumn({
   column,
   tasks,
   projectId,
-  currentUser
+  currentUser,
+  onAddTask
 }: BoardColumnProps) {
   const tasksInColumn = tasks.filter((task) => task.columnId === column.id)
   const taskIds = tasksInColumn.map((task) => task.id)
@@ -191,6 +194,7 @@ export function BoardColumn({
         column={column}
         taskCount={tasksInColumn.length}
         projectId={projectId}
+        onAddTask={onAddTask}
       />
       {/* Task List */}
       <div
@@ -204,7 +208,7 @@ export function BoardColumn({
           strategy={verticalListSortingStrategy}
         >
           {tasksInColumn.map((task) => (
-            <TaskCard key={task.id} task={task} currentUser={currentUser} />
+            <TaskCard key={task.id} task={task} />
           ))}
         </SortableContext>
         {tasksInColumn.length === 0 && (

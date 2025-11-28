@@ -41,7 +41,7 @@ function AddColumn({ projectId }: { projectId: string }) {
       toast.success('Column created')
       setIsAdding(false)
       setTitle('')
-    } catch (_error) {
+    } catch {
       toast.error('Failed to create column')
     }
   }
@@ -84,6 +84,10 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   const [tasks, setTasks] = useState(initialProject.tasks)
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null)
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
+
+  const addOptimisticTask = (newTask: TaskWithDetails) => {
+    setTasks((prev) => [...prev, newTask]);
+  };
 
   useEffect(() => { setPortalContainer(document.body) }, [])
   
@@ -227,12 +231,13 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
             tasks={tasks.filter(t => t.columnId === col.id)}
             projectId={initialProject.id}
             currentUser={currentUser}
+            onAddTask={addOptimisticTask}
           />
         ))}
         <AddColumn projectId={initialProject.id} />
         {portalContainer && createPortal(
           <DragOverlay>
-            {activeTask && <TaskCard task={activeTask} currentUser={currentUser} />}
+            {activeTask && <TaskCard task={activeTask} />}
           </DragOverlay>,
           portalContainer
         )}
