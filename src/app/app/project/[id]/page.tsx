@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/tabs'
 import { ProjectBoard } from '@/components/kanban/project-board'
 import { BoardSkeleton } from '@/components/kanban/board-skeleton'
+import { AddColumnButton } from '@/components/kanban/add-column-button'
 import { PlusCircle, Share } from 'lucide-react'
 
 interface ProjectDetailPageProps {
@@ -102,6 +103,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           <Button className="bg-dashboard-primary text-white hover:bg-dashboard-primary/90">
             <PlusCircle className="mr-2 h-4 w-4" /> Create Task
           </Button>
+          <AddColumnButton projectId={project.id} />
         </div>
       </header>
 

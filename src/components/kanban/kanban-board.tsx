@@ -29,57 +29,6 @@ type Column = {
   title: string
 }
 
-function AddColumn({ projectId }: { projectId: string }) {
-  const [isAdding, setIsAdding] = useState(false)
-  const [title, setTitle] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const handleCreateColumn = async () => {
-    if (isSubmitting || title.trim() === '') return;
-
-    setIsSubmitting(true);
-    try {
-      await createColumn({ projectId, title });
-      toast.success('Column created');
-      setIsAdding(false);
-      setTitle('');
-    } catch {
-      toast.error('Failed to create column');
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  if (isAdding) {
-    return (
-      <div className="w-80 shrink-0 p-2 space-y-2 bg-secondary/50 rounded-xl">
-        <Input
-          autoFocus
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleCreateColumn()}
-          disabled={isSubmitting}
-        />
-        <div className="flex items-center gap-2">
-          <Button onClick={handleCreateColumn} disabled={isSubmitting}>
-            {isSubmitting ? 'Adding...' : 'Add'}
-          </Button>
-          <Button variant="ghost" onClick={() => setIsAdding(false)} disabled={isSubmitting}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    )
-  }
-  return (
-    <div className="w-80 shrink-0">
-      <Button variant="secondary" className="w-full justify-start h-12" onClick={() => setIsAdding(true)}>
-        <PlusIcon className="mr-2 h-4 w-4" /> Add new column
-      </Button>
-    </div>
-  )
-}
-
 interface KanbanBoardProps {
   initialProject: Project & { tasks: TaskWithDetails[] }
   currentUser: User
@@ -248,7 +197,6 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
             onAddTask={addOptimisticTask}
           />
         ))}
-        <AddColumn projectId={initialProject.id} />
         {portalContainer && createPortal(
           <DragOverlay>
             {activeTask && <TaskCard task={activeTask} />}

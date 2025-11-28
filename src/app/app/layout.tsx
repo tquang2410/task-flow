@@ -22,12 +22,10 @@ export default async function AppLayout({
     return redirect('/auth')
   }
 
-  // The main layout for the authenticated part of the app, based on the HTML template.
   return (
-    // Using the new 'dashboard-background' color from tailwind.config.ts
-    <div className="relative flex min-h-screen w-full bg-dashboard-background text-white">
+    <div className="flex h-screen w-full overflow-hidden bg-dashboard-background text-white">
       <Toaster theme="dark" position="top-right" />
-      {/* Glassmorphism Sidebar from template */}
+      {/* Sidebar */}
       <aside className="fixed left-0 top-0 z-20 flex h-full w-20 flex-col items-center border-r border-white/10 bg-black/30 py-6 backdrop-blur-md">
         <div className="mb-10">
           <Link href="/app">
@@ -35,7 +33,6 @@ export default async function AppLayout({
           </Link>
         </div>
         <nav className="flex flex-col items-center gap-4">
-          {/* Active Link */}
           <Link
             href="/app"
             className="group relative flex items-center justify-center rounded-lg p-3 text-white"
@@ -43,7 +40,6 @@ export default async function AppLayout({
             <div className="absolute left-0 h-8 w-1 rounded-r-full bg-dashboard-primary transition-all"></div>
             <LayoutDashboard className="h-6 w-6" />
           </Link>
-          {/* Other Links */}
           <Link
             href="#"
             className="group relative flex items-center justify-center rounded-lg p-3 text-slate-400 hover:text-white transition-colors"
@@ -66,12 +62,11 @@ export default async function AppLayout({
             <Users className="h-6 w-6" />
           </Link>
         </nav>
-        {/* User Profile client component */}
         <UserProfile user={user} />
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 pl-20">
+      <main className="flex-1 pl-20 h-full overflow-hidden flex flex-col relative">
         {children}
       </main>
     </div>
