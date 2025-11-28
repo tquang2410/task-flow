@@ -26,8 +26,8 @@
 * **Kanban Board (Feature Complete):**
     * Drag & Drop mượt mà (đã fix lỗi nhảy vị trí).
     * Task CRUD: Tạo, Sửa, Xóa.
-    * Comments: Đã có UI và logic.
-    * Attachments: Đã tích hợp Supabase Storage (Bucket `ATTACHMENTS`) và UI upload/list.
+    * Comments: Đã có UI và logic (đã fix lỗi optimistic update).
+    * Attachments: Refactored to a direct-to-storage upload pattern, fixing file size limits and adding client-side validation. Now includes image previews in a responsive grid.
     * Column Management: Đã có logic thêm/sửa cột (đã fix lỗi không đồng bộ state và spam click).
     * Layout: Updated Kanban board container to ensure proper horizontal scrolling and column sizing (`flex h-full gap-6 overflow-x-auto p-4 items-start`).
     * Refactored "Add Column": Moved the "Add Column" button to the project header and rebuilt it as a `Popover`-based client component for a cleaner UI and better UX.
@@ -35,7 +35,7 @@
     * Implemented route-level loading skeletons (`loading.tsx`) for instant UI feedback.
     * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
     * Implemented an optimistic UI for task creation, making new tasks appear instantly on the board.
-* **Build & Code Health:** Resolved a critical `PrismaClientValidationError` and cleaned up all ESLint warnings to ensure a stable and clean build.
+* **Build & Code Health:** Resolved a critical `PrismaClientValidationError` and cleaned up all ESLint warnings to ensure a stable and clean build. All temporary debugging logs have been commented out.
 * **Layout:** Implemented an "app-like" layout (`h-screen overflow-hidden`) at the root level (`src/app/app/layout.tsx`) to prevent body scrolling. This fixes a critical bug where the background would break when the Kanban board overflowed horizontally.
 
 **🚨 Vấn đề Nghiêm trọng (Critical Issues):**

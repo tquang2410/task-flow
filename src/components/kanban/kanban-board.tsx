@@ -51,7 +51,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
   
   // Sync state khi server trả data mới (quan trọng cho việc F5)
   useEffect(() => {
-    console.log('[Sync] Tasks updated from Server:', initialProject.tasks.length)
+    // console.log('[Sync] Tasks updated from Server:', initialProject.tasks.length)
     setTasks(initialProject.tasks)
   }, [initialProject.tasks]);
 
@@ -116,9 +116,9 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
     const { active, over } = event
     
     // --- LOGGING (Debug) ---
-    console.log('--- Drag End ---')
-    console.log('Active:', active.id)
-    console.log('Over:', over?.id)
+    // console.log('--- Drag End ---')
+    // console.log('Active:', active.id)
+    // console.log('Over:', over?.id)
 
     if (!over) {
         setActiveTask(null)
@@ -141,7 +141,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
 
     // Nếu không xác định được cột, revert
     if (!newColumnId) {
-        console.error('Cannot determine target column')
+        // console.error('Cannot determine target column')
         return
     }
 
@@ -150,11 +150,11 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
     const tasksInColumn = tasks.filter(t => t.columnId === newColumnId)
     const newIndex = tasksInColumn.findIndex(t => t.id === activeId)
 
-    console.log('Target Column:', newColumnId)
-    console.log('New Index (Calculated):', newIndex)
+    // console.log('Target Column:', newColumnId)
+    // console.log('New Index (Calculated):', newIndex)
 
     if (newIndex === -1) {
-        console.error('Logic Error: Task not found in target column list')
+        // console.error('Logic Error: Task not found in target column list')
         return
     }
 
@@ -170,7 +170,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
             loading: 'Saving position...',
             success: 'Saved',
             error: (err) => {
-                console.error('Server Error:', err)
+                // console.error('Server Error:', err)
                 return 'Failed to save position'
             }
         }

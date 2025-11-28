@@ -10,6 +10,8 @@ import {
   MoveTaskSchema,
   CreateCommentSchema,
   DeleteAttachmentSchema,
+  CreateAttachmentRecordSchema,
+  GetSignedUrlSchema,
   AddMemberSchema,
   RemoveMemberSchema
 } from '@/lib/schemas'
@@ -605,11 +607,14 @@ export async function createComment(
 }
 
 
-// --- Attachment Management ---
-export async function uploadAttachment(
-  taskId: string,
-  formData: FormData
-): Promise<ActionResponse<Awaited<ReturnType<typeof db.attachment.create>>>> {
+// --- Attachment Management (Direct Upload) ---
+
+const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+export async function getSignedUploadUrl(
+  input: z.infer<typeof GetSignedUrlSchema>
+): Promise<ActionResponse<{ signedUrl: string; path: string }>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -617,49 +622,84 @@ export async function uploadAttachment(
     return { status: 'error', message: 'Unauthorized' }
   }
 
-  const file = formData.get('file') as File
-  if (!file) {
-    return { status: 'error', message: 'No file provided.' }
+  const validationResult = GetSignedUrlSchema.safeParse(input)
+  if (!validationResult.success) {
+    return { status: 'error', message: 'Invalid input.' }
+  }
+  
+  const { taskId, fileName, fileType, fileSize } = validationResult.data;
+
+  // Server-side validation
+  if (!ALLOWED_FILE_TYPES.includes(fileType)) {
+    return { status: 'error', message: 'File type not allowed.' };
+  }
+  if (fileSize > MAX_FILE_SIZE) {
+    return { status: 'error', message: 'File size exceeds 5MB limit.' };
   }
 
-  const task = await db.task.findUnique({
-    where: { id: taskId },
-    select: { projectId: true }
-  })
-
-  if (!task) {
-      return { status: 'error', message: 'Task not found.' }
-  }
-
-  const filePath = `${user.id}/${taskId}/${Date.now()}-${file.name}`
-
-  const { error: uploadError } = await supabase.storage
-    .from('ATTACHMENTS')
-    .upload(filePath, file)
-
-  if (uploadError) {
-    console.error('Storage Error:', uploadError)
-    return { status: 'error', message: 'Failed to upload file to storage.' }
-  }
-
-  const { data: { publicUrl } } = supabase.storage
-    .from('ATTACHMENTS')
-    .getPublicUrl(filePath)
+  const filePath = `${user.id}/${taskId}/${Date.now()}-${slugify(fileName)}`
 
   try {
+    const { data, error } = await supabase.storage
+      .from('ATTACHMENTS')
+      .createSignedUploadUrl(filePath)
+
+    if (error) {
+      throw error;
+    }
+    
+    return { status: 'success', data: { signedUrl: data.signedUrl, path: data.path } }
+  } catch (e: any) {
+    return { status: 'error', message: e.message || 'Failed to create signed URL.' }
+  }
+}
+
+export async function createAttachmentRecord(
+  input: z.infer<typeof CreateAttachmentRecordSchema>
+): Promise<ActionResponse<Awaited<ReturnType<typeof db.attachment.create>>>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' }
+  }
+  
+  const validationResult = CreateAttachmentRecordSchema.safeParse(input)
+  if (!validationResult.success) {
+    return { status: 'error', message: 'Invalid input.' }
+  }
+
+  const { taskId, name, path } = validationResult.data;
+  
+  try {
+    const task = await db.task.findUnique({
+      where: { id: taskId },
+      select: { projectId: true }
+    });
+
+    if (!task) {
+      return { status: 'error', message: 'Task not found.' }
+    }
+
+    // This is not quite right, the PUBLIC URL needs to be constructed.
+    // The `url` passed in from the client will be the full signed URL, which is temporary.
+    // We need the permanent public URL.
+    const { data: { publicUrl } } = supabase.storage.from('ATTACHMENTS').getPublicUrl(path)
+
     const newAttachment = await db.attachment.create({
       data: {
-        name: file.name,
+        name,
         url: publicUrl,
-        path: filePath,
-        taskId: taskId,
+        path,
+        taskId,
         uploaderId: user.id,
       },
     })
 
     revalidatePath(`/app/project/${task.projectId}`)
     return { status: 'success', data: newAttachment }
-  } catch {
+  } catch(e) {
+    console.error(e);
     return { status: 'error', message: 'Failed to save attachment to database.' }
   }
 }
