@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useTransition } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
   DndContext,
@@ -14,15 +14,12 @@ import {
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 import { toast } from 'sonner'
-import { PlusIcon } from '@radix-ui/react-icons'
 
 import type { Project, User } from '@prisma/client'
 import { type TaskWithDetails } from '@/types/prisma'
 import { BoardColumn } from './board-column'
 import { TaskCard } from './task-card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { moveTask, createColumn } from '@/app/actions'
+import { moveTask } from '@/app/actions'
 
 type Column = {
   id: string
@@ -169,8 +166,8 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
         {
             loading: 'Saving position...',
             success: 'Saved',
-            error: (err) => {
-                // console.error('Server Error:', err)
+            error: (_err) => {
+                // console.error('Server Error:', _err)
                 return 'Failed to save position'
             }
         }
@@ -193,7 +190,6 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
             column={col}
             tasks={tasks.filter(t => t.columnId === col.id)}
             projectId={initialProject.id}
-            currentUser={currentUser}
             onAddTask={addOptimisticTask}
           />
         ))}

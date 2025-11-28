@@ -649,8 +649,9 @@ export async function getSignedUploadUrl(
     }
     
     return { status: 'success', data: { signedUrl: data.signedUrl, path: data.path } }
-  } catch (e: any) {
-    return { status: 'error', message: e.message || 'Failed to create signed URL.' }
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Failed to create signed URL.';
+    return { status: 'error', message }
   }
 }
 
@@ -699,8 +700,9 @@ export async function createAttachmentRecord(
     revalidatePath(`/app/project/${task.projectId}`)
     return { status: 'success', data: newAttachment }
   } catch(e) {
+    const message = e instanceof Error ? e.message : 'An unknown error occurred while saving to the database.';
     console.error(e);
-    return { status: 'error', message: 'Failed to save attachment to database.' }
+    return { status: 'error', message }
   }
 }
 

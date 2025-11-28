@@ -33,7 +33,6 @@ import { CreateTaskDialog } from './create-task-dialog'
 import { updateColumn, deleteColumn } from '@/app/actions'
 import { type TaskWithDetails } from '@/types/prisma'
 import { cn } from '@/lib/utils'
-import { User } from '@prisma/client'
 
 type Column = {
   id: string
@@ -163,7 +162,6 @@ interface BoardColumnProps {
   column: Column
   tasks: TaskWithDetails[]
   projectId: string
-  currentUser: User
   onAddTask: (task: TaskWithDetails) => void;
 }
 
@@ -171,7 +169,6 @@ export function BoardColumn({
   column,
   tasks,
   projectId,
-  currentUser,
   onAddTask
 }: BoardColumnProps) {
   const tasksInColumn = tasks.filter((task) => task.columnId === column.id)

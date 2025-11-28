@@ -3,6 +3,7 @@
 import { useTransition } from 'react'
 import type { Attachment, User } from '@prisma/client'
 import { toast } from 'sonner'
+import Image from 'next/image'
 import { Paperclip, Trash2, UploadCloud, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getSignedUploadUrl, createAttachmentRecord, deleteAttachment } from '@/app/actions'
@@ -92,8 +93,9 @@ export function AttachmentList({ taskId, initialAttachments, currentUser }: Atta
         }
 
         toast.success('Attachment uploaded successfully.');
-      } catch (e: any) {
-        toast.error(e.message || 'An unknown error occurred.');
+      } catch (e) {
+        const message = e instanceof Error ? e.message : 'An unknown error occurred.';
+        toast.error(message);
       }
     })
     
@@ -146,10 +148,11 @@ export function AttachmentList({ taskId, initialAttachments, currentUser }: Atta
             <div key={attachment.id} className="relative group aspect-video bg-slate-800/50 rounded-md overflow-hidden">
               <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
                 {isImage ? (
-                  <img
+                  <Image
                     src={attachment.url}
                     alt={attachment.name}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full p-2">
