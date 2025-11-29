@@ -61,6 +61,7 @@ export function CreateTaskDialog({ projectId, columnId, onAddTask }: CreateTaskD
       dueDate: null,
       assigneeId: null,
       reporterId: 'temp-user', // Will be corrected by server
+      assignee: null, // Add this to satisfy TaskWithDetails
       createdAt: new Date(),
       updatedAt: new Date(),
       comments: [],

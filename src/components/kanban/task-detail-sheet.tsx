@@ -147,7 +147,7 @@ export function TaskDetailSheet({ task, isOpen, onClose, currentUser, members }:
                           <FormControl>
                             <MemberSelect
                               members={members}
-                              value={field.value}
+                              value={field.value ?? null}
                               onChange={field.onChange}
                             />
                           </FormControl>

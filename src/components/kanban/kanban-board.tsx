@@ -15,7 +15,7 @@ import {
 import { arrayMove } from '@dnd-kit/sortable'
 import { toast } from 'sonner'
 
-import type { Project, User } from '@prisma/client'
+import type { Project } from '@prisma/client'
 import { type TaskWithDetails } from '@/types/prisma'
 import { BoardColumn } from './board-column'
 import { TaskCard } from './task-card'
@@ -28,10 +28,9 @@ type Column = {
 
 interface KanbanBoardProps {
   initialProject: Project & { tasks: TaskWithDetails[] }
-  currentUser: User
 }
 
-export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
+export function KanbanBoard({ initialProject }: KanbanBoardProps) {
   // --- 1. Init State ---
   const [columns, setColumns] = useState<Column[]>(() => {
     try { return initialProject.columns as unknown as Column[] } catch { return [] }
@@ -166,7 +165,7 @@ export function KanbanBoard({ initialProject, currentUser }: KanbanBoardProps) {
         {
             loading: 'Saving position...',
             success: 'Saved',
-            error: (_err) => {
+            error: () => {
                 // console.error('Server Error:', _err)
                 return 'Failed to save position'
             }
