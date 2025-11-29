@@ -37,6 +37,10 @@
     * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
     * Implemented an optimistic UI for task creation, making new tasks appear instantly on the board.
 * **Build & Code Health:** Resolved critical build errors (`no-explicit-any`) and cleaned up all code quality warnings (`no-unused-vars`, `no-img-element`) to ensure a stable and clean build. All temporary debugging logs have also been commented out.
+* **Build Fixes (11/29):** Resolved a series of TypeScript type errors that were causing the `npm run build` command to fail. This included:
+    - Correcting the optimistic-UI object in `create-task-dialog.tsx` to include the required `assignee` property.
+    - Fixing a type mismatch in `task-detail-sheet.tsx` by ensuring a `null` value is passed instead of `undefined`.
+    - Removing an unused prop and type import in `kanban-board.tsx` and its usage in `project-kanban-view.tsx` to resolve subsequent errors and warnings.
 * **Layout:** Implemented an "app-like" layout (`h-screen overflow-hidden`) at the root level (`src/app/app/layout.tsx`) to prevent body scrolling. This fixes a critical bug where the background would break when the Kanban board overflowed horizontally.
 
 **🚨 Vấn đề Nghiêm trọng (Critical Issues):**
