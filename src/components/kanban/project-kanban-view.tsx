@@ -7,7 +7,7 @@ import type { Project, User } from '@prisma/client'
 import { type TaskWithDetails } from '@/types/prisma'
 
 interface ProjectKanbanViewProps {
-  project: Project & { tasks: TaskWithDetails[] };
+  project: Project & { tasks: TaskWithDetails[], workspace: { members: User[] } };
   currentUser: User;
 }
 
@@ -33,6 +33,7 @@ export function ProjectKanbanView({ project, currentUser }: ProjectKanbanViewPro
           onClose={handleSheetClose}
           task={selectedTask}
           currentUser={currentUser}
+          members={project.workspace.members}
         />
       )}
     </>

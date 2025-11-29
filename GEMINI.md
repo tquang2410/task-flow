@@ -31,6 +31,7 @@
     * Column Management: Đã có logic thêm/sửa cột (đã fix lỗi không đồng bộ state và spam click).
     * Layout: Updated Kanban board container to ensure proper horizontal scrolling and column sizing (`flex h-full gap-6 overflow-x-auto p-4 items-start`).
     * Refactored "Add Column": Moved the "Add Column" button to the project header and rebuilt it as a `Popover`-based client component for a cleaner UI and better UX.
+    * Assignee Feature: Implemented functionality to assign tasks to workspace members via a combobox in the task details. The assignee's avatar is now displayed on the task card.
 * **Performance & UX:**
     * Implemented route-level loading skeletons (`loading.tsx`) for instant UI feedback.
     * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
