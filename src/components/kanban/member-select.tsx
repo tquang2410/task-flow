@@ -1,10 +1,11 @@
 'use client'
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown } from 'lucide-react'
+import type { User } from '@prisma/client'
+import { useState } from 'react'
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -12,32 +13,30 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import type { User } from "@prisma/client"
+} from '@/components/ui/popover'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 interface MemberSelectProps {
-  members: User[];
-  value: string | null;
-  onChange: (value: string | null) => void;
-}
-
-const getInitials = (name: string | undefined | null) => {
-    if (!name) return '?'
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+  members: User[]
+  value: string | null
+  onChange: (value: string | null) => void
 }
 
 export function MemberSelect({ members, value, onChange }: MemberSelectProps) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = useState(false)
+  const selectedUser = members.find((member) => member.supabaseId === value)
 
-  const selectedMember = members.find(
-    (member) => member.supabaseId === value
-  )
+  const handleSelect = (memberId: string | null) => {
+    // If the same user is selected, do nothing new, just close.
+    // The logic to un-assign should be explicit via "Unassigned" option.
+    onChange(memberId)
+    setOpen(false)
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -46,65 +45,60 @@ export function MemberSelect({ members, value, onChange }: MemberSelectProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between bg-slate-800 border-slate-700 hover:bg-slate-700"
+          className="w-full justify-between bg-slate-800 border-slate-700 hover:bg-slate-700 text-white"
         >
-          {selectedMember ? (
+          {selectedUser ? (
             <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                    <AvatarImage src={selectedMember.avatarUrl ?? undefined} />
-                    <AvatarFallback>{getInitials(selectedMember.name)}</AvatarFallback>
-                </Avatar>
-                <span>{selectedMember.name || selectedMember.email}</span>
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={selectedUser.avatarUrl ?? ''} alt={selectedUser.name ?? 'User'} />
+                <AvatarFallback>
+                  {selectedUser.name?.charAt(0).toUpperCase() || selectedUser.email.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="truncate">{selectedUser.name || selectedUser.email}</span>
             </div>
           ) : (
-            "Unassigned"
+            'Unassigned'
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[250px] p-0 bg-slate-900 border-slate-800 text-white">
         <Command>
-          <CommandInput placeholder="Search member..." />
+          <CommandInput placeholder="Search members..." />
           <CommandList>
-            <CommandEmpty>No member found.</CommandEmpty>
+            <CommandEmpty>No members found.</CommandEmpty>
             <CommandGroup>
               <CommandItem
-                key="unassign"
-                value="unassign"
-                onSelect={() => {
-                  onChange(null)
-                  setOpen(false)
-                }}
+                onSelect={() => handleSelect(null)}
+                className="cursor-pointer"
               >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === null ? "opacity-100" : "opacity-0"
-                  )}
-                />
                 Unassigned
               </CommandItem>
               {members.map((member) => (
                 <CommandItem
                   key={member.id}
-                  value={member.name || member.email}
-                  onSelect={() => {
-                    onChange(member.supabaseId === value ? null : member.supabaseId)
-                    setOpen(false)
+                  value={member.supabaseId}
+                  onSelect={(currentValue) => {
+                    // The `currentValue` from onSelect is the `value` prop of CommandItem
+                    handleSelect(currentValue)
                   }}
+                  className="cursor-pointer"
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
-                      value === member.supabaseId ? "opacity-100" : "opacity-0"
+                      'mr-2 h-4 w-4',
+                      value === member.supabaseId ? 'opacity-100' : 'opacity-0'
                     )}
                   />
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                        <AvatarImage src={member.avatarUrl ?? undefined} />
-                        <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
-                    </Avatar>
-                    <span>{member.name || member.email}</span>
+                   <div className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                          <AvatarImage src={member.avatarUrl ?? ''} alt={member.name ?? 'User'} />
+                          <AvatarFallback>
+                            {member.name?.charAt(0).toUpperCase() || member.email.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                      </Avatar>
+                      <span className="truncate">{member.name || member.email}</span>
                   </div>
                 </CommandItem>
               ))}
