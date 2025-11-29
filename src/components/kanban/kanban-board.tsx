@@ -27,7 +27,7 @@ type Column = {
 }
 
 interface KanbanBoardProps {
-  initialProject: Project & { tasks: TaskWithDetails[] }
+  initialProject: Project & { tasks: TaskWithDetails[] };
 }
 
 export function KanbanBoard({ initialProject }: KanbanBoardProps) {

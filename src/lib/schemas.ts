@@ -49,7 +49,7 @@ export const UpdateTaskSchema = z.object({
     description: z.string().optional().nullable(),
     priority: z.nativeEnum(Priority).optional(),
     dueDate: z.date().optional().nullable(),
-    assigneeId: z.string().optional().nullable(), // New: Allow assigning a user or unassigning
+    assigneeId: z.string().nullable().optional(), // New: Allow assigning a user or unassigning
 });
 
 // Schema for the refactored moveTask action
