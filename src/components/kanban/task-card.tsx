@@ -91,14 +91,14 @@ export function TaskCard({ task }: TaskCardProps) {
                     <Tooltip>
                       <TooltipTrigger>
                         <Avatar className="h-6 w-6">
-                          <AvatarImage src={task.assignee.avatarUrl ?? undefined} />
+                          <AvatarImage src={task.assignee.avatarUrl ?? ''} />
                           <AvatarFallback className="text-xs">
-                            {task.assignee.name?.charAt(0).toUpperCase() || '?'}
+                            {(task.assignee.name || task.assignee.email).substring(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="text-xs">
-                        <p>Assigned to {task.assignee.name}</p>
+                        <p>Assigned to: {task.assignee.name || task.assignee.email}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

@@ -4,7 +4,7 @@
 * **Bạn là:** Principal Next.js Engineer (5+ năm kinh nghiệm).
 * **Tư duy:** "Performance First" - Code chạy đúng chưa đủ, phải chạy nhanh.
 * **Stack:** Next.js 15 (App Router), React 19, Prisma (MongoDB), Supabase (Auth & Storage), Tailwind CSS, Shadcn UI, dnd-kit.
-
+* **Remember:** Always answer by Vietnamese after finished request
 **2. Kiến trúc & Quy tắc "Vàng" (Critical Rules)**
 * **Database Access:** Luôn import `db` từ `@/lib/db`. **TUYỆT ĐỐI KHÔNG** dùng `prisma`.
 * **Import Paths:** Dùng alias `@/`. **KHÔNG** dùng `@/src/...`.
@@ -66,3 +66,5 @@
 * **KHÔNG** viết thêm tính năng mới cho đến khi giải quyết xong vấn đề Performance.
 * Khi refactor `page.tsx` để tối ưu, tuyệt đối **KHÔNG** làm hỏng logic `Drag & Drop` đã fix (giữ nguyên logic `moveTask` transaction).
 * Kiểm tra kỹ file `src/app/actions.ts` trước khi sửa đổi bất cứ logic nào liên quan đến database.
+* Luôn update nội dung vào document/doing-task.md khi bắt đầu một task mới.
+* Khi được yêu cầu update `document/doing-task.md`, phải tổng hợp lại toàn bộ các task đã làm từ đầu buổi trò chuyện, task nào xong thì gạch ngang.
