@@ -110,7 +110,12 @@ function ColumnHeader({ column, taskCount, projectId, onAddTask }: ColumnHeaderP
       </div>
       <div className="flex items-center gap-1">
         <div data-testid="create-task-btn">
-          <CreateTaskDialog projectId={projectId} columnId={column.id} onAddTask={onAddTask} />
+          <CreateTaskDialog
+            projectId={projectId}
+            columnId={column.id}
+            onAddTask={onAddTask}
+            data-testid={`create-task-${column.id}`}
+          />
         </div>
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <DropdownMenu>

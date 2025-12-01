@@ -46,6 +46,7 @@ export default function LoginPage() {
         // redirect đến /app, nhưng chúng ta cũng
         // chủ động refresh để cập nhật session
         router.push('/app'); // Chuyển hướng đến trang /app
+        router.push('/app'); // Chuyển trang ngay lập tức
         router.refresh();    // Cập nhật session mới
       }
     } catch {

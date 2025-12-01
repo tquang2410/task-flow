@@ -18,15 +18,7 @@
     * Ưu tiên **Streaming** (`<Suspense>`) cho các thành phần load chậm (Kanban Board).
     * Sử dụng `Promise.all` để fetch dữ liệu song song.
     * Luôn có `loading.tsx` cho các route chính.
-* **Testing (NEW):**
-    * Sử dụng **Playwright** cho E2E testing.
-    * Thư mục test: `tests/`.
-    * Các kịch bản test chính bao gồm luồng đăng nhập (`auth-flow.spec.ts`) và các thao tác trên Kanban (`kanban.spec.ts`).
 
-**3. Trạng thái dự án (Current Status)**
-
-**✅ Đã hoàn thành (Done & Stable):**
-* **Playwright E2E Test Fix:** Resolved failing tests by adding `data-testid` attributes to Kanban board components for reliable element selection. Updated `kanban.spec.ts` and `auth-flow.spec.ts` to use these test IDs and increased test timeouts to prevent failures due to network latency.
 * **Login Redirect Fix:** Fixed an issue where the application would not redirect to `/app` after a successful login from the `/login` page. Implemented `router.push('/app')` to ensure correct navigation.
 * **Core:** Auth, Routing, Middleware, Dashboard UI.
 * **Workspace:** CRUD Workspace, Mời thành viên (cơ bản).
