@@ -43,3 +43,12 @@ next-env.d.ts
 # IntelliJ
 .idea/
 \n# Design mockups and references\n/public/design
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+\n# Playwright authentication state\nplaywright/.auth/
