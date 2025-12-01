@@ -47,6 +47,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { TaskDetailSheet } from '@/components/kanban/task-detail-sheet'
 import { deleteTask } from '@/app/actions'
 import { type TaskWithDetails } from '@/types/prisma'
+import { type User } from '@prisma/client'
 
 type Column = {
   id: string
@@ -56,9 +57,12 @@ type Column = {
 interface TaskTableProps {
   data: TaskWithDetails[]
   columns: Column[] // Pass columns to map columnId to title
+  projectId: string
+  currentUser: User
+  members: User[]
 }
 
-export function TaskTable({ data, columns: projectColumns }: TaskTableProps) {
+export function TaskTable({ data, columns: projectColumns, projectId, currentUser, members }: TaskTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -70,7 +74,7 @@ export function TaskTable({ data, columns: projectColumns }: TaskTableProps) {
   
   const handleDeleteTask = (taskId: string) => {
     startTransition(() => {
-        toast.promise(deleteTask({ id: taskId }), {
+        toast.promise(deleteTask({ taskId, projectId }), {
             loading: 'Deleting task...',
             success: 'Task deleted successfully!',
             error: (err) => err.message || 'Failed to delete task.',
@@ -250,12 +254,10 @@ export function TaskTable({ data, columns: projectColumns }: TaskTableProps) {
         {selectedTask && (
             <TaskDetailSheet
                 task={selectedTask}
-                open={!!selectedTask}
-                onOpenChange={(isOpen) => {
-                    if (!isOpen) {
-                        setSelectedTask(null);
-                    }
-                }}
+                isOpen={!!selectedTask}
+                onClose={() => setSelectedTask(null)}
+                currentUser={currentUser}
+                members={members}
             />
         )}
     </div>

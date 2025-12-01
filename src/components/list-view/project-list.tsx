@@ -23,46 +23,65 @@ interface ProjectListProps {
 }
 
 export async function ProjectList({ projectId }: ProjectListProps) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
     return redirect('/login')
   }
 
-  const project = await db.project.findUnique({
-    where: {
-      id: projectId,
-      workspace: {
-        members: {
-          some: {
-            id: user.id,
+  const [project, currentUser] = await Promise.all([
+    db.project.findUnique({
+      where: {
+        id: projectId,
+        workspace: {
+          members: {
+            some: {
+              id: user.id,
+            },
           },
         },
       },
-    },
-    include: {
-      tasks: {
-        include: {
-          assignee: true,
-          reporter: true,
-          comments: true,
-          attachments: true,
+      include: {
+        tasks: {
+          include: {
+            assignee: true,
+            reporter: true,
+            comments: {
+              include: {
+                user: true,
+              },
+            },
+            attachments: {
+              include: {
+                uploader: true,
+              },
+            },
+          },
+          orderBy: {
+            order: 'asc',
+          },
         },
-        orderBy: {
-          order: 'asc',
-        },
+        workspace: {
+            select: {
+                members: true
+            }
+        }
       },
-    },
-  })
+    }),
+    db.user.findUnique({
+        where: { supabaseId: user.id }
+    })
+  ]);
 
-  if (!project) {
+  if (!project || !currentUser) {
     // This case should ideally be handled by a not-found page
-    return <div className="p-4 text-red-500">Project not found or you don't have access.</div>
+    return <div className="p-4 text-red-500">Project not found or you don&apos;t have access.</div>
   }
 
   // The columns are stored as a JSON object, so we need to parse it.
   const columns = project.columns as unknown as ProjectColumn[];
+  const members = project.workspace.members;
 
-  return <TaskTable data={project.tasks} columns={columns} />
+  return <TaskTable data={project.tasks} columns={columns} projectId={project.id} currentUser={currentUser} members={members} />
 }
