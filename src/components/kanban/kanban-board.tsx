@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import {
   DndContext,
@@ -15,11 +15,12 @@ import {
 import { arrayMove } from '@dnd-kit/sortable'
 import { toast } from 'sonner'
 
-import type { Project } from '@prisma/client'
+import type { Project, User } from '@prisma/client'
 import { type TaskWithDetails } from '@/types/prisma'
 import { BoardColumn } from './board-column'
 import { TaskCard } from './task-card'
 import { moveTask } from '@/app/actions'
+import { BoardToolbar } from './board-toolbar'
 
 type Column = {
   id: string
@@ -28,9 +29,10 @@ type Column = {
 
 interface KanbanBoardProps {
   initialProject: Project & { tasks: TaskWithDetails[] };
+  members: User[];
 }
 
-export function KanbanBoard({ initialProject }: KanbanBoardProps) {
+export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
   // --- 1. Init State ---
   const [columns, setColumns] = useState<Column[]>(() => {
     try { return initialProject.columns as unknown as Column[] } catch { return [] }
@@ -38,10 +40,25 @@ export function KanbanBoard({ initialProject }: KanbanBoardProps) {
   const [tasks, setTasks] = useState(initialProject.tasks)
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null)
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterMemberId, setFilterMemberId] = useState<string | null>(null)
 
   const addOptimisticTask = (newTask: TaskWithDetails) => {
     setTasks((prev) => [...prev, newTask]);
   };
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setFilterMemberId(null)
+  }
+
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(task => {
+      const matchSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchMember = filterMemberId ? task.assigneeId === filterMemberId : true
+      return matchSearch && matchMember
+    })
+  }, [tasks, searchQuery, filterMemberId])
 
   useEffect(() => { setPortalContainer(document.body) }, [])
   
@@ -176,29 +193,39 @@ export function KanbanBoard({ initialProject }: KanbanBoardProps) {
   }
 
   return (
-    <div className="flex h-full gap-6 overflow-x-auto p-4 items-start">
-      <DndContext
-        sensors={sensors}
-        onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        onDragEnd={onDragEnd}
-      >
-        {columns.map((col) => (
-          <BoardColumn
-            key={col.id}
-            column={col}
-            tasks={tasks.filter(t => t.columnId === col.id)}
-            projectId={initialProject.id}
-            onAddTask={addOptimisticTask}
-          />
-        ))}
-        {portalContainer && createPortal(
-          <DragOverlay>
-            {activeTask && <TaskCard task={activeTask} />}
-          </DragOverlay>,
-          portalContainer
-        )}
-      </DndContext>
+    <div className="flex flex-col w-full h-full">
+      <BoardToolbar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filterMemberId={filterMemberId}
+        setFilterMemberId={setFilterMemberId}
+        members={members}
+        clearFilters={clearFilters}
+      />
+      <div className="flex h-full gap-6 overflow-x-auto p-4 items-start">
+        <DndContext
+          sensors={sensors}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+        >
+          {columns.map((col) => (
+            <BoardColumn
+              key={col.id}
+              column={col}
+              tasks={filteredTasks.filter(t => t.columnId === col.id)}
+              projectId={initialProject.id}
+              onAddTask={addOptimisticTask}
+            />
+          ))}
+          {portalContainer && createPortal(
+            <DragOverlay>
+              {activeTask && <TaskCard task={activeTask} />}
+            </DragOverlay>,
+            portalContainer
+          )}
+        </DndContext>
+      </div>
     </div>
   )
 }
