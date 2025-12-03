@@ -1,5 +1,9 @@
-feat: Add Project Settings tab
+fix: Complete Project Settings UI and resolve build errors
 
-Adds a "Settings" tab to projects, allowing users to update a
-project's name/description and to delete the project. Includes
-new server actions, a form, and a confirmation dialog.
+Completed the implementation of the "Danger Zone" in the Project Settings
+component, ensuring the delete project functionality is fully accessible.
+Resolved several build errors and warnings encountered during development:
+- Fixed unescaped apostrophes in `project-settings.tsx`.
+- Re-added missing `useForm` import in `project-settings.tsx`.
+- Removed unused `useRouter` import in `project-settings.tsx`.
+- Adjusted layout classes in `project/[id]/page.tsx` for optimal rendering.
