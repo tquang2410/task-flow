@@ -1,11 +1,5 @@
-refactor: Centralize Realtime logic in ProjectKanbanView
+feat: Add Project Settings tab
 
-To enable broadcasting from multiple child components (`KanbanBoard`
-and `TaskDetailSheet`), the Realtime subscription and broadcast
-logic has been lifted into the shared parent, `ProjectKanbanView`.
-
-- `KanbanBoard` is refactored to receive `onUpdate` as a prop.
-- `TaskDetailSheet` now accepts and calls `onUpdate` after a task
-  is successfully modified.
-- This change ensures a consistent Realtime update mechanism for
-  both task movement and task detail edits.
+Adds a "Settings" tab to projects, allowing users to update a
+project's name/description and to delete the project. Includes
+new server actions, a form, and a confirmation dialog.
