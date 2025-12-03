@@ -44,9 +44,10 @@ interface ColumnHeaderProps {
   taskCount: number
   projectId: string
   onAddTask: (task: TaskWithDetails) => void;
+  onUpdate: () => Promise<void>;
 }
 
-function ColumnHeader({ column, taskCount, projectId, onAddTask }: ColumnHeaderProps) {
+function ColumnHeader({ column, taskCount, projectId, onAddTask, onUpdate }: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState(column.title)
   const [isPending, startTransition] = useTransition()
@@ -114,6 +115,7 @@ function ColumnHeader({ column, taskCount, projectId, onAddTask }: ColumnHeaderP
             projectId={projectId}
             columnId={column.id}
             onAddTask={onAddTask}
+            onUpdate={onUpdate}
             data-testid={`create-task-${column.id}`}
           />
         </div>
@@ -170,13 +172,15 @@ interface BoardColumnProps {
   tasks: TaskWithDetails[]
   projectId: string
   onAddTask: (task: TaskWithDetails) => void;
+  onUpdate: () => Promise<void>;
 }
 
 export function BoardColumn({
   column,
   tasks,
   projectId,
-  onAddTask
+  onAddTask,
+  onUpdate
 }: BoardColumnProps) {
   const tasksInColumn = tasks.filter((task) => task.columnId === column.id)
   const taskIds = tasksInColumn.map((task) => task.id)
@@ -200,6 +204,7 @@ export function BoardColumn({
         taskCount={tasksInColumn.length}
         projectId={projectId}
         onAddTask={onAddTask}
+        onUpdate={onUpdate}
       />
       {/* Task List */}
       <div

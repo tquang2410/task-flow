@@ -33,6 +33,7 @@
     * Refactored "Add Column": Moved the "Add Column" button to the project header and rebuilt it as a `Popover`-based client component for a cleaner UI and better UX.
     * Assignee Feature: Implemented functionality to assign tasks to workspace members via a combobox in the task details. The assignee's avatar is now displayed on the task card.
     * **Restore "Add Column" Button:** Re-added the `AddColumnButton` component to the `KanbanBoard` within a `w-80 shrink-0` div after `columns.map` to restore the functionality.
+    * **Realtime Sync (Broadcast):** Implemented Supabase Realtime to broadcast changes (task creation, movement) across all clients viewing the same project board. This triggers a `router.refresh()` to keep data in sync without manual reloads.
 * **Performance & UX:**
     * Implemented route-level loading skeletons (`loading.tsx`) for instant UI feedback.
     * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
