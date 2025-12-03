@@ -60,7 +60,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   }
 
   return (
-    <div className="flex flex-col h-full p-6">
+    <div className="flex flex-col h-full p-6 overflow-hidden">
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
