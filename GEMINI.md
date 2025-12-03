@@ -32,10 +32,15 @@
     * Layout: Updated Kanban board container to ensure proper horizontal scrolling and column sizing (`flex h-full gap-6 overflow-x-auto p-4 items-start`).
     * Refactored "Add Column": Moved the "Add Column" button to the project header and rebuilt it as a `Popover`-based client component for a cleaner UI and better UX.
     * Assignee Feature: Implemented functionality to assign tasks to workspace members via a combobox in the task details. The assignee's avatar is now displayed on the task card.
+    * **Restore "Add Column" Button:** Re-added the `AddColumnButton` component to the `KanbanBoard` within a `w-80 shrink-0` div after `columns.map` to restore the functionality.
 * **Performance & UX:**
     * Implemented route-level loading skeletons (`loading.tsx`) for instant UI feedback.
     * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
     * Implemented an optimistic UI for task creation, making new tasks appear instantly on the board.
+    * **Fix Vertical Scroll & Smooth Scrolling:**
+        - Đã loại bỏ `overflow-hidden` khỏi `src/app/app/layout.tsx` để kích hoạt cuộn dọc tự nhiên cho các chế độ xem Dashboard và List.
+        - Đã tích hợp thư viện `lenis` và tạo component `SmoothScroll` (`src/components/providers/smooth-scroll.tsx`) để cung cấp trải nghiệm cuộn mượt mà trên toàn bộ tuyến `/app`.
+        - Đã thêm lại `overflow-hidden` vào vùng chứa chính trong `src/app/app/project/[id]/page.tsx` để đảm bảo bảng Kanban duy trì bố cục giống như ứng dụng và ngăn chặn cuộn dọc không mong muốn trên trang đó.
 * **Build & Code Health:** Resolved critical build errors (`no-explicit-any`) and cleaned up all code quality warnings (`no-unused-vars`, `no-img-element`) to ensure a stable and clean build. All temporary debugging logs have also been commented out.
 * **Build Fixes (11/29):** Resolved a series of TypeScript type errors that were causing the `npm run build` command to fail. This included:
     - Correcting the optimistic-UI object in `create-task-dialog.tsx` to include the required `assignee` property.
