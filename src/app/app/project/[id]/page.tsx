@@ -22,6 +22,8 @@ import {
 import { ProjectBoard } from '@/components/kanban/project-board'
 import { BoardSkeleton } from '@/components/kanban/board-skeleton'
 import { AddColumnButton } from '@/components/kanban/add-column-button'
+import { ListSkeleton } from '@/components/list-view/list-skeleton'
+import { ProjectList } from '@/components/list-view/project-list'
 import { PlusCircle, Share } from 'lucide-react'
 
 interface ProjectDetailPageProps {
@@ -122,7 +124,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
             <ProjectBoard projectId={project.id} />
           </Suspense>
         </TabsContent>
-        <TabsContent value="list">List view coming soon...</TabsContent>
+        {/* List View Content with Streaming */}
+        <TabsContent value="list" className="flex-grow overflow-hidden">
+          <Suspense fallback={<ListSkeleton />}>
+            <ProjectList projectId={project.id} />
+          </Suspense>
+        </TabsContent>
         <TabsContent value="timeline">Timeline view coming soon...</TabsContent>
         <TabsContent value="settings">Settings coming soon...</TabsContent>
       </Tabs>

@@ -1,14 +1,28 @@
-fix: Resolve PrismaClientValidationError in Project Detail Page
+feat: Refactor Add Column UI and fix app-level layout
 
-This commit fixes a `PrismaClientValidationError` that occurred in the Project Detail Page
-(`src/app/app/project/[id]/page.tsx`). The error was caused by attempting to select
-the non-existent `memberIds` field from the `User` model during a `db.user.findUnique` query.
+This commit significantly refactors the "Add Column" functionality and
+implements an app-like layout to resolve critical scrolling and UI issues.
 
-The `select` clause for `db.user.findUnique` has been corrected to retrieve
-`id`, `name`, `email`, and `avatarUrl` fields, which are valid fields on the `User` model.
-The security check logic, which compares `appUser.id` with `workspace.memberIds`,
-remains functionally correct as `workspace.memberIds` was always correctly fetched.
+Key Changes:
+- **App-level Layout Fix (`src/app/app/layout.tsx`):**
+  - Implemented an "app-like" layout by configuring the root container
+    with `flex h-screen w-full overflow-hidden`.
+  - The main content area (`<main>`) now uses `flex-1 h-full overflow-hidden
+    flex flex-col relative`. This prevents the entire page body from
+    scrolling horizontally and causing background display issues when
+    the Kanban board content overflows.
+- **"Add Column" Functionality Refactor:**
+  - **Relocation:** The "Add Column" button and its associated logic were
+    moved from the Kanban board's footer to the project header
+    (`src/app/app/project/[id]/page.tsx`).
+  - **New Component (`src/components/kanban/add-column-button.tsx`):**
+    A new client component was created to encapsulate the "Add Column" UI.
+    It now uses a Shadcn `Popover` for a cleaner, more integrated user
+    experience within the header.
+  - **Cleanup (`src/components/kanban/kanban-board.tsx`):** The `AddColumn`
+    component definition and its usage were removed from this file.
+- **Documentation (`GEMINI.md`):** Updated to reflect the completion of
+  the layout fix and the refactoring of the "Add Column" feature.
 
-Files affected:
-- `GEMINI.md`: Updated to include this fix in the "Critical Issues" section.
-- `src/app/app/project/[id]/page.tsx`: Modified `db.user.findUnique` select clause.
+This ensures a stable and visually consistent user experience, especially
+when dealing with wide Kanban boards, and improves the overall app-like feel.

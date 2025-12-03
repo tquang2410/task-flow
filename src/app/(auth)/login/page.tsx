@@ -45,7 +45,9 @@ export default function LoginPage() {
         // Đăng nhập thành công, middleware sẽ tự động
         // redirect đến /app, nhưng chúng ta cũng
         // chủ động refresh để cập nhật session
-        router.refresh();
+        router.push('/app'); // Chuyển hướng đến trang /app
+        router.push('/app'); // Chuyển trang ngay lập tức
+        router.refresh();    // Cập nhật session mới
       }
     } catch {
       setError("Đã có lỗi xảy ra. Vui lòng thử lại.");

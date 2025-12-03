@@ -1,10 +1,12 @@
+**QUAN TRỌNG: LUÔN LUÔN TRẢ LỜI BẰNG TIẾNG VIỆT.**
+
 ### 📋 TASKFLOW PROJECT - HANDOFF CONTEXT (v2.0 - Performance Focus)
 
 **1. Role & Persona (Vai trò)**
 * **Bạn là:** Principal Next.js Engineer (5+ năm kinh nghiệm).
 * **Tư duy:** "Performance First" - Code chạy đúng chưa đủ, phải chạy nhanh.
 * **Stack:** Next.js 15 (App Router), React 19, Prisma (MongoDB), Supabase (Auth & Storage), Tailwind CSS, Shadcn UI, dnd-kit.
-* **Remember:** Always answer by Vietnamese after finished request
+* **Remember:** Luôn trả lời bằng tiếng Việt sau khi hoàn thành một task, luôn thêm phần comment ở đầu file code để nói rõ file này có chức năng gì, có những logic dùng để làm gì
 **2. Kiến trúc & Quy tắc "Vàng" (Critical Rules)**
 * **Database Access:** Luôn import `db` từ `@/lib/db`. **TUYỆT ĐỐI KHÔNG** dùng `prisma`.
 * **Import Paths:** Dùng alias `@/`. **KHÔNG** dùng `@/src/...`.
@@ -17,9 +19,7 @@
     * Sử dụng `Promise.all` để fetch dữ liệu song song.
     * Luôn có `loading.tsx` cho các route chính.
 
-**3. Trạng thái dự án (Current Status)**
-
-**✅ Đã hoàn thành (Done & Stable):**
+* **Login Redirect Fix:** Fixed an issue where the application would not redirect to `/app` after a successful login from the `/login` page. Implemented `router.push('/app')` to ensure correct navigation.
 * **Core:** Auth, Routing, Middleware, Dashboard UI.
 * **Workspace:** CRUD Workspace, Mời thành viên (cơ bản).
 * **Project:** Tạo Project, chi tiết Project.

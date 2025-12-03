@@ -21,3 +21,11 @@ export type TaskWithDetails = Prisma.TaskGetPayload<{
     }
   }
 }>
+
+/**
+ * Type for a single column object stored in the `columns` JSON field of a Project.
+ */
+export type ProjectColumn = {
+  id: string
+  title: string
+}

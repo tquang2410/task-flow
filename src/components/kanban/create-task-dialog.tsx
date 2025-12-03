@@ -119,7 +119,7 @@ export function CreateTaskDialog({ projectId, columnId, onAddTask }: CreateTaskD
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-dashboard-primary text-white">
+            <Button data-testid="submit-task-btn" type="submit" className="w-full bg-dashboard-primary text-white">
               Create Task
             </Button>
           </form>

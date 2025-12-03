@@ -109,7 +109,14 @@ function ColumnHeader({ column, taskCount, projectId, onAddTask }: ColumnHeaderP
         )}
       </div>
       <div className="flex items-center gap-1">
-        <CreateTaskDialog projectId={projectId} columnId={column.id} onAddTask={onAddTask} />
+        <div data-testid="create-task-btn">
+          <CreateTaskDialog
+            projectId={projectId}
+            columnId={column.id}
+            onAddTask={onAddTask}
+            data-testid={`create-task-${column.id}`}
+          />
+        </div>
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -185,6 +192,7 @@ export function BoardColumn({
   return (
     <div
       ref={setNodeRef}
+      data-testid={`column-${column.id}`}
       className="w-80 shrink-0 flex flex-col bg-secondary/50 rounded-xl h-full max-h-full"
     >
       <ColumnHeader

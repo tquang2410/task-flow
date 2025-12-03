@@ -4,19 +4,18 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 
 ---
 
-## Cập nhật lần cuối: 29/11/2025
+## Cập nhật lần cuối: 01/12/2025
 
 ### Task đang làm
 
-- (Không có)
+*(Không có task nào đang thực hiện)*
 
 ---
 
 ### Task đã hoàn thành
 
--   **~~[Hoàn thành]~~** ~~Implement Kanban Board Toolbar (Search & Filter):~~
-    -   ~~Tạo component `BoardToolbar` với ô tìm kiếm và danh sách avatar để lọc.~~
-    -   ~~Tích hợp toolbar vào `KanbanBoard`, thêm state và logic filter bằng `useMemo`.~~
+
+-   **~~[Hoàn thành]~~** ~~Implement Kanban Board Toolbar (Search & Filter).~~
 -   **~~[Hoàn thành]~~** ~~Cập nhật file context `GEMINI.md` với các quy tắc làm việc mới.~~
 -   **~~[Hoàn thành]~~** ~~Sửa lỗi và hoàn thiện UI cho tính năng "Giao việc" (Assignee).~~
 -   **~~[Hoàn thành]~~** ~~Fix một chuỗi các lỗi build (Build Errors).~~
