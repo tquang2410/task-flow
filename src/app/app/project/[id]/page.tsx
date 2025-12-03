@@ -24,6 +24,7 @@ import { BoardSkeleton } from '@/components/kanban/board-skeleton'
 import { AddColumnButton } from '@/components/kanban/add-column-button'
 import { ListSkeleton } from '@/components/list-view/list-skeleton'
 import { ProjectList } from '@/components/list-view/project-list'
+import { ProjectSettings } from '@/components/project/project-settings'
 import { PlusCircle, Share } from 'lucide-react'
 
 interface ProjectDetailPageProps {
@@ -45,12 +46,11 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
     db.user.findUnique({ where: { supabaseId: user.id }, select: { id: true, name: true, email: true, avatarUrl: true } }),
     db.project.findUnique({
       where: { id: id },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        workspace: { select: { id: true, name: true, memberIds: true } },
-      },
+      include: {
+        workspace: {
+          select: { id: true, name: true, memberIds: true }
+        }
+      }
     }),
   ])
 
@@ -60,7 +60,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
   }
 
   return (
-    <div className="flex flex-col h-full p-6 overflow-hidden">
+    <div className="flex flex-col h-full p-6">
       {/* Breadcrumb */}
       <Breadcrumb className="mb-4">
         <BreadcrumbList>
@@ -125,13 +125,15 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           </Suspense>
         </TabsContent>
         {/* List View Content with Streaming */}
-        <TabsContent value="list" className="flex-grow overflow-hidden">
+        <TabsContent value="list" className="flex-grow">
           <Suspense fallback={<ListSkeleton />}>
             <ProjectList projectId={project.id} />
           </Suspense>
         </TabsContent>
         <TabsContent value="timeline">Timeline view coming soon...</TabsContent>
-        <TabsContent value="settings">Settings coming soon...</TabsContent>
+        <TabsContent value="settings" className="flex-grow overflow-y-auto">
+          <ProjectSettings project={project} />
+        </TabsContent>
       </Tabs>
     </div>
   )
