@@ -31,6 +31,13 @@ export const CreateProjectSchema = z.object({
     }),
 });
 
+// Schema cho việc cập nhật một Project
+export const UpdateProjectSchema = z.object({
+    id: z.string(),
+    name: z.string().min(3, { message: "Tên dự án phải có ít nhất 3 ký tự." }).max(100).optional(),
+    description: z.string().max(500, { message: "Mô tả không được quá 500 ký tự." }).optional().nullable(),
+});
+
 // Schema cho việc tạo một Task mới
 // Dùng trong action `createTask` (Epic 3)
 export const CreateTaskSchema = z.object({

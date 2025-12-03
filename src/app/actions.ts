@@ -6,6 +6,7 @@ import {
   CreateProjectSchema, CreateColumnSchema, UpdateColumnSchema, DeleteColumnSchema,
   CreateTaskSchema,
   CreateWorkspaceSchema,
+  UpdateProjectSchema,
   UpdateTaskSchema,
   MoveTaskSchema,
   CreateCommentSchema,
@@ -17,6 +18,7 @@ import {
 } from '@/lib/schemas'
 import { db } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { type ActionResponse } from '@/types/actions'
 import { Prisma, type Task } from '@prisma/client'
 import { slugify } from '@/lib/utils'
@@ -253,6 +255,79 @@ export async function createProject(
     return { status: 'error', message: 'Failed to create project.' }
   }
 }
+
+export async function updateProject(
+  input: z.infer<typeof UpdateProjectSchema>
+): Promise<ActionResponse<Awaited<ReturnType<typeof db.project.update>>>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' }
+  }
+
+  const validationResult = UpdateProjectSchema.safeParse(input)
+  if (!validationResult.success) {
+    return { status: 'error', message: 'Invalid data' }
+  }
+  
+  const { id, ...updateData } = validationResult.data
+
+  try {
+    const project = await db.project.findUnique({
+      where: { id },
+      select: { workspace: { select: { memberIds: true } } }
+    });
+
+    const appUser = await db.user.findUnique({ where: { supabaseId: user.id }, select: { id: true } });
+
+    if (!project || !appUser || !project.workspace.memberIds.includes(appUser.id)) {
+      return { status: 'error', message: 'You do not have permission to edit this project.' };
+    }
+
+    const updatedProject = await db.project.update({
+      where: { id },
+      data: updateData,
+    })
+    revalidatePath(`/app/project/${id}`)
+    return { status: 'success', data: updatedProject }
+  } catch {
+    return { status: 'error', message: 'Failed to update project.' }
+  }
+}
+
+
+export async function deleteProject(input: { projectId: string }): Promise<ActionResponse<string>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' }
+  }
+
+  try {
+    const project = await db.project.findUnique({
+      where: { id: input.projectId },
+      select: { workspaceId: true, workspace: { select: { memberIds: true } } }
+    });
+
+    const appUser = await db.user.findUnique({ where: { supabaseId: user.id }, select: { id: true } });
+
+    if (!project || !appUser || !project.workspace.memberIds.includes(appUser.id)) {
+      return { status: 'error', message: 'You do not have permission to delete this project.' };
+    }
+    
+    await db.project.delete({
+      where: { id: input.projectId },
+    })
+
+    revalidatePath('/app')
+  } catch {
+    return { status: 'error', message: 'Failed to delete project.' }
+  }
+  redirect('/app');
+}
+
 
 // --- Column Management ---
 type Column = { id: string; title: string };

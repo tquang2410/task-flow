@@ -1,5 +1,11 @@
-chore: Update Kanban board for Realtime debugging
+refactor: Centralize Realtime logic in ProjectKanbanView
 
-Replaced the main Kanban board component with a temporary version
-that includes enhanced logging for debugging Supabase Realtime
-synchronization. Also fixed related prop-drilling type errors.
+To enable broadcasting from multiple child components (`KanbanBoard`
+and `TaskDetailSheet`), the Realtime subscription and broadcast
+logic has been lifted into the shared parent, `ProjectKanbanView`.
+
+- `KanbanBoard` is refactored to receive `onUpdate` as a prop.
+- `TaskDetailSheet` now accepts and calls `onUpdate` after a task
+  is successfully modified.
+- This change ensures a consistent Realtime update mechanism for
+  both task movement and task detail edits.
