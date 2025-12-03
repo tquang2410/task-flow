@@ -32,9 +32,10 @@ interface CreateTaskDialogProps {
   projectId: string;
   columnId: string;
   onAddTask: (task: TaskWithDetails) => void;
+  onUpdate?: () => Promise<void>;
 }
 
-export function CreateTaskDialog({ projectId, columnId, onAddTask }: CreateTaskDialogProps) {
+export function CreateTaskDialog({ projectId, columnId, onAddTask, onUpdate }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false)
 
   const form = useForm<z.infer<typeof CreateTaskSchema>>({
@@ -77,7 +78,13 @@ export function CreateTaskDialog({ projectId, columnId, onAddTask }: CreateTaskD
 
     // Step 4: Call the server action in the background
     toast.promise(
-      createTask(values),
+      createTask(values).then(async (res) => {
+        if (res.status === 'success' && onUpdate) {
+          // Send broadcast after successful creation
+          await onUpdate();
+        }
+        return res;
+      }),
       {
         loading: 'Creating task...',
         success: (result) => {
