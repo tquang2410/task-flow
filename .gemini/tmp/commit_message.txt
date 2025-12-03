@@ -1,14 +1,5 @@
-feat: Implement Supabase Realtime Broadcast for Kanban board
+chore: Update Kanban board for Realtime debugging
 
-This commit introduces Supabase Realtime Broadcast to synchronize Kanban board
-changes across multiple clients.
-
-- Integrated Supabase Realtime in `src/components/kanban/kanban-board.tsx`
-  to subscribe to project-specific channels and listen for 'change' events.
-- On receiving a 'change' event, `router.refresh()` is called to re-fetch
-  and update the UI with the latest data from the server.
-- Implemented a `broadcastChange` function to send 'change' signals
-  after successful task movements and creations.
-- The `onUpdate` prop was threaded through `BoardColumn.tsx` and
-  `CreateTaskDialog.tsx` to trigger `broadcastChange` after a new task
-  is successfully added.
+Replaced the main Kanban board component with a temporary version
+that includes enhanced logging for debugging Supabase Realtime
+synchronization. Also fixed related prop-drilling type errors.

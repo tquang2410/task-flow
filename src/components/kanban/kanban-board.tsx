@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { useRouter } from 'next/navigation'
 import {
   DndContext,
   DragEndEvent,
@@ -18,12 +17,11 @@ import { toast } from 'sonner'
 
 import type { Project, User } from '@prisma/client'
 import { type TaskWithDetails } from '@/types/prisma'
-import { createClient } from '@/lib/supabase/client' // Import Supabase Client
 
 import { BoardColumn } from './board-column'
 import { TaskCard } from './task-card'
 import { BoardToolbar } from './board-toolbar'
-import { AddColumnButton } from './add-column-button' // Import component Add Column
+import { AddColumnButton } from './add-column-button'
 import { moveTask } from '@/app/actions'
 
 type Column = {
@@ -34,12 +32,10 @@ type Column = {
 interface KanbanBoardProps {
   initialProject: Project & { tasks: TaskWithDetails[] };
   members: User[];
+  onUpdate: () => Promise<void>;
 }
 
-export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
-  const router = useRouter()
-  const supabase = createClient()
-
+export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardProps) {
   // --- 1. Init State ---
   const [columns, setColumns] = useState<Column[]>(() => {
     try { return initialProject.columns as unknown as Column[] } catch { return [] }
@@ -52,46 +48,7 @@ export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterMemberId, setFilterMemberId] = useState<string | null>(null)
 
-  // --- 2. Realtime Setup (DEBUGGING MODE) ---
-  useEffect(() => {
-    const channelName = `project-${initialProject.id}`
-    console.log('🔌 [Realtime] Connecting to channel:', channelName)
-
-    const channel = supabase.channel(channelName)
-
-    channel
-      .on('broadcast', { event: 'change' }, (payload) => {
-        console.log('📡 [Realtime] RECEIVED signal from another client:', payload)
-        console.log('🔄 [Realtime] Triggering router.refresh()...')
-        router.refresh()
-      })
-      .subscribe((status) => {
-        console.log('🔌 [Realtime] Status changed:', status)
-        if (status === 'SUBSCRIBED') {
-            toast.success('Connected to Realtime updates')
-        }
-      })
-
-    return () => {
-      console.log('🔌 [Realtime] Disconnecting...')
-      supabase.removeChannel(channel)
-    }
-  }, [initialProject.id, router, supabase])
-
-  // Hàm gửi tín hiệu (Broadcaster)
-  const onUpdate = async () => {
-    console.log('📡 [Realtime] SENDING broadcast signal...')
-    const channelName = `project-${initialProject.id}`
-    const result = await supabase.channel(channelName).send({
-      type: 'broadcast',
-      event: 'change',
-      payload: { user: 'someone' }
-    })
-    console.log('📡 [Realtime] Send result:', result)
-  }
-
-  // --- 3. Sync State ---
-  // Khi router.refresh() xong, props mới sẽ về đây -> Cập nhật state
+  // --- 2. Sync State ---
   useEffect(() => {
     console.log('🔄 [Sync] Props updated from Server. Tasks count:', initialProject.tasks.length)
     setTasks(initialProject.tasks)
@@ -104,10 +61,10 @@ export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
 
   useEffect(() => { setPortalContainer(document.body) }, [])
 
-  // --- 4. Logic & Handlers ---
+  // --- 3. Logic & Handlers ---
   const addOptimisticTask = (newTask: TaskWithDetails) => {
     setTasks((prev) => [...prev, newTask]);
-    onUpdate(); // Báo cho người khác biết ngay khi tạo xong
+    onUpdate();
   };
 
   const clearFilters = () => {
@@ -188,10 +145,7 @@ export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
     const newIndex = tasksInColumn.findIndex(t => t.id === activeId)
 
     if (newIndex === -1) return
-
-    // Optimistic Update UI trước (đã làm trong onDragOver)
     
-    // Gọi Server Action
     toast.promise(
         moveTask({
             taskId: String(activeId),
@@ -200,7 +154,6 @@ export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
             projectId: initialProject.id
         }).then((res) => {
             if (res.status === 'success') {
-                // Thành công -> Gửi tín hiệu Realtime
                 onUpdate();
             } else {
                 throw new Error(res.message);
@@ -211,7 +164,6 @@ export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
             loading: 'Saving...',
             success: 'Saved',
             error: (err) => {
-                // Revert logic nếu cần (tạm bỏ qua cho gọn)
                 return 'Failed to move';
             }
         }
@@ -244,12 +196,11 @@ export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
               tasks={filteredTasks.filter(t => t.columnId === col.id)}
               projectId={initialProject.id}
               onAddTask={addOptimisticTask}
-              onUpdate={onUpdate} // Truyền xuống để component con dùng
+              onUpdate={onUpdate}
               members={members}
             />
           ))}
           
-          {/* Nút Add Column */}
           <div className="min-w-[300px] shrink-0">
              <AddColumnButton projectId={initialProject.id} />
           </div>
