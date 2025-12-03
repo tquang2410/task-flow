@@ -21,6 +21,7 @@ import { BoardColumn } from './board-column'
 import { TaskCard } from './task-card'
 import { moveTask } from '@/app/actions'
 import { BoardToolbar } from './board-toolbar'
+import { AddColumnButton } from './add-column-button'
 
 type Column = {
   id: string
@@ -160,8 +161,8 @@ export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
 
     // Tính toán New Index trong cột đích
     // Lọc ra danh sách các task đang hiển thị ở cột đó (theo state hiện tại)
-    const tasksInColumn = tasks.filter(t => t.columnId === newColumnId)
-    const newIndex = tasksInColumn.findIndex(t => t.id === activeId)
+    const tasksInDestination = tasks.filter(t => t.columnId === newColumnId)
+    const newIndex = tasksInDestination.findIndex(t => t.id === activeId)
 
     // console.log('Target Column:', newColumnId)
     // console.log('New Index (Calculated):', newIndex)
@@ -218,6 +219,12 @@ export function KanbanBoard({ initialProject, members }: KanbanBoardProps) {
               onAddTask={addOptimisticTask}
             />
           ))}
+
+          {/* 👇 THÊM LẠI NÚT NÀY 👇 */}
+          <div className="w-80 shrink-0">
+             <AddColumnButton projectId={initialProject.id} />
+          </div>
+          
           {portalContainer && createPortal(
             <DragOverlay>
               {activeTask && <TaskCard task={activeTask} />}
