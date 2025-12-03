@@ -33,6 +33,7 @@ import { CreateTaskDialog } from './create-task-dialog'
 import { updateColumn, deleteColumn } from '@/app/actions'
 import { type TaskWithDetails } from '@/types/prisma'
 import { cn } from '@/lib/utils'
+import type { User } from '@prisma/client'
 
 type Column = {
   id: string
@@ -173,6 +174,7 @@ interface BoardColumnProps {
   projectId: string
   onAddTask: (task: TaskWithDetails) => void;
   onUpdate: () => Promise<void>;
+  members: User[];
 }
 
 export function BoardColumn({
@@ -180,7 +182,8 @@ export function BoardColumn({
   tasks,
   projectId,
   onAddTask,
-  onUpdate
+  onUpdate,
+  members
 }: BoardColumnProps) {
   const tasksInColumn = tasks.filter((task) => task.columnId === column.id)
   const taskIds = tasksInColumn.map((task) => task.id)
@@ -218,7 +221,7 @@ export function BoardColumn({
           strategy={verticalListSortingStrategy}
         >
           {tasksInColumn.map((task) => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard key={task.id} task={task} members={members} />
           ))}
         </SortableContext>
         {tasksInColumn.length === 0 && (

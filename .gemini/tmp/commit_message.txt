@@ -1,9 +1,14 @@
-fix: Restore "Add Column" button and resolve build errors
+feat: Implement Supabase Realtime Broadcast for Kanban board
 
-This commit includes two main fixes:
+This commit introduces Supabase Realtime Broadcast to synchronize Kanban board
+changes across multiple clients.
 
-1.  Restored the "Add Column" button to the Kanban board.
-    - The `AddColumnButton` component was re-added to `src/components/kanban/kanban-board.tsx` to restore the ability to add new columns directly from the board view.
-
-2.  Resolved build errors related to page discovery.
-    - Moved the authentication page from `src/app/(auth)/auth/page.tsx` to `src/app/auth/page.tsx`. This corrected a `PageNotFoundError` that was causing the `npm run build` command to fail.
+- Integrated Supabase Realtime in `src/components/kanban/kanban-board.tsx`
+  to subscribe to project-specific channels and listen for 'change' events.
+- On receiving a 'change' event, `router.refresh()` is called to re-fetch
+  and update the UI with the latest data from the server.
+- Implemented a `broadcastChange` function to send 'change' signals
+  after successful task movements and creations.
+- The `onUpdate` prop was threaded through `BoardColumn.tsx` and
+  `CreateTaskDialog.tsx` to trigger `broadcastChange` after a new task
+  is successfully added.

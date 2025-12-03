@@ -13,16 +13,17 @@ import { useRouter, usePathname } from 'next/navigation';
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Priority } from "@prisma/client";
+import type { Priority, User } from "@prisma/client";
 import { type TaskWithDetails } from "@/types/prisma";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TaskCardProps {
   task: TaskWithDetails;
+  members: User[];
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ task, members }: TaskCardProps) {
   const router = useRouter();
   const pathname = usePathname();
 
