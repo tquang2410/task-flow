@@ -52,9 +52,10 @@ interface TaskDetailSheetProps {
   onClose: () => void
   currentUser: User | null
   members: User[]
+  onUpdate?: () => Promise<void>
 }
 
-export function TaskDetailSheet({ task, isOpen, onClose, currentUser, members }: TaskDetailSheetProps) {
+export function TaskDetailSheet({ task, isOpen, onClose, currentUser, members, onUpdate }: TaskDetailSheetProps) {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const form = useForm<z.infer<typeof UpdateTaskSchema>>({
@@ -75,6 +76,9 @@ export function TaskDetailSheet({ task, isOpen, onClose, currentUser, members }:
     const result = await updateTask(values)
     if (result.status === 'success') {
       toast.success('Task updated successfully.')
+      if (onUpdate) {
+        await onUpdate()
+      }
       onClose()
     } else {
       toast.error(result.message)
