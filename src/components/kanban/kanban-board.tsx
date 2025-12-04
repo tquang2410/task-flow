@@ -173,7 +173,7 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
   }
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full min-h-[500px]">
       <BoardToolbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -182,7 +182,7 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
         members={members}
         clearFilters={clearFilters}
       />
-      <div className="flex h-full gap-6 p-4 items-start">
+      <div className="flex flex-1 gap-6 p-4 items-start overflow-x-auto">
         <DndContext
           sensors={sensors}
           onDragStart={onDragStart}

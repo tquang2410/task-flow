@@ -1,1 +1,1 @@
-bug: Vertical scroll issue persists
+bug: Scrolling remains broken on Kanban board
