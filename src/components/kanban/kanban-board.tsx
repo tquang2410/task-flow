@@ -182,7 +182,7 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
         members={members}
         clearFilters={clearFilters}
       />
-      <div className="flex h-full gap-6 overflow-x-auto p-4 items-start">
+      <div className="flex h-full gap-6 p-4 items-start">
         <DndContext
           sensors={sensors}
           onDragStart={onDragStart}

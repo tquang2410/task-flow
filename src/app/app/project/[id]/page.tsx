@@ -25,6 +25,7 @@ import { AddColumnButton } from '@/components/kanban/add-column-button'
 import { ListSkeleton } from '@/components/list-view/list-skeleton'
 import { ProjectList } from '@/components/list-view/project-list'
 import { ProjectSettings } from '@/components/project/project-settings'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { PlusCircle, Share } from 'lucide-react'
 
 interface ProjectDetailPageProps {
@@ -110,7 +111,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
       </header>
 
       {/* Tabs */}
-      <Tabs defaultValue="board" className="flex flex-col">
+      <Tabs defaultValue="board" className="flex flex-col flex-1 overflow-hidden">
         <TabsList className="bg-transparent border-b border-white/10 rounded-none justify-start">
           <TabsTrigger value="board" className="data-[state=active]:bg-white/5 data-[state=active]:text-white">Board</TabsTrigger>
           <TabsTrigger value="list">List</TabsTrigger>
@@ -118,11 +119,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
-        {/* Board Content with Streaming */}
-        <TabsContent value="board" className="flex-grow overflow-hidden">
-          <Suspense fallback={<BoardSkeleton />}>
-            <ProjectBoard projectId={project.id} />
-          </Suspense>
+        <TabsContent value="board" className="h-full flex flex-col overflow-hidden">
+          <ScrollArea className="h-[calc(100vh-180px)] w-full">
+              <Suspense fallback={<BoardSkeleton />}>
+                <ProjectBoard projectId={project.id} />
+              </Suspense>
+          </ScrollArea>
         </TabsContent>
         {/* List View Content with Streaming */}
         <TabsContent value="list" className="flex-grow">

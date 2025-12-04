@@ -1,10 +1,1 @@
-refactor: Remove Playwright and all related test configurations
-
-Removes all Playwright dependencies, configuration files, and test
-directories from the project as it is no longer being used for
-end-to-end testing.
-
-- Uninstalled the `@playwright/test` package.
-- Deleted the `playwright/`, `playwright-report/`, and `test-results/`
-  directories.
-- Removed the `playwright.yml` GitHub Actions workflow.
+bug: Vertical scroll issue persists
