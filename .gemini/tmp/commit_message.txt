@@ -1,1 +1,5 @@
-bug: Vertical scroll issue persists
+refactor: Implement native window scrolling
+
+Changed the app layout to use standard browser scrolling instead
+of a fixed-height, container-based approach to fix all layout
+and scrolling issues.
