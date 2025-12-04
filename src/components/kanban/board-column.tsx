@@ -46,9 +46,12 @@ interface ColumnHeaderProps {
   projectId: string
   onAddTask: (task: TaskWithDetails) => void;
   onUpdate: () => Promise<void>;
+  isExpanded: boolean;
+  onToggle: () => void;
+  showToggle: boolean;
 }
 
-function ColumnHeader({ column, taskCount, projectId, onAddTask, onUpdate }: ColumnHeaderProps) {
+function ColumnHeader({ column, taskCount, projectId, onAddTask, onUpdate, isExpanded, onToggle, showToggle }: ColumnHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState(column.title)
   const [isPending, startTransition] = useTransition()
@@ -111,6 +114,11 @@ function ColumnHeader({ column, taskCount, projectId, onAddTask, onUpdate }: Col
         )}
       </div>
       <div className="flex items-center gap-1">
+        {showToggle && (
+            <Button variant="ghost" size="sm" className="h-6" onClick={onToggle}>
+                {isExpanded ? "Hide" : "Expand"}
+            </Button>
+        )}
         <div data-testid="create-task-btn">
           <CreateTaskDialog
             projectId={projectId}
@@ -185,8 +193,13 @@ export function BoardColumn({
   onUpdate,
   members
 }: BoardColumnProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const tasksInColumn = tasks.filter((task) => task.columnId === column.id)
-  const taskIds = tasksInColumn.map((task) => task.id)
+  
+  const showToggle = tasksInColumn.length > 5;
+  const visibleTasks = isExpanded || !showToggle ? tasksInColumn : tasksInColumn.slice(0, 5);
+  
+  const taskIds = visibleTasks.map((task) => task.id)
 
   const { setNodeRef } = useDroppable({
     id: column.id,
@@ -208,23 +221,26 @@ export function BoardColumn({
         projectId={projectId}
         onAddTask={onAddTask}
         onUpdate={onUpdate}
+        isExpanded={isExpanded}
+        onToggle={() => setIsExpanded(prev => !prev)}
+        showToggle={showToggle}
       />
       {/* Task List */}
       <div
         className={cn(
           'flex-1 overflow-y-auto flex flex-col gap-3 mt-4 px-4 pb-4',
-          tasksInColumn.length === 0 && 'items-center justify-center'
+          visibleTasks.length === 0 && 'items-center justify-center'
         )}
       >
         <SortableContext
           items={taskIds}
           strategy={verticalListSortingStrategy}
         >
-          {tasksInColumn.map((task) => (
+          {visibleTasks.map((task) => (
             <TaskCard key={task.id} task={task} members={members} />
           ))}
         </SortableContext>
-        {tasksInColumn.length === 0 && (
+        {visibleTasks.length === 0 && (
           <div className="text-sm text-slate-500">
             <p>No tasks yet.</p>
           </div>
