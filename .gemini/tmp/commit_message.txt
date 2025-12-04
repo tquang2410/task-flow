@@ -1,9 +1,10 @@
-fix: Complete Project Settings UI and resolve build errors
+refactor: Remove Playwright and all related test configurations
 
-Completed the implementation of the "Danger Zone" in the Project Settings
-component, ensuring the delete project functionality is fully accessible.
-Resolved several build errors and warnings encountered during development:
-- Fixed unescaped apostrophes in `project-settings.tsx`.
-- Re-added missing `useForm` import in `project-settings.tsx`.
-- Removed unused `useRouter` import in `project-settings.tsx`.
-- Adjusted layout classes in `project/[id]/page.tsx` for optimal rendering.
+Removes all Playwright dependencies, configuration files, and test
+directories from the project as it is no longer being used for
+end-to-end testing.
+
+- Uninstalled the `@playwright/test` package.
+- Deleted the `playwright/`, `playwright-report/`, and `test-results/`
+  directories.
+- Removed the `playwright.yml` GitHub Actions workflow.
