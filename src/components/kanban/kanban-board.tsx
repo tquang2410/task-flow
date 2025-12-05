@@ -173,7 +173,7 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
   }
 
   return (
-    <div className="flex flex-col w-full min-h-[500px]">
+    <div className="flex flex-col h-full"> {/* Bỏ w-full để nó không bị giới hạn */}
       <BoardToolbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -182,7 +182,8 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
         members={members}
         clearFilters={clearFilters}
       />
-      <div className="flex flex-1 gap-6 p-4 items-start overflow-x-auto">
+      {/* Container bảng: Min-height để đẹp, padding chuẩn */}
+      <div className="flex min-h-[500px] gap-6 p-4 items-start overflow-x-auto">
         <DndContext
           sensors={sensors}
           onDragStart={onDragStart}

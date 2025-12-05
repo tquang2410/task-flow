@@ -1,35 +1,23 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import {
-  LayoutDashboard,
-  CheckCircle,
-  Inbox,
-  Users,
-} from 'lucide-react'
+import { LayoutDashboard, CheckCircle, Inbox, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { UserProfile } from '@/components/dashboard/user-profile'
 import { Toaster } from 'sonner'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
 
-export default async function AppLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return redirect('/auth')
-  }
+  if (!user) return redirect('/auth')
 
   return (
     <SmoothScroll>
-      {/* Dùng min-h-screen để trang có thể dài ra. Bỏ overflow-hidden. */}
+      {/* Dùng min-h-screen để trang dài tự nhiên. KHÔNG dùng overflow-hidden */}
       <div className="flex min-h-screen w-full bg-dashboard-background text-white">
         <Toaster theme="dark" position="top-right" />
         
-        {/* Sidebar - Fixed position */}
+        {/* Sidebar Fixed */}
         <aside className="fixed left-0 top-0 z-20 flex h-full w-20 flex-col items-center border-r border-white/10 bg-black/30 py-6 backdrop-blur-md">
           <div className="mb-10">
             <Link href="/app">
@@ -46,7 +34,7 @@ export default async function AppLayout({
               <UserProfile user={user} />
             </aside>
 
-            {/* Main Content - Tự do dãn nở */}
+            {/* Main Content: Tự do dãn nở theo nội dung. Padding bottom để không bị sát đáy */}
             <main className="flex-1 pl-20 flex flex-col relative pb-10">
               {children}
             </main>
@@ -54,4 +42,3 @@ export default async function AppLayout({
         </SmoothScroll>
       )
     }
-    

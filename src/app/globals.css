@@ -63,6 +63,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-[#0B0D12] text-white;
+    @apply bg-dashboard-background text-white;
   }
 }
