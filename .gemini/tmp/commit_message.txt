@@ -1,1 +1,5 @@
-bug: Scroll bug persists
+fix: Implement native window scrolling and background consistency
+
+Resolved all remaining layout and scrolling issues by switching to
+a native window scroll strategy and ensuring background consistency
+across the entire application.
