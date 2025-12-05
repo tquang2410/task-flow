@@ -21,7 +21,7 @@ import { type TaskWithDetails } from '@/types/prisma'
 import { BoardColumn } from './board-column'
 import { TaskCard } from './task-card'
 import { BoardToolbar } from './board-toolbar'
-import { AddColumnButton } from './add-column-button'
+import { AddColumnButton } from './add-column-button' // This import is no longer needed but keeping it doesn't harm
 import { moveTask } from '@/app/actions'
 
 type Column = {
@@ -173,7 +173,7 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
   }
 
   return (
-    <div className="flex flex-col h-full"> {/* Bỏ w-full để nó không bị giới hạn */}
+    <div className="flex flex-col">
       <BoardToolbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -181,9 +181,9 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
         setFilterMemberId={setFilterMemberId}
         members={members}
         clearFilters={clearFilters}
+        projectId={initialProject.id}
       />
-      {/* Container bảng: Min-height để đẹp, padding chuẩn */}
-      <div className="flex min-h-[500px] gap-6 p-4 items-start overflow-x-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start p-4">
         <DndContext
           sensors={sensors}
           onDragStart={onDragStart}
@@ -202,10 +202,6 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
             />
           ))}
           
-          <div className="min-w-[300px] shrink-0">
-             <AddColumnButton projectId={initialProject.id} />
-          </div>
-
           {portalContainer && createPortal(
             <DragOverlay>
               {activeTask && <TaskCard task={activeTask} members={[]} />}

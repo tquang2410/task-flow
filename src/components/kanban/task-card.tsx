@@ -10,6 +10,7 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useRouter, usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +27,13 @@ interface TaskCardProps {
 export function TaskCard({ task, members }: TaskCardProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [clientDate, setClientDate] = useState('');
+
+  useEffect(() => {
+    if (task.dueDate) {
+      setClientDate(new Date(task.dueDate).toLocaleDateString());
+    }
+  }, [task.dueDate]);
 
   const {
     attributes,
@@ -78,7 +86,7 @@ export function TaskCard({ task, members }: TaskCardProps) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-400">
-                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ""}
+                    {clientDate}
                   </span>
                   <Badge
                     variant="outline"
