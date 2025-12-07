@@ -85,7 +85,7 @@ export function ProjectSettings({ project }: ProjectSettingsProps) {
         <CardHeader>
           <CardTitle>General Settings</CardTitle>
           <CardDescription>
-            Update your project's name and description.
+            Update your project&#39;s name and description.
           </CardDescription>
         </CardHeader>
         <CardContent>
