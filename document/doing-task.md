@@ -1,8 +1,28 @@
-# Các Task Đang Thực Hiện
+## ~~[2025-12-07] Implement User Profile Settings~~
+- Status: Done
+- Changes:
+    - Create `UpdateProfileSchema` in `src/lib/schemas.ts`.
+    - Implement `updateProfile` server action in `src/app/actions.ts`.
+    - Create `ProfileForm` component at `src/components/settings/profile-form.tsx`.
+    - Create settings page at `src/app/app/settings/page.tsx`.
+    - Add link to settings page in the main sidebar layout.
 
-Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu cầu của Team Leader.
+## ~~[2025-12-07] Restore Sidebar & Fix Layout Scroll~~
+- Status: Done
+- Changes: Overwrote `src/app/app/layout.tsx` with correct code to restore all sidebar icons and fix scrolling behavior.
 
----
+## ~~[2025-12-07] Restore Settings Link in Sidebar~~
+- Status: Done
+- Changes:
+    - Added `Settings` import to `lucide-react`.
+    - Added new Link to `/app/settings` in the sidebar navigation.
+
+## ~~[2025-12-07] Implement Client-side File Validation for Avatar~~
+- Status: Done
+- Changes:
+    - Added file size validation (1MB limit) to `handleAvatarChange` in `src/components/settings/profile-form.tsx`.
+    - Displayed toast error for oversized files, reset file input and preview.
+    - Updated `UpdateProfileSchema` in `src/lib/schemas.ts` with file size validation.
 
 ## Cập nhật lần cuối: 03/12/2025
 
@@ -15,7 +35,6 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 ### Task đã hoàn thành
 
 -   **[completed]** Thêm bộ lọc (Filter) cho bảng Kanban.
-<<<<<<< HEAD
 -   **[completed]** Fix Vertical Scroll & Implement Smooth Scrolling:
     *   Đã xóa `overflow-hidden` khỏi `src/app/app/layout.tsx`.
     *   Đã tạo `src/components/providers/smooth-scroll.tsx` và tích hợp nó.
@@ -51,8 +70,6 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 -   **[completed]** Removed Playwright:
     *   Đã gỡ cài đặt `@playwright/test`.
     *   Đã xóa `playwright/`, `playwright-report/`, `.github/workflows/playwright.yml`, và `test-results/`.
-=======
->>>>>>> parent of 84af90b (fix: Complete Project Settings UI and resolve build errors)
 -   **[Hoàn thành]** Optimization Phase 1 (Instant Feedback):
     *   Tạo file `loading.tsx` cho các route: `/app`, `/app/workspace/[id]`, `/app/project/[id]`.
     *   Sử dụng **Skeleton** của Shadcn để hiển thị khung giao diện ngay lập tức.
