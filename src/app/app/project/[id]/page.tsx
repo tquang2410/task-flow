@@ -28,12 +28,14 @@ import { ProjectSettings } from '@/components/project/project-settings'
 import { PlusCircle, Share } from 'lucide-react'
 
 interface ProjectDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
+export default async function ProjectDetailPage({ params, searchParams: searchParamsProp }: ProjectDetailPageProps) {
   // 1. DATA FETCHING (Simplified for fast initial load)
-  const { id } = params;
+  const { id } = await params;
+  const searchParams = await searchParamsProp;
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
