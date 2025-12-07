@@ -45,7 +45,6 @@ interface ProjectSettingsProps {
 }
 
 export function ProjectSettings({ project }: ProjectSettingsProps) {
-  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 

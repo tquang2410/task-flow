@@ -21,7 +21,6 @@ import { type TaskWithDetails } from '@/types/prisma'
 import { BoardColumn } from './board-column'
 import { TaskCard } from './task-card'
 import { BoardToolbar } from './board-toolbar'
-import { AddColumnButton } from './add-column-button' // This import is no longer needed but keeping it doesn't harm
 import { moveTask } from '@/app/actions'
 
 type Column = {
@@ -163,7 +162,7 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
         {
             loading: 'Saving...',
             success: 'Saved',
-            error: (err) => {
+            error: (_err) => {
                 return 'Failed to move';
             }
         }
