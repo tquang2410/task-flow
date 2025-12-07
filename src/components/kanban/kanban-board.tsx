@@ -203,7 +203,7 @@ export function KanbanBoard({ initialProject, members, onUpdate }: KanbanBoardPr
           
           {portalContainer && createPortal(
             <DragOverlay>
-              {activeTask && <TaskCard task={activeTask} members={[]} />}
+              {activeTask && <TaskCard task={activeTask} />}
             </DragOverlay>,
             portalContainer
           )}

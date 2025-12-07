@@ -237,7 +237,7 @@ export function BoardColumn({
           strategy={verticalListSortingStrategy}
         >
           {visibleTasks.map((task) => (
-            <TaskCard key={task.id} task={task} members={members} />
+            <TaskCard key={task.id} task={task} />
           ))}
         </SortableContext>
         {visibleTasks.length === 0 && (

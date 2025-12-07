@@ -64,3 +64,5 @@
 - Changes:
     - Renamed `src/middleware.ts` to `src/proxy.ts`.
     - Removed unused variables/imports from `src/app/app/project/[id]/page.tsx`, `src/components/kanban/kanban-board.tsx`, `src/components/kanban/task-card.tsx`, `src/components/project/project-settings.tsx`, and `src/components/settings/profile-form.tsx`.
+    - Renamed `middleware` function to `proxy` in `src/proxy.ts`.
+    - Removed `members` prop from `TaskCard` usage in `src/components/kanban/board-column.tsx` and `src/components/kanban/kanban-board.tsx`.
