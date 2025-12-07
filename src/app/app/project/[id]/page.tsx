@@ -117,7 +117,18 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
 
           </div>
 
+<<<<<<< HEAD
           <div className="flex items-center space-x-2">
+=======
+      {/* Tabs */}
+      <Tabs defaultValue="board" className="flex flex-col flex-grow">
+        <TabsList className="bg-transparent border-b border-white/10 rounded-none justify-start">
+          <TabsTrigger value="board" className="data-[state=active]:bg-white/5 data-[state=active]:text-white">Board</TabsTrigger>
+          <TabsTrigger value="list">List</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+>>>>>>> parent of 84af90b (fix: Complete Project Settings UI and resolve build errors)
 
             <div className="flex -space-x-2">
 

@@ -15,6 +15,7 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 ### Task đã hoàn thành
 
 -   **[completed]** Thêm bộ lọc (Filter) cho bảng Kanban.
+<<<<<<< HEAD
 -   **[completed]** Fix Vertical Scroll & Implement Smooth Scrolling:
     *   Đã xóa `overflow-hidden` khỏi `src/app/app/layout.tsx`.
     *   Đã tạo `src/components/providers/smooth-scroll.tsx` và tích hợp nó.
@@ -50,6 +51,8 @@ Tài liệu này ghi lại các task mà Gemini đang thực hiện theo yêu c�
 -   **[completed]** Removed Playwright:
     *   Đã gỡ cài đặt `@playwright/test`.
     *   Đã xóa `playwright/`, `playwright-report/`, `.github/workflows/playwright.yml`, và `test-results/`.
+=======
+>>>>>>> parent of 84af90b (fix: Complete Project Settings UI and resolve build errors)
 -   **[Hoàn thành]** Optimization Phase 1 (Instant Feedback):
     *   Tạo file `loading.tsx` cho các route: `/app`, `/app/workspace/[id]`, `/app/project/[id]`.
     *   Sử dụng **Skeleton** của Shadcn để hiển thị khung giao diện ngay lập tức.
