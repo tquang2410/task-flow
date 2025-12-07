@@ -219,6 +219,78 @@ export async function removeMemberFromWorkspace(
   }
 }
 
+// --- User Profile Management ---
+import { UpdateProfileSchema } from '@/lib/schemas';
+
+export async function updateProfile(
+  formData: FormData
+): Promise<ActionResponse<string>> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' };
+  }
+  
+  const name = formData.get('name');
+  const avatarFile = formData.get('avatar');
+
+  const validationResult = UpdateProfileSchema.safeParse({
+    name,
+    avatar: avatarFile
+  });
+
+  if (!validationResult.success) {
+    return {
+      status: 'error',
+      message: 'Invalid data',
+      fieldErrors: validationResult.error.flatten().fieldErrors,
+    };
+  }
+  
+  let avatarUrl: string | undefined = undefined;
+
+  // Handle avatar upload if a new file is provided
+  if (avatarFile instanceof File && avatarFile.size > 0) {
+    const filePath = `avatars/${user.id}-${Date.now()}`;
+    const { error: uploadError } = await supabase.storage
+      .from('AVATARS')
+      .upload(filePath, avatarFile);
+
+    if (uploadError) {
+      console.error('Avatar upload error:', uploadError);
+      return { status: 'error', message: 'Failed to upload avatar.' };
+    }
+    
+    const { data: { publicUrl } } = supabase.storage.from('AVATARS').getPublicUrl(filePath);
+    avatarUrl = publicUrl;
+  }
+
+  try {
+    const updateData: { name: string; avatarUrl?: string } = {
+      name: validationResult.data.name,
+    };
+
+    if (avatarUrl) {
+      updateData.avatarUrl = avatarUrl;
+    }
+
+    await db.user.update({
+      where: { supabaseId: user.id },
+      data: updateData,
+    });
+    
+    // Revalidate relevant paths to update UI instantly
+    revalidatePath('/app');
+    revalidatePath('/app/settings');
+
+    return { status: 'success', data: 'Profile updated successfully.' };
+  } catch (e) {
+    console.error('Profile update error:', e);
+    return { status: 'error', message: 'Failed to update profile.' };
+  }
+}
+
 
 
 // --- Project Management ---

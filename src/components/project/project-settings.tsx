@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import type { Project } from '@prisma/client'
@@ -44,6 +45,7 @@ interface ProjectSettingsProps {
 }
 
 export function ProjectSettings({ project }: ProjectSettingsProps) {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
@@ -83,7 +85,7 @@ export function ProjectSettings({ project }: ProjectSettingsProps) {
         <CardHeader>
           <CardTitle>General Settings</CardTitle>
           <CardDescription>
-            Update your project&apos;s name and description.
+            Update your project's name and description.
           </CardDescription>
         </CardHeader>
         <CardContent>

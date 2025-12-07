@@ -143,3 +143,17 @@ export const RemoveMemberSchema = z.object({
   workspaceId: z.string(),
   userId: z.string(),
 });
+
+// Schema for updating user profile
+export const UpdateProfileSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  avatar: z.any()
+    .optional()
+    .refine((file) => {
+      if (!file) return true; // No file, no validation needed
+      if (file instanceof File) {
+        return file.size <= 1024 * 1024; // 1MB limit
+      }
+      return true; // Not a file, or other unexpected value
+    }, "Avatar image must be less than 1MB"),
+});

@@ -1,5 +1,19 @@
+<<<<<<< HEAD
 fix: Resolve all scrolling and build-related errors
 
 Successfully implemented native window scrolling to fix all layout
 and background bugs. Also resolved multiple build failures related
 to SSR and missing imports.
+=======
+refactor: Centralize Realtime logic in ProjectKanbanView
+
+To enable broadcasting from multiple child components (
+and ), the Realtime subscription and broadcast
+logic has been lifted into the shared parent, .
+
+-  is refactored to receive  as a prop.
+-  now accepts and calls  after a task
+  is successfully modified.
+- This change ensures a consistent Realtime update mechanism for
+  both task movement and task detail edits.
+>>>>>>> parent of 84af90b (fix: Complete Project Settings UI and resolve build errors)

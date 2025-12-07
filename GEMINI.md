@@ -14,60 +14,27 @@
 * **Kanban Logic:**
     * `moveTask` phải dùng **Transaction** để Re-indexing toàn bộ cột (Logic đã fix và hoạt động tốt, không được sửa lại logic cũ).
     * `columns` được lưu dạng JSON trong Project.
-* **Performance (NEW):**
+* **Performance:**
     * Ưu tiên **Streaming** (`<Suspense>`) cho các thành phần load chậm (Kanban Board).
     * Sử dụng `Promise.all` để fetch dữ liệu song song.
     * Luôn có `loading.tsx` cho các route chính.
 
-* **Login Redirect Fix:** Fixed an issue where the application would not redirect to `/app` after a successful login from the `/login` page. Implemented `router.push('/app')` to ensure correct navigation.
-* **Core:** Auth, Routing, Middleware, Dashboard UI.
-* **Workspace:** CRUD Workspace, Mời thành viên (cơ bản).
-* **Project:** Tạo Project, chi tiết Project.
-* **Kanban Board (Feature Complete):**
-    * Drag & Drop mượt mà (đã fix lỗi nhảy vị trí).
-    * Task CRUD: Tạo, Sửa, Xóa.
-    * Comments: Đã có UI và logic (đã fix lỗi optimistic update).
-    * Attachments: Refactored to a direct-to-storage upload pattern, fixing file size limits and adding client-side validation. Now includes image previews in a responsive grid.
-    * Column Management: Đã có logic thêm/sửa cột (đã fix lỗi không đồng bộ state và spam click).
-    * Layout: Updated Kanban board container to ensure proper horizontal scrolling and column sizing (`flex h-full gap-6 overflow-x-auto p-4 items-start`).
-    * Refactored "Add Column": Moved the "Add Column" button to the project header and rebuilt it as a `Popover`-based client component for a cleaner UI and better UX.
-    * Assignee Feature: Implemented functionality to assign tasks to workspace members via a combobox in the task details. The assignee's avatar is now displayed on the task card.
-    * **Restore "Add Column" Button:** Re-added the `AddColumnButton` component to the `KanbanBoard` within a `w-80 shrink-0` div after `columns.map` to restore the functionality.
-    * **Realtime Sync (Broadcast):** Implemented Supabase Realtime to broadcast changes (task creation, movement) across all clients viewing the same project board. This triggers a `router.refresh()` to keep data in sync without manual reloads.
-    * **Realtime Debugging Version:** Replaced `src/components/kanban/kanban-board.tsx` with a debugging version to better understand and fix Realtime synchronization issues, including detailed console logs for broadcast events.
-* **Performance & UX:**
-    * Implemented route-level loading skeletons (`loading.tsx`) for instant UI feedback.
-    * Refactored Project Detail Page to use React Suspense and streaming, preventing render-blocking from heavy data fetches.
-    * Implemented an optimistic UI for task creation, making new tasks appear instantly on the board.
-    * **Fix Vertical Scroll & Smooth Scrolling:**
-        - Đã loại bỏ `overflow-hidden` khỏi `src/app/app/layout.tsx` để kích hoạt cuộn dọc tự nhiên cho các chế độ xem Dashboard và List.
-        - Đã tích hợp thư viện `lenis` và tạo component `SmoothScroll` (`src/components/providers/smooth-scroll.tsx`) để cung cấp trải nghiệm cuộn mượt mà trên toàn bộ tuyến `/app`.
-        - Đã thêm lại `overflow-hidden` vào vùng chứa chính trong `src/app/app/project/[id]/page.tsx` để đảm bảo bảng Kanban duy trì bố cục giống như ứng dụng và ngăn chặn cuộn dọc không mong muốn trên trang đó.
-* **Build & Code Health:** Resolved critical build errors (`no-explicit-any`) and cleaned up all code quality warnings (`no-unused-vars`, `no-img-element`) to ensure a stable and clean build. All temporary debugging logs have also been commented out.
-* **Build Fixes (11/29):** Resolved a series of TypeScript type errors that were causing the `npm run build` command to fail. This included:
-    - Correcting the optimistic-UI object in `create-task-dialog.tsx` to include the required `assignee` property.
-    - Fixing a type mismatch in `task-detail-sheet.tsx` by ensuring a `null` value is passed instead of `undefined`.
-    - Removing an unused prop and type import in `kanban-board.tsx` and its usage in `project-kanban-view.tsx` to resolve subsequent errors and warnings.
-* **Layout:** Implemented an "app-like" layout (`h-screen overflow-hidden`) at the root level (`src/app/app/layout.tsx`) to prevent body scrolling. This fixes a critical bug where the background would break when the Kanban board overflowed horizontally.
+**3. Trạng thái dự án hiện tại (Current Status):**
+* **✅ Core:** Auth, Workspace, Project, Sidebar Layout (Hybrid Scroll).
+* **✅ Kanban:** Drag & Drop (Transaction Logic), Column Config, Task CRUD, Comments, Attachments.
+* **✅ Views:** List View (TanStack Table), Kanban Board.
+* **✅ Settings:** Project Settings (Edit/Delete).
+* **✅ Performance & UX:**
+    * Implemented route-level loading skeletons (`loading.tsx`).
+    * Refactored Project Detail Page to use React Suspense and streaming.
+    * Implemented optimistic UI for task creation.
+    * Fixed vertical scroll and implemented smooth scrolling using `lenis`.
+* **✅ Build & Code Health:** Resolved critical build errors and cleaned up code quality warnings.
 
-**🚨 Vấn đề Nghiêm trọng (Critical Issues):**
-* **Performance:** While the project page is optimized, other pages (`/app`, `/app/workspace/[id]`) may still suffer from slower, non-streamed data fetching. A full performance review across the app is still needed.
-
-**📝 Kế hoạch hành động tiếp theo (Next Steps - Priority High):**
-
-1.  **~~Optimization Phase 1 (Instant Feedback):~~ (DONE)**
-    *   ~~Tạo file `loading.tsx` cho các route: `/app`, `/app/workspace/[id]`, `/app/project/[id]`.~~
-    *   ~~Sử dụng **Skeleton** của Shadcn để hiển thị khung giao diện ngay lập tức.~~
-
-2.  **~~Optimization Phase 2 (Streaming):~~ (DONE)**
-    *   ~~Refactor `ProjectDetailPage`:~~
-        *   ~~Tách phần fetch `tasks` nặng nề ra khỏi `page.tsx`.~~
-        *   ~~Chuyển logic fetch board vào một component riêng (VD: `<BoardContainer />`) và bọc nó trong `<Suspense>`.~~
-    *   ~~Dùng `Promise.all` ở những chỗ fetch `user` và `workspace` song song.~~
-
-3.  **Enhancements (Sau khi fix performance):**
-    * Hoàn thiện UI cho phần Members (Invite link).
-    * Thêm bộ lọc (Filter) cho bảng Kanban.
+**📝 Kế hoạch hành động tiếp theo (Next Steps):**
+* **Priority 1:** Implement User Profile Settings (Upload Avatar, Edit Name).
+* **Priority 2:** Timeline View (Gantt Chart).
+* **Priority 3:** Global Search.
 
 **Lưu ý đặc biệt cho AI Agent:**
 * **KHÔNG** viết thêm tính năng mới cho đến khi giải quyết xong vấn đề Performance.
@@ -75,3 +42,201 @@
 * Kiểm tra kỹ file `src/app/actions.ts` trước khi sửa đổi bất cứ logic nào liên quan đến database.
 * Luôn update nội dung vào document/doing-task.md khi bắt đầu một task mới.
 * Khi được yêu cầu update `document/doing-task.md`, phải tổng hợp lại toàn bộ các task đã làm từ đầu buổi trò chuyện, task nào xong thì gạch ngang.
+* Tuyệt đối tuân thủ quy trình Debug "Sherlock Holmes".
+* Không tự ý sửa các file cấu hình (`playwright`, `package.json`) nếu không được yêu cầu.
+
+---
+
+## Workflow
+
+### Khi Nhận Task:
+1. **Đọc context files** (theo thứ tự):
+   - `README.md`
+   - `GEMINI.md` (file này)
+   - `document/databaseFlow.md`
+   - `document/SRS.md`
+   - `document/PRD/<epic-tương-ứng>.md`
+   - `document/doing-task.md`
+
+2. **Clarify nếu cần:** Đặt câu hỏi khi request mơ hồ
+
+3. **Code + Explain:** Cung cấp code kèm giải thích rõ ràng
+
+4. **Architecture advice:** Tư vấn về structure, libraries, design decisions
+
+---
+
+## Task & Change Management
+
+### 1. Task Tracking
+- Mọi task được ghi trong `document/doing-task.md`
+- Format:
+  ```markdown
+  ## [YYYY-MM-DD] Task Name
+  - Status: In Progress / Done / Blocked
+  - Changes: Brief summary
+  ```
+
+### 2. Code Changes Summary
+- Chỉ log **thay đổi quan trọng** vào `## Code Changes Summary` ở cuối file này:
+  - Thay đổi kiến trúc (architecture)
+  - Config cốt lõi (core configuration)
+  - Quyết định kỹ thuật lớn (major technical decisions)
+- **Không log:** Thay đổi nhỏ, cục bộ, bug fixes đơn giản
+
+Format:
+```markdown
+### Feature: <Tên Feature>
+**Date:** YYYY-MM-DD
+**Files:** `path/to/file.ts`, `another/file.tsx`
+**Changes:** Mô tả ngắn gọn (1-2 câu)
+```
+
+### 3. Git Commit Messages
+- **Ngôn ngữ:** English
+- **Format:** Conventional Commits
+  ```
+  feat: add user authentication
+  fix: resolve middleware redirect loop
+  refactor: simplify data fetching logic
+  docs: update API documentation
+  ```
+
+### 4. PRD Updates
+- Khi hoàn thành feature, update file `document/PRD/<epic>.md` nếu có thay đổi so với mục tiêu ban đầu
+- Viết ngắn gọn: tên việc làm, chức năng, file tương tác
+
+### 5. Stability Rules
+- ⚠️ **Chỉ sửa code đang hoạt động tốt** khi cần thiết
+- Tránh reintroduce bugs
+- Ưu tiên stability > perfection
+
+### 6. Pragmatic Problem Solving
+- Nếu fix bug mà cách cũ không hiệu quả → **Thay đổi tư duy**
+- Chấp nhận solution "đủ tốt" để project hoạt động stable
+- Perfect solution có thể đến sau
+
+---
+
+## Code Standards
+
+### TypeScript
+```typescript
+// ✅ Good
+interface User {
+  id: string
+  email: string
+  name: string | null
+}
+
+// ❌ Bad
+const user: any = { ... }
+```
+
+### Server Components (Default)
+```typescript
+// app/page.tsx
+export default async function Page() {
+  const data = await fetch('...', { cache: 'force-cache' })
+  return <div>{data}</div>
+}
+```
+
+### Client Components (When Needed)
+```typescript
+// app/components/Button.tsx
+'use client'
+
+import { useState } from 'react'
+
+export default function Button() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+
+### Server Actions
+```typescript
+// app/actions.ts
+'use server'
+
+import { revalidatePath } from 'next/cache'
+
+export async function createUser(formData: FormData) {
+  const name = formData.get('name')
+  // Validation
+  // Database operation
+  revalidatePath('/users')
+}
+```
+
+---
+
+## Project Structure
+```
+├── app/
+│   ├── (auth)/          # Route groups
+│   ├── api/             # API routes (minimal)
+│   ├── components/      # Shared components
+│   └── actions.ts       # Server actions
+├── lib/
+│   ├── db/              # Database utilities
+│   ├── utils/           # Helper functions
+│   └── validations/     # Zod schemas
+├── document/
+│   ├── PRD/             # Product requirements
+│   ├── doing-task.md    # Current tasks
+│   └── SRS.md           # System requirements
+└── public/              # Static assets
+```
+
+---
+
+## Quick Reference
+
+### Data Fetching
+```typescript
+// Static (default)
+const data = await fetch('...', { cache: 'force-cache' })
+
+// Dynamic
+const data = await fetch('...', { cache: 'no-store' })
+
+// Revalidate
+const data = await fetch('...', { next: { revalidate: 3600 } })
+```
+
+### Caching
+```typescript
+import { unstable_cache } from 'next/cache'
+
+const getCachedData = unstable_cache(
+  async () => { /* ... */ },
+  ['cache-key'],
+  { revalidate: 3600 }
+)
+```
+
+### Streaming
+```tsx
+import { Suspense } from 'react'
+
+<Suspense fallback={<Loading />}>
+  <SlowComponent />
+</Suspense>
+```
+
+---
+
+## Code Changes Summary
+
+<!-- Log major changes here following the format above -->
+
+### Feature: Supabase Migration to <!-- Import failed: supabase/ssr - ENOENT: no such file or directory, access '/Users/justicepencil/Downloads/supabase/ssr' -->
+**Date:** 2025-11-17
+**Files:** `lib/supabase/client.ts`, `lib/supabase/server.ts`, `middleware.ts`
+**Changes:** Migrated from deprecated `@supabase/auth-helpers-nextjs` to `@supabase/ssr` v0.7.0. Unified server/client implementation.
+
+---
+
+**Last Updated:** 2025-12-07
