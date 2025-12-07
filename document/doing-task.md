@@ -46,3 +46,21 @@
 - Changes:
     - Modify `ProjectDetailPageProps` in `src/app/app/project/[id]/page.tsx` to use `params: Promise<{ id: string }>;` and `searchParams: Promise<{ [key: string]: string | string[] | undefined }>;`.
     - Add `await` to `searchParams` destructuring in `ProjectDetailPage` component.
+
+## ~~[2025-12-07] Update Next.js to address security vulnerability~~
+- Status: Done
+- Changes:
+    - Update `next` to the latest version to resolve CVE-2025-66478.
+    - Run `npm run build` to verify the update.
+
+## ~~[2025-12-07] Update Supabase libraries to address build errors~~
+- Status: Done
+- Changes:
+    - Update `@supabase/ssr` and `@supabase/supabase-js` to their latest versions.
+    - Run `npm run build` to verify the update.
+
+## ~~[2025-12-07] Address Build Warnings~~
+- Status: Done
+- Changes:
+    - Renamed `src/middleware.ts` to `src/proxy.ts`.
+    - Removed unused variables/imports from `src/app/app/project/[id]/page.tsx`, `src/components/kanban/kanban-board.tsx`, `src/components/kanban/task-card.tsx`, `src/components/project/project-settings.tsx`, and `src/components/settings/profile-form.tsx`.

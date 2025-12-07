@@ -21,10 +21,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TaskCardProps {
   task: TaskWithDetails;
-  members: User[];
 }
 
-export function TaskCard({ task, members }: TaskCardProps) {
+export function TaskCard({ task }: TaskCardProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [clientDate, setClientDate] = useState('');

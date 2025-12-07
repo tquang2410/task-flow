@@ -5,7 +5,6 @@ import { useState, useTransition, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import Image from 'next/image'
 import { type User } from '@prisma/client'
 
 import { UpdateProfileSchema } from '@/lib/schemas'
