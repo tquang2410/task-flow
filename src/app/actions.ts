@@ -62,13 +62,13 @@ export async function createWorkspace(
     })
     // Also update the user's workspace list
     await db.user.update({
-        where: { supabaseId: user.id },
-        data: { workspaceIds: { push: newWorkspace.id } }
+      where: { supabaseId: user.id },
+      data: { workspaceIds: { push: newWorkspace.id } }
     })
 
     revalidatePath('/app')
     return { status: 'success', data: newWorkspace }
-  } catch(e) {
+  } catch (e) {
     console.error(e)
     return { status: 'error', message: 'Failed to create workspace.' }
   }
@@ -84,10 +84,10 @@ export async function addMemberToWorkspace(
   if (!currentUser) {
     return { status: 'error', message: 'Unauthorized' }
   }
-  
-  const appCurrentUser = await db.user.findUnique({ where: { supabaseId: currentUser.id }, select: { id: true }});
+
+  const appCurrentUser = await db.user.findUnique({ where: { supabaseId: currentUser.id }, select: { id: true } });
   if (!appCurrentUser) {
-      return { status: 'error', message: 'Authenticated user not found in database.' }
+    return { status: 'error', message: 'Authenticated user not found in database.' }
   }
 
 
@@ -150,9 +150,9 @@ export async function removeMemberFromWorkspace(
     return { status: 'error', message: 'Unauthorized' }
   }
 
-  const appCurrentUser = await db.user.findUnique({ where: { supabaseId: currentUser.id }, select: { id: true }});
+  const appCurrentUser = await db.user.findUnique({ where: { supabaseId: currentUser.id }, select: { id: true } });
   if (!appCurrentUser) {
-      return { status: 'error', message: 'Authenticated user not found in database.' }
+    return { status: 'error', message: 'Authenticated user not found in database.' }
   }
 
   const validationResult = RemoveMemberSchema.safeParse(input)
@@ -173,14 +173,14 @@ export async function removeMemberFromWorkspace(
     if (!workspace || !workspace.memberIds.includes(appCurrentUser.id)) {
       return { status: 'error', message: 'Not authorized to perform this action.' }
     }
-    
+
     const userToRemove = await db.user.findUnique({
-        where: { supabaseId: userToRemoveSupabaseId },
-        select: { id: true, workspaceIds: true }
+      where: { supabaseId: userToRemoveSupabaseId },
+      select: { id: true, workspaceIds: true }
     });
 
-    if(!userToRemove) {
-        return { status: 'error', message: "User to remove not found." };
+    if (!userToRemove) {
+      return { status: 'error', message: "User to remove not found." };
     }
 
     const adminId = workspace.memberIds[0] // Internal ObjectId of admin
@@ -200,20 +200,20 @@ export async function removeMemberFromWorkspace(
 
     // Using a transaction to ensure data consistency
     await db.$transaction([
-        db.workspace.update({
-            where: { id: workspaceId },
-            data: { memberIds: newMemberIds },
-        }),
-        db.user.update({
-            where: { id: userToRemove.id },
-            data: { workspaceIds: newUserWorkspaceIds },
-        }),
+      db.workspace.update({
+        where: { id: workspaceId },
+        data: { memberIds: newMemberIds },
+      }),
+      db.user.update({
+        where: { id: userToRemove.id },
+        data: { workspaceIds: newUserWorkspaceIds },
+      }),
     ]);
 
 
     revalidatePath(`/app/workspace/${workspaceId}`)
     return { status: 'success', data: 'Member removed successfully.' }
-  } catch(e) {
+  } catch (e) {
     console.log(e);
     return { status: 'error', message: 'Failed to remove member.' }
   }
@@ -231,7 +231,7 @@ export async function updateProfile(
   if (!user) {
     return { status: 'error', message: 'Unauthorized' };
   }
-  
+
   const name = formData.get('name');
   const avatarFile = formData.get('avatar');
 
@@ -247,7 +247,7 @@ export async function updateProfile(
       fieldErrors: validationResult.error.flatten().fieldErrors,
     };
   }
-  
+
   let avatarUrl: string | undefined = undefined;
 
   // Handle avatar upload if a new file is provided
@@ -261,7 +261,7 @@ export async function updateProfile(
       console.error('Avatar upload error:', uploadError);
       return { status: 'error', message: 'Failed to upload avatar.' };
     }
-    
+
     const { data: { publicUrl } } = supabase.storage.from('AVATARS').getPublicUrl(filePath);
     avatarUrl = publicUrl;
   }
@@ -279,7 +279,7 @@ export async function updateProfile(
       where: { supabaseId: user.id },
       data: updateData,
     });
-    
+
     // Revalidate relevant paths to update UI instantly
     revalidatePath('/app');
     revalidatePath('/app/settings');
@@ -342,7 +342,7 @@ export async function updateProject(
   if (!validationResult.success) {
     return { status: 'error', message: 'Invalid data' }
   }
-  
+
   const { id, ...updateData } = validationResult.data
 
   try {
@@ -388,7 +388,7 @@ export async function deleteProject(input: { projectId: string }): Promise<Actio
     if (!project || !appUser || !project.workspace.memberIds.includes(appUser.id)) {
       return { status: 'error', message: 'You do not have permission to delete this project.' };
     }
-    
+
     await db.project.delete({
       where: { id: input.projectId },
     })
@@ -405,7 +405,7 @@ export async function deleteProject(input: { projectId: string }): Promise<Actio
 type Column = { id: string; title: string };
 
 export async function createColumn(
-    input: z.infer<typeof CreateColumnSchema>
+  input: z.infer<typeof CreateColumnSchema>
 ): Promise<ActionResponse<Column>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -452,7 +452,7 @@ export async function createColumn(
 }
 
 export async function updateColumn(
-    input: z.infer<typeof UpdateColumnSchema>
+  input: z.infer<typeof UpdateColumnSchema>
 ): Promise<ActionResponse<Column>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -490,7 +490,7 @@ export async function updateColumn(
     })
 
     if (!updatedColumn) {
-        return { status: 'error', message: 'Column not found.' }
+      return { status: 'error', message: 'Column not found.' }
     }
 
     await db.project.update({
@@ -506,7 +506,7 @@ export async function updateColumn(
 }
 
 export async function deleteColumn(
-    input: z.infer<typeof DeleteColumnSchema>
+  input: z.infer<typeof DeleteColumnSchema>
 ): Promise<ActionResponse<string>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -547,7 +547,7 @@ export async function deleteColumn(
     const newColumns = columns.filter(col => col.id !== columnId)
 
     if (columns.length === newColumns.length) {
-        return { status: 'error', message: 'Column not found.'}
+      return { status: 'error', message: 'Column not found.' }
     }
 
     await db.project.update({
@@ -567,45 +567,47 @@ export async function deleteColumn(
 export async function createTask(
   input: z.infer<typeof CreateTaskSchema>
 ): Promise<ActionResponse<Task>> {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-        return { status: 'error', message: 'Unauthorized' }
-    }
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' }
+  }
 
-    const validationResult = CreateTaskSchema.safeParse(input)
-    if (!validationResult.success) {
-        return { status: 'error', message: 'Invalid data' }
-    }
-    
-    const { title, projectId, columnId } = validationResult.data
+  const validationResult = CreateTaskSchema.safeParse(input)
+  if (!validationResult.success) {
+    return { status: 'error', message: 'Invalid data' }
+  }
 
-    try {
-        // This logic is correct: it finds the highest order and adds 1,
-        // ensuring the new task is always at the bottom.
-        const highestOrderTask = await db.task.findFirst({
-            where: { projectId, columnId },
-            orderBy: { order: 'desc' },
-        })
+  const { title, projectId, columnId, startDate, dueDate } = validationResult.data
 
-        const newOrder = highestOrderTask ? highestOrderTask.order + 1 : 0
+  try {
+    // This logic is correct: it finds the highest order and adds 1,
+    // ensuring the new task is always at the bottom.
+    const highestOrderTask = await db.task.findFirst({
+      where: { projectId, columnId },
+      orderBy: { order: 'desc' },
+    })
 
-        const newTask = await db.task.create({
-            data: {
-                title,
-                projectId,
-                columnId,
-                reporterId: user.id,
-                order: newOrder,
-                type: 'TASK',
-            },
-        })
-        revalidatePath(`/app/project/${projectId}`)
-        return { status: 'success', data: newTask }
-    } catch {
-        return { status: 'error', message: 'Failed to create task.' }
-    }
+    const newOrder = highestOrderTask ? highestOrderTask.order + 1 : 0
+
+    const newTask = await db.task.create({
+      data: {
+        title,
+        projectId,
+        columnId,
+        reporterId: user.id,
+        order: newOrder,
+        type: 'TASK',
+        startDate,
+        dueDate
+      },
+    })
+    revalidatePath(`/app/project/${projectId}`)
+    return { status: 'success', data: newTask }
+  } catch {
+    return { status: 'error', message: 'Failed to create task.' }
+  }
 }
 
 export async function updateTask(
@@ -622,7 +624,7 @@ export async function updateTask(
   if (!validationResult.success) {
     return { status: 'error', message: 'Invalid data' }
   }
-  
+
   const { id, ...updateData } = validationResult.data
 
   try {
@@ -641,22 +643,22 @@ export async function updateTask(
 }
 
 export async function deleteTask(input: { taskId: string, projectId: string }): Promise<ActionResponse<string>> {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-        return { status: 'error', message: 'Unauthorized' }
-    }
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' }
+  }
 
-    try {
-        await db.task.delete({
-            where: { id: input.taskId },
-        })
-        revalidatePath(`/app/project/${input.projectId}`)
-        return { status: 'success', data: 'Task deleted' }
-    } catch {
-        return { status: 'error', message: 'Failed to delete task.' }
-    }
+  try {
+    await db.task.delete({
+      where: { id: input.taskId },
+    })
+    revalidatePath(`/app/project/${input.projectId}`)
+    return { status: 'success', data: 'Task deleted' }
+  } catch {
+    return { status: 'error', message: 'Failed to delete task.' }
+  }
 }
 
 export async function moveTask(
@@ -691,7 +693,7 @@ export async function moveTask(
 
     // 2. Tính toán danh sách ID mới theo đúng thứ tự mong muốn
     const newOrderedIds = tasksInDestination.map(t => t.id)
-    
+
     // Chèn ID của task đang di chuyển vào đúng vị trí index (newIndex)
     newOrderedIds.splice(newIndex, 0, taskId)
 
@@ -722,35 +724,35 @@ export async function moveTask(
 export async function createComment(
   input: z.infer<typeof CreateCommentSchema>
 ): Promise<ActionResponse<Awaited<ReturnType<typeof db.comment.create>>>> {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-        return { status: 'error', message: 'Unauthorized' }
-    }
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' }
+  }
 
-    const validationResult = CreateCommentSchema.safeParse(input)
-    if (!validationResult.success) {
-        return { status: 'error', message: 'Invalid data' }
-    }
+  const validationResult = CreateCommentSchema.safeParse(input)
+  if (!validationResult.success) {
+    return { status: 'error', message: 'Invalid data' }
+  }
 
-    const { taskId, text } = validationResult.data
-    try {
-        const task = await db.task.findUnique({ where: { id: taskId }, select: { projectId: true }})
-        if (!task) return { status: 'error', message: 'Task not found' }
+  const { taskId, text } = validationResult.data
+  try {
+    const task = await db.task.findUnique({ where: { id: taskId }, select: { projectId: true } })
+    if (!task) return { status: 'error', message: 'Task not found' }
 
-        const newComment = await db.comment.create({
-            data: {
-                text,
-                taskId,
-                userId: user.id
-            }
-        })
-        revalidatePath(`/app/project/${task.projectId}`)
-        return { status: 'success', data: newComment }
-    } catch {
-        return { status: 'error', message: 'Failed to create comment.' }
-    }
+    const newComment = await db.comment.create({
+      data: {
+        text,
+        taskId,
+        userId: user.id
+      }
+    })
+    revalidatePath(`/app/project/${task.projectId}`)
+    return { status: 'success', data: newComment }
+  } catch {
+    return { status: 'error', message: 'Failed to create comment.' }
+  }
 }
 
 
@@ -773,7 +775,7 @@ export async function getSignedUploadUrl(
   if (!validationResult.success) {
     return { status: 'error', message: 'Invalid input.' }
   }
-  
+
   const { taskId, fileName, fileType, fileSize } = validationResult.data;
 
   // Server-side validation
@@ -794,7 +796,7 @@ export async function getSignedUploadUrl(
     if (error) {
       throw error;
     }
-    
+
     return { status: 'success', data: { signedUrl: data.signedUrl, path: data.path } }
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Failed to create signed URL.';
@@ -811,14 +813,14 @@ export async function createAttachmentRecord(
   if (!user) {
     return { status: 'error', message: 'Unauthorized' }
   }
-  
+
   const validationResult = CreateAttachmentRecordSchema.safeParse(input)
   if (!validationResult.success) {
     return { status: 'error', message: 'Invalid input.' }
   }
 
   const { taskId, name, path } = validationResult.data;
-  
+
   try {
     const task = await db.task.findUnique({
       where: { id: taskId },
@@ -846,7 +848,7 @@ export async function createAttachmentRecord(
 
     revalidatePath(`/app/project/${task.projectId}`)
     return { status: 'success', data: newAttachment }
-  } catch(e) {
+  } catch (e) {
     const message = e instanceof Error ? e.message : 'An unknown error occurred while saving to the database.';
     console.error(e);
     return { status: 'error', message }
@@ -865,33 +867,33 @@ export async function deleteAttachment(
 
   const validationResult = DeleteAttachmentSchema.safeParse(input)
   if (!validationResult.success) {
-      return { status: 'error', message: 'Invalid data' }
+    return { status: 'error', message: 'Invalid data' }
   }
 
   const { attachmentId, path } = validationResult.data
 
   try {
     const attachment = await db.attachment.findUnique({
-        where: { id: attachmentId },
-        select: { uploaderId: true, task: { select: { projectId: true } } },
+      where: { id: attachmentId },
+      select: { uploaderId: true, task: { select: { projectId: true } } },
     })
 
     if (!attachment) {
-        return { status: 'error', message: 'Attachment not found.' }
+      return { status: 'error', message: 'Attachment not found.' }
     }
 
     if (attachment.uploaderId !== user.id) {
-        return { status: 'error', message: 'You are not authorized to delete this file.' }
+      return { status: 'error', message: 'You are not authorized to delete this file.' }
     }
 
     const { error: storageError } = await supabase.storage.from('ATTACHMENTS').remove([path])
     if (storageError) {
-        console.error('Storage Deletion Error:', storageError)
-        return { status: 'error', message: 'Failed to delete file from storage.' }
+      console.error('Storage Deletion Error:', storageError)
+      return { status: 'error', message: 'Failed to delete file from storage.' }
     }
 
     await db.attachment.delete({
-        where: { id: attachmentId },
+      where: { id: attachmentId },
     })
 
     revalidatePath(`/app/project/${attachment.task.projectId}`)

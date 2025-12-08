@@ -239,4 +239,11 @@ import { Suspense } from 'react'
 
 ---
 
-**Last Updated:** 2025-12-07
+### Feature: Timeline View (Gantt Chart)
+**Date:** 2025-12-08
+**Files:** `src/components/timeline/*`, `src/app/app/project/[id]/page.tsx`, `src/lib/schemas.ts`, `prisma/schema.prisma`
+**Changes:** Implemented Gantt Chart view using `gantt-task-react`. Added `startDate` to Task model. Integrated with Project Detail page.
+
+---
+
+**Last Updated:** 2025-12-08

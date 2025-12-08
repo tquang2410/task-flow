@@ -60,6 +60,7 @@ export function CreateTaskDialog({ projectId, columnId, onAddTask, onUpdate }: C
       type: 'TASK',
       description: null,
       dueDate: null,
+      startDate: null,
       assigneeId: null,
       reporterId: 'temp-user', // Will be corrected by server
       assignee: null, // Add this to satisfy TaskWithDetails
@@ -105,7 +106,7 @@ export function CreateTaskDialog({ projectId, columnId, onAddTask, onUpdate }: C
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" className="h-6 w-6">
-            <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800">
