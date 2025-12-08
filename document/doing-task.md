@@ -1,3 +1,20 @@
+## ~~[2025-12-07] Refine Timeline View Implementation~~
+- Status: Done
+- Changes:
+    - **Schema & Actions**: Added `startDate` to `CreateTaskSchema` and `createTask` action.
+    - **UI**: Added `DatePicker` for Start Date in `TaskDetailSheet`.
+    - **Timeline Logic**: Updated `TimelineView` to fallback `startDate` to `createdAt` (instead of now) and default duration to 1 day.
+    - **Styling**: Added dark mode colors to Gantt chart bars.
+
+## ~~[2025-12-07] Implement Timeline View (Gantt Chart)~~
+- Status: Done
+- Changes:
+    - Add `startDate` to `Task` model in `schema.prisma`.
+    - Install `gantt-task-react`.
+    - Implement `TimelineView` and `TimelineToolbar` components.
+    - Create `ProjectTimeline` server component with Suspense.
+    - Integrate Timeline tab into `ProjectDetailPage`.
+
 ## ~~[2025-12-07] Implement User Profile Settings~~
 - Status: Done
 - Changes:

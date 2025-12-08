@@ -97,6 +97,7 @@ model Task {
   // REQ-FUN-4.2: Thuộc tính Task
   priority Priority  @default(MEDIUM) // Enum: LOW, MEDIUM, HIGH
   type     TaskType  @default(TASK) // Enum: TASK, BUG, FEATURE
+  startDate DateTime?
   dueDate  DateTime?
 
   // REQ-FUN-3.3: Task này đang ở Cột (Column) nào?

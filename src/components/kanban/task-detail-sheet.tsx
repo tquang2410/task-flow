@@ -32,12 +32,12 @@ import {
   SheetClose,
 } from '@/components/ui/sheet'
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@/components/ui/form'
 import { Separator } from '@/components/ui/separator'
 import { CommentSection } from './comment-section'
@@ -65,6 +65,7 @@ export function TaskDetailSheet({ task, isOpen, onClose, currentUser, members, o
       title: task.title || '',
       description: task.description || '',
       priority: task.priority,
+      startDate: task.startDate,
       dueDate: task.dueDate,
       assigneeId: task.assigneeId,
     },
@@ -108,150 +109,188 @@ export function TaskDetailSheet({ task, isOpen, onClose, currentUser, members, o
           <SheetDescription>View and edit the details of your task.</SheetDescription>
         </SheetHeader>
         <div className="py-6">
-            <Form {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
+              <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                        <Input {...field} className="bg-slate-800 border-slate-700"/>
+                      <Input {...field} className="bg-slate-800 border-slate-700" />
                     </FormControl>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
-                <FormField
+              />
+              <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                        <Textarea
+                      <Textarea
                         placeholder="Add a more detailed description..."
                         className="resize-none bg-slate-800 border-slate-700"
                         {...field}
                         value={field.value ?? ''}
-                        />
+                      />
                     </FormControl>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
+              />
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="assigneeId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assignee</FormLabel>
+                      <FormControl>
+                        <MemberSelect
+                          members={members}
+                          value={field.value ?? null}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <div className="grid grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="assigneeId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Assignee</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="priority"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Priority</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-slate-800 border-slate-700">
+                            <SelectValue placeholder="Select priority" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="bg-slate-900 text-white">
+                          {(Object.keys(Priority) as Array<keyof typeof Priority>).map(p => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Start Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
                           <FormControl>
-                            <MemberSelect
-                              members={members}
-                              value={field.value ?? null}
-                              onChange={field.onChange}
-                            />
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "pl-3 text-left font-normal bg-slate-800 border-slate-700 hover:bg-slate-700",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="priority"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Priority</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                            <SelectTrigger className="bg-slate-800 border-slate-700">
-                                <SelectValue placeholder="Select priority" />
-                            </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="bg-slate-900 text-white">
-                                {(Object.keys(Priority) as Array<keyof typeof Priority>).map(p => (
-                                    <SelectItem key={p} value={p}>{p}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="dueDate"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                        <FormLabel>Due date</FormLabel>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                            <FormControl>
-                                <Button
-                                variant={"outline"}
-                                className={cn(
-                                    "pl-3 text-left font-normal bg-slate-800 border-slate-700 hover:bg-slate-700",
-                                    !field.value && "text-muted-foreground"
-                                )}
-                                >
-                                {field.value ? (
-                                    format(field.value, "PPP")
-                                ) : (
-                                    <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                            </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                                mode="single"
-                                selected={field.value ?? undefined}
-                                onSelect={field.onChange}
-                                initialFocus
-                            />
-                            </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                </div>
-                <SheetFooter className="mt-8 !space-x-2">
-                    <Button 
-                        type="button" 
-                        variant="destructive" 
-                        onClick={onDelete} 
-                        disabled={isSubmitting || isDeleting}
-                        className="mr-auto"
-                    >
-                        <Trash className="mr-2 h-4 w-4" />
-                        {isDeleting ? 'Deleting...' : 'Delete Task'}
-                    </Button>
-                    <SheetClose asChild>
-                       <Button type="button" variant="ghost">Cancel</Button>
-                    </SheetClose>
-                    <Button type="submit" className="bg-dashboard-primary text-white" disabled={isSubmitting || isDeleting}>
-                        {isSubmitting ? 'Saving...' : 'Save Changes'}
-                    </Button>
-                </SheetFooter>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value ?? undefined}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dueDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Due Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "pl-3 text-left font-normal bg-slate-800 border-slate-700 hover:bg-slate-700",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value ?? undefined}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <SheetFooter className="mt-8 !space-x-2">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={onDelete}
+                  disabled={isSubmitting || isDeleting}
+                  className="mr-auto"
+                >
+                  <Trash className="mr-2 h-4 w-4" />
+                  {isDeleting ? 'Deleting...' : 'Delete Task'}
+                </Button>
+                <SheetClose asChild>
+                  <Button type="button" variant="ghost">Cancel</Button>
+                </SheetClose>
+                <Button type="submit" className="bg-dashboard-primary text-white" disabled={isSubmitting || isDeleting}>
+                  {isSubmitting ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </SheetFooter>
             </form>
-            </Form>
-            <Separator className="my-6 bg-slate-800" />
-            <AttachmentList
-                taskId={task.id}
-                initialAttachments={task.attachments}
-                currentUser={currentUser}
-            />
-            <Separator className="my-6 bg-slate-800" />
-            <CommentSection 
-                taskId={task.id}
-                initialComments={task.comments}
-                currentUser={currentUser}
-            />
+          </Form>
+          <Separator className="my-6 bg-slate-800" />
+          <AttachmentList
+            taskId={task.id}
+            initialAttachments={task.attachments}
+            currentUser={currentUser}
+          />
+          <Separator className="my-6 bg-slate-800" />
+          <CommentSection
+            taskId={task.id}
+            initialComments={task.comments}
+            currentUser={currentUser}
+          />
         </div>
       </SheetContent>
     </Sheet>
