@@ -12,7 +12,12 @@ import {
     MonitorSmartphone,
     ArrowLeft,
     ArrowRight,
-    Folder
+    Folder,
+    Bug,
+    Code,
+    Layout,
+    ClipboardCheck,
+    Circle
 } from 'lucide-react'
 import {
     addDays,
@@ -72,6 +77,48 @@ const getTaskColorStyle = (priority: string | null) => {
                 iconBg: 'bg-task-purple',
             };
     }
+};
+
+/**
+ * Lấy ra icon phù hợp dựa trên từ khóa trong title của task
+ * @param title Tên của task
+ * @returns React component icon
+ */
+const getTaskIcon = (title: string) => {
+    const lowerTitle = title.toLowerCase();
+
+    // Research & Analysis
+    if (lowerTitle.includes('research') || lowerTitle.includes('analysis')) {
+        return Search;
+    }
+
+    // Design & UI/UX
+    if (lowerTitle.includes('design') || lowerTitle.includes('ui') || lowerTitle.includes('ux')) {
+        return Layout;
+    }
+
+    // Mobile & App
+    if (lowerTitle.includes('mobile') || lowerTitle.includes('app')) {
+        return Smartphone;
+    }
+
+    // Bug & Fix
+    if (lowerTitle.includes('bug') || lowerTitle.includes('fix') || lowerTitle.includes('error')) {
+        return Bug;
+    }
+
+    // Development & Backend
+    if (lowerTitle.includes('dev') || lowerTitle.includes('api') || lowerTitle.includes('backend')) {
+        return Code;
+    }
+
+    // Testing & QA
+    if (lowerTitle.includes('test') || lowerTitle.includes('qa')) {
+        return ClipboardCheck;
+    }
+
+    // Default
+    return Circle;
 };
 
 
@@ -248,6 +295,7 @@ export function CustomGantt({ tasks }: CustomGanttProps) {
                                 {tasks.map((task, index) => {
                                     const style = calculateTaskStyle(task);
                                     const colors = getTaskColorStyle(task.priority);
+                                    const TaskIcon = getTaskIcon(task.title);
 
                                     // Check if task is out of current month's view
                                     const startDate = task.startDate ?? task.createdAt;
@@ -269,7 +317,7 @@ export function CustomGantt({ tasks }: CustomGanttProps) {
                                                 <div className={`${colors.iconBg} p-1 rounded mr-2 flex items-center justify-center h-6 w-6`}>
                                                     <ArrowLeft className="w-3 h-3 text-white" />
                                                 </div>
-                                                <Search className={`${colors.text} mr-2 w-4 h-4 flex-shrink-0`} />
+                                                <TaskIcon className={`${colors.text} mr-2 w-4 h-4 flex-shrink-0`} />
                                                 <span
                                                     className={`text-xs font-medium ${colors.text} truncate`}>{task.title}</span>
 

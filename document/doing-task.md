@@ -91,3 +91,22 @@
     - Implemented synced scrolling, month navigation, and task rendering logic.
     - Updated `tailwind.config.ts` with requested color palette.
     - Integrated new component into `ProjectTimeline`.
+
+## ~~[2025-12-12] Implement Dynamic Gantt Chart with Priority-Based Colors~~
+- Status: Done
+- Changes:
+    - **Dynamic Rendering**: Replaced hardcoded mock UI with dynamic `date-fns` rendering
+    - **Timeline Header**: Fixed day format to single letter (T, F, S, M, W) with `format(day, 'EEEEEE')`
+    - **Priority-Based Colors**: Implemented color system based on task priority
+        * HIGH → Orange (#FB923C)
+        * MEDIUM → Blue (#38BDF8)
+        * LOW → Green (#84CC16)
+        * Default → Purple (#A855F7)
+    - **Layout Fixes**: Fixed calendar grid height to match Activity List sidebar (full height)
+    - **Current Day Indicator**: Added diamond shape and pink vertical line for current day
+    - **Task Bars**: Implemented dynamic calculation based on `startDate` and `dueDate`
+    - **Icon Box**: Added wrapper for task bar icons with arrow icon
+    - **Avatars**: Positioned assignee avatars outside task bars
+    - **Scroll Sync**: Implemented synchronized scrolling between task list and gantt chart
+    - **Files Modified**: `src/components/timeline/custom-gantt.tsx`
+    - **Commit**: `b8a2a59` on branch `feat/timeline-view`
