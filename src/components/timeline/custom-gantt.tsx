@@ -31,8 +31,31 @@ import {
     startOfMonth,
     subMonths
 } from 'date-fns'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { toast } from 'sonner'
 import { TaskWithDetails } from '@/types/prisma'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { TaskDetailSheet } from '@/components/kanban/task-detail-sheet'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { CreateTaskSchema } from '@/lib/schemas'
+import { createTask } from '@/app/actions'
 
 // =================================================================
 // 🧠 LOGIC VÀ CÁC HÀM HELPERS
@@ -128,14 +151,52 @@ const getTaskIcon = (title: string) => {
 
 interface CustomGanttProps {
     tasks: TaskWithDetails[];
+    projectId: string;
+    columns: { id: string; title: string; order: number }[];
+    members: Array<{
+        id: string;
+        supabaseId: string;
+        name: string | null;
+        email: string;
+        avatarUrl: string | null;
+        workspaceIds: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
 }
 
-export function CustomGantt({ tasks }: CustomGanttProps) {
+export function CustomGantt({ tasks, projectId, columns, members }: CustomGanttProps) {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedTask, setSelectedTask] = useState<TaskWithDetails | null>(null);
+    const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
     const ganttContainerRef = useRef<HTMLDivElement>(null);
     const activityListRef = useRef<HTMLDivElement>(null);
+
+    // Form setup for creating new task
+    const createForm = useForm<z.infer<typeof CreateTaskSchema>>({
+        resolver: zodResolver(CreateTaskSchema),
+        defaultValues: {
+            title: '',
+            projectId: projectId,
+            columnId: columns[0]?.id || '',
+        },
+    });
+
+    // Handler for creating new task
+    async function handleCreateTask(values: z.infer<typeof CreateTaskSchema>) {
+        const result = await createTask(values);
+        if (result.status === 'success') {
+            toast.success('Task created successfully');
+            setIsCreateDialogOpen(false);
+            createForm.reset();
+            // Refresh page to show new task
+            window.location.reload();
+        } else {
+            toast.error(result.message);
+        }
+    }
 
     // --- Date Logic ---
     const startOfMonthDate = useMemo(() => startOfMonth(currentDate), [currentDate]);
@@ -230,11 +291,50 @@ export function CustomGantt({ tasks }: CustomGanttProps) {
                     </div>
 
                     <div className="p-4 border-t border-gantt-border-dark">
-                        <button
-                            className="w-full bg-gantt-primary hover:bg-opacity-90 text-white rounded-lg py-3 px-4 flex items-center justify-center transition-all">
-                            <Plus className="mr-2 w-4 h-4" />
-                            <span className="text-sm font-medium">Add New Activity</span>
-                        </button>
+                        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                            <DialogTrigger asChild>
+                                <button
+                                    className="w-full bg-gantt-primary hover:bg-opacity-90 text-white rounded-lg py-3 px-4 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!columns[0]?.id}
+                                    title={!columns[0]?.id ? "No columns available" : "Add new task to first column"}
+                                >
+                                    <Plus className="mr-2 w-4 h-4" />
+                                    <span className="text-sm font-medium">Add New Activity</span>
+                                </button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800">
+                                <DialogHeader>
+                                    <DialogTitle className="text-white">Create a new task</DialogTitle>
+                                </DialogHeader>
+                                <Form {...createForm}>
+                                    <form onSubmit={createForm.handleSubmit(handleCreateTask)} className="space-y-4">
+                                        <FormField
+                                            control={createForm.control}
+                                            name="title"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="Enter task title..."
+                                                            {...field}
+                                                            className="bg-slate-800 border-slate-700 text-white"
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <Button
+                                            type="submit"
+                                            className="w-full bg-gantt-primary hover:bg-opacity-90 text-white"
+                                            disabled={createForm.formState.isSubmitting}
+                                        >
+                                            {createForm.formState.isSubmitting ? 'Creating...' : 'Create Task'}
+                                        </Button>
+                                    </form>
+                                </Form>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
 
@@ -313,6 +413,10 @@ export function CustomGantt({ tasks }: CustomGanttProps) {
                                             <div
                                                 className={`absolute h-10 top-2 ${colors.bg} rounded-lg flex items-center px-3 border-2 ${colors.border} hover:shadow-lg transition-shadow cursor-pointer`}
                                                 style={style}
+                                                onClick={() => {
+                                                    setSelectedTask(task);
+                                                    setIsTaskDetailOpen(true);
+                                                }}
                                             >
                                                 <div className={`${colors.iconBg} p-1 rounded mr-2 flex items-center justify-center h-6 w-6`}>
                                                     <ArrowLeft className="w-3 h-3 text-white" />
@@ -379,6 +483,17 @@ export function CustomGantt({ tasks }: CustomGanttProps) {
                 background: transparent;
               }
             `}</style>
+
+            {/* Task Detail Sheet */}
+            {selectedTask && (
+                <TaskDetailSheet
+                    task={selectedTask}
+                    isOpen={isTaskDetailOpen}
+                    onClose={() => setIsTaskDetailOpen(false)}
+                    currentUser={null} // TODO: Get current user from context
+                    members={members}
+                />
+            )}
         </div>
     );
 }
