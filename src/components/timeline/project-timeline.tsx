@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
-import { TimelineView } from './timeline-view'
+import { CustomGantt } from './custom-gantt'
 
 interface ProjectTimelineProps {
     projectId: string;
@@ -51,16 +51,5 @@ export async function ProjectTimeline({ projectId }: ProjectTimelineProps) {
     }
 
     // 3. RENDER THE CLIENT COMPONENT
-    return <TimelineView tasks={project.tasks} onUpdate={async () => {
-        'use server'
-        // This empty server action is passed to trigger revalidation in the client component
-        // However, revalidatePath in the actual updateTask action handles the revalidation.
-        // The Client Component calls a prop onUpdate, which we can just leave as a no-op 
-        // or pass a server action that revalidates if needed.
-        // But better: relying on the revalidatePath in updateTask is enough.
-        // We just need to pass a function that satisfies the prop type or make it optional.
-        // Actually, KanbanBoard uses onUpdate to just trigger local state refresh if needed, 
-        // but with revalidatePath, the Server Component rerenders.
-        // FOR NOW: Let's pass a simple server function to satisfy the type.
-    }} />
+    return <CustomGantt tasks={project.tasks} columns={project.columns as any[]} />;
 }
