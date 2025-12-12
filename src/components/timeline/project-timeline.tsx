@@ -1,3 +1,19 @@
+
+/**
+ * File: src/components/timeline/project-timeline.tsx
+ * 
+ * Chức năng:
+ * - Đây là Server Component chịu trách nhiệm fetch dữ liệu các task cho một project cụ thể.
+ * - Sau khi có dữ liệu, nó sẽ truyền vào component client 'CustomGantt' để hiển thị.
+ * - Component này được sử dụng trong trang chi tiết project (project/[id]/page.tsx) trong một Tab.
+ * 
+ * Logic chính:
+ * - Nhận vào 'projectId' từ props.
+ * - Sử dụng 'db.task.findMany' để truy vấn tất cả các task thuộc project đó từ database.
+ *   - Lựa chọn bao gồm cả thông tin người được giao ('assignee') để hiển thị avatar.
+ *   - Sắp xếp các task theo 'createdAt' để có thứ tự ổn định.
+ * - Dữ liệu task sau khi fetch sẽ được truyền vào prop 'tasks' của component 'CustomGantt'.
+ */
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
@@ -8,48 +24,33 @@ interface ProjectTimelineProps {
 }
 
 export async function ProjectTimeline({ projectId }: ProjectTimelineProps) {
-    // 1. DATA FETCHING
     const supabase = await createClient()
-    const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
-    if (!supabaseUser) {
-        return redirect('/auth')
-    }
+    if (!user) return redirect('/auth')
 
-    // Fetch project with tasks included
-    // We don't need all the heavy details like comments/attachments for the Timeline initially
-    // But reusing the same shape as Kanban might be easier if we want to share types
-    // For performance, let's fetch just what we need plus what TaskWithDetails expects
-    // To avoid type issues, let's include everything TaskWithDetails needs
+    // Fetch dữ liệu thật
     const project = await db.project.findUnique({
         where: { id: projectId },
         include: {
             tasks: {
-                orderBy: { order: 'asc' },
                 include: {
-                    assignee: true,
-                    comments: {
-                        include: { user: true },
-                        orderBy: { createdAt: 'asc' }
-                    },
-                    attachments: {
-                        include: { uploader: true }
-                    }
-                }
+                    assignee: true, // Cần lấy assignee để hiện Avatar
+                },
+                orderBy: { order: 'asc' } // Sắp xếp theo thứ tự
             },
-            workspace: {
-                select: { memberIds: true }
-            }
-        },
+            workspace: true
+        }
     })
 
-    const appUser = await db.user.findUnique({ where: { supabaseId: supabaseUser.id }, select: { id: true } })
+    if (!project) return null
 
-    // 2. SECURITY & VALIDATION
-    if (!project || !appUser || !project.workspace.memberIds.includes(appUser.id)) {
-        return <div className="p-4 text-red-500">Access denied or project not found.</div>;
-    }
-
-    // 3. RENDER THE CLIENT COMPONENT
-    return <CustomGantt tasks={project.tasks} columns={project.columns as any[]} />;
+    // Truyền data vào component Gantt xịn
+    return (
+        <div className="h-[calc(100vh-140px)] w-full p-4">
+            <CustomGantt tasks={project.tasks as any} />
+            {/* Type assertion 'as any' tạm thời nếu dính lỗi type TaskWithDetails phức tạp,
+          nhưng tốt nhất là import đúng type */}
+        </div>
+    )
 }

@@ -89,8 +89,8 @@ const config: Config = {
         // No, `primary` in the snippet is `#2D2852`.
         // I will ADD the new ones. For `primary` and `secondary` which exist, I will use `timeline-primary` and `timeline-secondary` and update the component to use those.
 
-        "timeline-primary": "#2D2852",
-        "timeline-secondary": "#7C3AED",
+        "gantt-primary": "#2D2852",
+        "gantt-secondary": "#7C3AED",
         "accent-pink": "#F43F5E",
         "task-blue": "#38BDF8",
         "task-green": "#84CC16",
@@ -99,6 +99,10 @@ const config: Config = {
         "surface-dark": "#1F2937",
         "border-dark": "#374151",
         "background-dark": "#111827",
+        "bg-light": "#F9FAFB",
+        "bg-dark": "#111827",
+        "surface-light": "#FFFFFF",
+        "border-light": "#E5E7EB",
       },
       keyframes: {
         'accordion-down': {

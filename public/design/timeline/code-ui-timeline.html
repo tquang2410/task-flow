@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TaskFlow - Project Timeline</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2D2852", // Deep purple from sidebar
+                        secondary: "#7C3AED", // Brighter purple for accents
+                        "accent-pink": "#F43F5E",
+                        "task-blue": "#38BDF8",
+                        "task-green": "#84CC16",
+                        "task-purple": "#A855F7",
+                        "task-orange": "#FB923C",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#111827",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1F2937",
+                        "border-light": "#E5E7EB",
+                        "border-dark": "#374151",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>.timeline-scroll::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .timeline-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .timeline-scroll::-webkit-scrollbar-thumb {
+            background-color: #CBD5E1;
+            border-radius: 4px;
+        }
+        .dark .timeline-scroll::-webkit-scrollbar-thumb {
+            background-color: #4B5563;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 overflow-hidden h-screen flex transition-colors duration-200">
+<aside class="w-20 bg-primary flex flex-col items-center py-6 flex-shrink-0 z-20">
+<div class="mb-10 text-white">
+<span class="material-icons-outlined text-3xl text-green-400">api</span>
+</div>
+<nav class="flex-1 flex flex-col space-y-8 w-full items-center">
+<button class="text-gray-400 hover:text-white transition-colors relative group">
+<span class="material-icons-outlined">grid_view</span>
+<span class="absolute left-14 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">Dashboard</span>
+</button>
+<button class="text-white relative group">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-0 right-0 h-3 w-3 bg-accent-pink rounded-full border-2 border-primary"></span>
+<span class="absolute left-14 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">Notifications</span>
+</button>
+<button class="text-gray-400 hover:text-white transition-colors group relative">
+<span class="material-icons-outlined">folder</span>
+</button>
+<button class="text-gray-400 hover:text-white transition-colors group relative">
+<span class="material-icons-outlined">pie_chart</span>
+</button>
+<button class="text-gray-400 hover:text-white transition-colors group relative">
+<span class="material-icons-outlined">format_list_bulleted</span>
+</button>
+<button class="text-gray-400 hover:text-white transition-colors group relative">
+<span class="material-icons-outlined">calendar_today</span>
+</button>
+<button class="text-gray-400 hover:text-white transition-colors group relative">
+<span class="material-icons-outlined">search</span>
+</button>
+</nav>
+<div class="mt-auto flex flex-col space-y-8 items-center">
+<button class="text-gray-400 hover:text-white transition-colors">
+<span class="material-icons-outlined">people</span>
+</button>
+<button class="text-gray-400 hover:text-white transition-colors">
+<span class="material-icons-outlined">info</span>
+</button>
+<div class="h-10 w-10 rounded-full overflow-hidden border-2 border-gray-600">
+<img alt="User Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqCLvMAxSbXk6GX8sTWKxn7wrHnHHxrdKwOi_AFBGzXOzg6-pSoc-8IddrcpPDEHA7vShBxxkecmjxar49HikI-Ee5QaX9uXqAHreLeFGPPWmtaorhEFIasAzyN-zPDfOFkcaaZRN0ILr-_n_tyruLtTRmaFXYOnWEIvArJwtBovSSTcHdW_mn1kfhZhpw2iLp1HhtIzdJ646fOHX3wuHLebK7GwuYsnIY-U2PyDbd59_1QrwoYfXAEf3ne1Fmgrq8V0sqCJzy0WQ"/>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col min-w-0">
+<header class="h-16 bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark flex items-center justify-between px-6 flex-shrink-0">
+<div class="flex items-center text-sm">
+<span class="text-gray-500 dark:text-gray-400">Odama</span>
+<span class="mx-2 text-gray-400">/</span>
+<span class="text-gray-500 dark:text-gray-400">Projects</span>
+<span class="mx-2 text-gray-400">/</span>
+<span class="text-gray-500 dark:text-gray-400">Funnel HQ</span>
+<span class="mx-2 text-gray-400">/</span>
+<span class="font-semibold text-gray-900 dark:text-white">Scrum 10</span>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex -space-x-2 mr-2">
+<img alt="Team 1" class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHIpQ6Vyfl2drA1H12uSHN33GZH1Pu3wLQ9Ts0skb9_5zopykmcxFh-Q_CUkoKnEVbQXxr-ecACqrYq9ByMdKAOW7cN0sjYdZZ6nGjhEmCsGFfenoB5gfuqf1KRZdDYJvJIyduh7Vk3qFilFPPAQRyb6FH08g6jenQ3fNcmj4LaxIy9hiIjywqvKSzvYCcAQ55Utru0GaNpfnwVtW_xQIu5sF4sRi6aDbr8yAE_kvlkinexmCTtm_tpSnwc2IbK1v6Lcdtyj6uIPk"/>
+<img alt="Team 2" class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCboHlnwE3p8Yan30nLcX-toln6mafT9OcSQjUcu6-Mot2BP47UItg2PBS3LLFwjS0GLpIEAlZr4z2gBsQoIR3vLBO9mkdNPKDTv7LmQbtdWZE1JNnpcCZQ62k8uRNOac4Sn6JbT8EY7kC_l43H504R6-UVFdjBtN1QzA6J9qTahyMMR36s5ZsGEN9PX0ToKx2JO3aByB6wIC3eFvBdPw0G07Z6bMFqTIMO8BraNOHNU24MjNRapstOQ-77zk0SorOL3y10iJc76ro"/>
+<img alt="Team 3" class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFxTRY07h2oAG_tpGcL7WU1GdabiyFOCCHBzW3_AdQ9DRO5-H8FBGiKlfn1KN3ddXFDhBUq-OFj5lr6JD4FLqkHhknS6LVuwhbhruw01zgD6a64KIHxVN0Ous6CL03BmNFFMMhSiEttm5ruVUByEXEjDxOdwDiRZWbbrVK7x8o2Y-aFUSfi5Xtjbp1AdIUANoHyn2rX7D1cUArHrIcmXHYNmTWiTQquSFtZ7KJtRTHeG_DpuoBkHCKxU9bPlHvq3H8cSDwT9q0pHc"/>
+<div class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 bg-primary text-white text-xs flex items-center justify-center font-medium">+10</div>
+</div>
+<button class="text-gray-500 hover:text-primary dark:hover:text-white transition-colors"><span class="material-icons-outlined text-xl">schedule</span></button>
+<button class="text-gray-500 hover:text-primary dark:hover:text-white transition-colors"><span class="material-icons-outlined text-xl">chat_bubble_outline</span></button>
+<button class="text-gray-500 hover:text-primary dark:hover:text-white transition-colors"><span class="material-icons-outlined text-xl">star_border</span></button>
+<button class="text-gray-500 hover:text-primary dark:hover:text-white transition-colors"><span class="material-icons-outlined text-xl">file_upload</span></button>
+<button class="text-gray-500 hover:text-primary dark:hover:text-white transition-colors"><span class="material-icons-outlined text-xl">more_horiz</span></button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<div class="w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col flex-shrink-0 z-10">
+<div class="p-6 pb-2">
+<h2 class="text-lg font-bold text-gray-800 dark:text-white">Activity List</h2>
+</div>
+<div class="flex-1 overflow-y-auto px-4 pb-4 space-y-1 mt-6">
+<div class="group flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer h-14">
+<span class="material-icons-outlined text-gray-400 mr-3 text-lg">search</span>
+<span class="text-sm font-medium">User Research</span>
+</div>
+<div class="group flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 cursor-pointer h-14 border border-gray-100 dark:border-gray-700">
+<span class="text-lg mr-3">🧠</span>
+<span class="text-sm font-medium">Brainstorming</span>
+</div>
+<div class="group flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer h-14">
+<span class="material-icons-outlined text-gray-400 mr-3 text-lg">settings</span>
+<span class="text-sm font-medium">Design System</span>
+</div>
+<div class="group flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer h-14">
+<span class="material-icons-outlined text-gray-400 mr-3 text-lg">smartphone</span>
+<span class="text-sm font-medium">HiFi Design</span>
+</div>
+<div class="group flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer h-14">
+<span class="text-lg mr-3">🤖</span>
+<span class="text-sm font-medium">3D Illustration</span>
+</div>
+<div class="group flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer h-14">
+<span class="text-lg mr-3">🔥</span>
+<span class="text-sm font-medium">Work on Revision</span>
+</div>
+<div class="group flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer h-14">
+<span class="material-icons-outlined text-gray-400 mr-3 text-lg">devices</span>
+<span class="text-sm font-medium">Prototyping</span>
+</div>
+<div class="group flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer h-14">
+<span class="text-lg mr-3">📝</span>
+<span class="text-sm font-medium">Testing</span>
+</div>
+<div class="group flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer h-14">
+<span class="text-lg mr-3">⛱️</span>
+<span class="text-sm font-medium">Day Off</span>
+</div>
+</div>
+<div class="p-4 border-t border-border-light dark:border-border-dark">
+<button class="w-full bg-primary hover:bg-opacity-90 text-white rounded-lg py-3 px-4 flex items-center justify-center transition-all">
+<span class="material-icons-outlined mr-2 text-sm">add</span>
+<span class="text-sm font-medium">Add New Activity</span>
+</button>
+</div>
+</div>
+<div class="flex-1 flex flex-col bg-background-light dark:bg-background-dark min-w-0">
+<div class="h-16 flex items-center justify-between px-6 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex-shrink-0">
+<div class="flex items-center space-x-4">
+<div class="flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md px-3 py-1.5 shadow-sm">
+<span class="material-icons-outlined text-gray-500 dark:text-gray-400 text-sm mr-2">calendar_today</span>
+<span class="text-sm font-medium text-gray-700 dark:text-gray-200">March 2022</span>
+</div>
+</div>
+<div class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
+<button class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><span class="material-icons-outlined text-sm">chevron_left</span></button>
+<span class="mx-3">18 March</span>
+<button class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><span class="material-icons-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+<div class="flex-1 overflow-auto timeline-scroll relative" id="gantt-container">
+<div class="min-w-[1400px] h-full relative">
+<div class="absolute inset-0 flex">
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">T 10</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">F 11</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group bg-gray-50/50 dark:bg-gray-800/20">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">S 12</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group bg-gray-50/50 dark:bg-gray-800/20">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">S 13</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">M 14</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">W 15</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">T 16</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">F 17</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col relative">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center bg-primary text-white text-xs font-semibold rounded-t-sm z-10 shadow-lg relative">
+                                    S 18
+<div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-primary rotate-45"></div>
+</div>
+<div class="absolute left-1/2 top-12 bottom-0 border-l-2 border-accent-pink z-0 h-full"></div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group bg-gray-50/50 dark:bg-gray-800/20">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">S 19</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">M 20</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">T 21</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">W 22</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">T 23</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">F 24</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group bg-gray-50/50 dark:bg-gray-800/20">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">S 25</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group bg-gray-50/50 dark:bg-gray-800/20">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">S 26</div>
+</div>
+<div class="flex-1 border-r border-border-light dark:border-border-dark flex flex-col group">
+<div class="h-12 border-b border-border-light dark:border-border-dark flex items-center justify-center text-xs text-gray-400 bg-surface-light dark:bg-surface-dark group-hover:bg-gray-50 dark:group-hover:bg-gray-800">M 27</div>
+</div>
+</div>
+<div class="absolute inset-0 top-12 pt-4"> 
+<div class="h-14 relative w-full mb-1">
+<div class="absolute left-[3%] w-[15%] h-10 top-2 bg-task-blue/20 dark:bg-task-blue/30 rounded-lg flex items-center px-2 border-2 border-task-blue hover:shadow-lg transition-shadow cursor-pointer">
+<div class="bg-white text-task-blue p-1 rounded mr-2 flex items-center justify-center h-6 w-6">
+<span class="material-icons-outlined text-xs">arrow_back</span>
+</div>
+<span class="material-icons-outlined text-task-blue mr-2">search</span>
+<span class="text-xs font-medium text-task-blue">User Research</span>
+<div class="absolute -right-6 top-1/2 transform -translate-y-1/2 flex -space-x-2">
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbx0MzQASUZ7Ts7lLBTRr8xKfYeaNl7e1wXu2R9pnjbBwVCwEKR8zWrtW85Y7ccIuFy7ulp05sqqddhZ4OlZ4WsPi4uehY3i3k-j364rL-0mPelXPvDtla2aUpgZ3hD5VwM5XtiHADIi2tmiPNBTRSHqb3nNvXJuj1wWQrjd4DdQ_MvDn4IehxQkhTM6vQiyObOnbGNjY1krh6jw9yY5Zft6KTPf4P9aK6502d2NL5xgPa3WzPDk34frxZgYT8qckdkzRdR4U5L5U"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADM7Fe8INgedVUlQER-4AnjE1mfof1nr72Y2WivyrZq7piNKjZHp2jsOxPkh_P4ClfLlhX9SAzq5vKzWpGsIKZ6zcz5NhG5PkijmyCSpq3F-lX5qLAXY5HwFzPT-ZdCyeYZntGZ9Hn_Ur4mN6FuWQQc1qMmYJ_OOqdIVgMUzcYWQ-2M1SKoLAjddKXv-gLfyMw2SOFDK29V31paQKuiky8EmdkDtk_AFlPWCG8u-dFdCauH5pvIFmsTBr40gsxipe0lxl4COLRXzc"/>
+</div>
+</div>
+</div>
+<div class="h-14 relative w-full mb-1">
+<div class="absolute left-[3%] w-[25%] h-10 top-2 bg-task-green text-white rounded-lg flex items-center px-3 hover:shadow-lg transition-shadow cursor-pointer">
+<div class="bg-white/30 p-1 rounded mr-2 flex items-center justify-center h-6 w-6">
+<span class="material-icons-outlined text-xs">arrow_back</span>
+</div>
+<span class="text-lg mr-2">🧠</span>
+<span class="text-xs font-medium truncate">Brainstorming + Wireframing</span>
+<div class="absolute -right-12 top-1/2 transform -translate-y-1/2 flex -space-x-2">
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc0f8sU1H021EF9wvY8XtEbC28ZWU9lZYcwvAw5DgbBcrVcZ83Y1HaYMpbQrkUW-gRg_zbfV73KS7FY7GnBE6SqH90dQ3J-pyD6gHgjgRjbYQAQKM4z3GdagMa_1p8CyFS98BvlI9_hCCuW7TJj2dtBWEmmD6E1zW1sQ_IzusS3bEeZ2NkkSQk9VdMfe4oRj6znJ4hEmELHioMBzGvNLFVJbZnTqpD4dEVhXRgVgmRLxnIH3mQFf2mP_o9OU7Yk-8B3Y2xRV7VtLs"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYBcRWKsOs4ASvTrGL7YdPes9Uazm8u0Tz8tvTpJv4Ed9SRG61b2k66-lmka2I0LP_hs3cUr3QH67Cpua-w77HXU2UkWg5b6HZYbcCwjfPDghWpud-faZWGja_UsVbYz-U2pMcCLs3lUfjJZkJk6m9mDYkyOfa_NhMQuydce1xBwrNxKeKsGcWaRNdDilW2YGSRmRy8hY2N2beJOHqJvOjabi2cN8j6JhEOP9B0m9jj9pGIlfNYgDvrq7N25qbbKCyS1VlSlNPnCE"/>
+</div>
+</div>
+</div>
+<div class="h-14 relative w-full mb-1">
+<div class="absolute left-[20%] w-[35%] h-10 top-2 bg-task-purple text-white rounded-lg flex items-center px-3 hover:shadow-lg transition-shadow cursor-pointer">
+<span class="material-icons-outlined mr-2 text-sm text-white/80">settings</span>
+<span class="text-xs font-medium truncate">Design System</span>
+<div class="absolute -right-16 top-1/2 transform -translate-y-1/2 flex -space-x-2">
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsBL272aFHyHcH0sh9m3Qqg-V5n25IJFL9bbsUx-jKU9kxUUnyrfqam3-yttoSN0Ka1tAMB8i0RNNK1W_itPJxj1S02mgOKycuqj6kGZQ7yHcaXYqOjOtlkLKoneFrn_a_BqNlm2hEUotL57iNZaB0yAWky05KhohPfXTRZA4-xRZtOHwerwH2YVgt_07EU0nzgWfqvbXDjesv3eb-sCdjwo7omrpg1hqednEu8_mBmRJR2ZJIRdEjpVG-3uArvAuoe-aiYlbXqSo"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWgsMg8-DiY09kqLGsRB_oPw2_wIPMYC4wA1TD-LVGEx-iI1B_u5aKF5D7smcqvSopbBEJIaZdXzgEnch8JEuJRcOTOkcTwWRf-WITogrz7q2YP_s06ARDUYofxCHBIuNrFmp168LhZ7URJKZtJ6vIPGuTRKR-XuWQcrRYy1ymZLgHO05nifzOFMG4WIsZMzmxH0jmPqB71P_3wZHYnmeIjSzjCeCiVoLRoW_CjU_Y3TUz3UZQLLJiMKvfl8ZURBLuBWs9Fukz1hg"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjPfXazOAuqRrkQ6upr3Jg38NpKg8_nOHvzr1e3N-0v0Yf-Fo4quDA11zDeX-TfLnltfV7Uo3hf9FMcq8wWMtwdKdhDo6saMd4G_AFqRbePOShSdOo9NPOXIz9brBLFyQ87aTH2CnUKOMeZGoeOt5GPJqDXci1TfyoK-lGYlUMirdwqTscxo5Qbo3csDyWO3d-jDgiHOFAxzYJNuZJzOqOzvTwuZYQKf3XDbC_gpFpKls1qF6wzopZFuzI9DNT7vK_0s-Fb_BshQ8"/>
+</div>
+</div>
+</div>
+<div class="h-14 relative w-full mb-1">
+<div class="absolute left-[35%] w-[45%] h-10 top-2 bg-task-blue text-white rounded-lg flex items-center px-3 hover:shadow-lg transition-shadow cursor-pointer">
+<span class="material-icons-outlined mr-2 text-sm text-white/80">smartphone</span>
+<span class="text-xs font-medium truncate">HiFi Design</span>
+<div class="absolute -right-16 top-1/2 transform -translate-y-1/2 flex -space-x-2">
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXCTX7mdl-kbXifZnDkCy7sAiH48HIJDMuqF0Hmye_9wCFgBL330hFWG0WjwKkfTGEO5sdJvFdwGNVH842kzy07QqkuQNnjQRRSAWGDK2AwYKXsq31y7jjj6I-En2Q-WEnPn1jfpOH4Zg2nf5a7Z7U6r6GWVF5WvuOUEn4N_4yHs2GCi_sS6-TMaacFyLIC1xgGk7kcjunI9o4N4Z_itsXh74sYXRhOn-85RN_NBJKjXpcUgI2vL3oDcXtW_TMP7DgxLTLSJGdXn0"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfvWWPVAbT76tJNBi9BxaZiYEHhDN4UtyK5Qa2dOre3Sdhg5ld_twb4gx2JShsUd4zJ3pXJBIm3zWcUh4iDnkdqXqPj76zZ5PQ8EEJW6F8l70cuAYK_pJf3DnDTBkvPxnmu29Epf67CfnvLQH3_tKOl9d3MGGRXLoM7nwso6UmMc9fq8G4mAnp4QGt6fEC5nDivlxEcQHRNqC0zKfJLbqo50gbc4XOgOZ0HXo9cF-xvQ4g4G_Z_YaigYm7Ne9rBJgZ9TBn57c7aN0"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm__gUBB6yoKBI8vDcidayuNA98iKg1u_hAQEdUdm0tGV5XEFRXcr1k1r-mDH7KTwAt-hv9h__xp6xhog6FRc_fqr0BIFj6aYNC0mpbZrJXFFLgPdk9lUS_3dJVPkzfCndI4F2ajSd_7tlE7D6zCAL2Po1ws7zyQ2CIreFLZ-dWjdKDA83RHFSvvnR3VAi7enzU4BcxBlMoDFjQOPxVQUudaqqf9oWw4KLSUijDFfLgYeKXrFt8vXdXkFmrQTvOMgcdxQOuzs147U"/>
+</div>
+</div>
+</div>
+<div class="h-14 relative w-full mb-1">
+<div class="absolute left-[15%] w-[22%] h-10 top-2 bg-task-orange text-white rounded-lg flex items-center px-3 hover:shadow-lg transition-shadow cursor-pointer">
+<span class="mr-2 text-sm">🤖</span>
+<span class="text-xs font-medium truncate">3D Illustration</span>
+<div class="absolute -right-16 top-1/2 transform -translate-y-1/2 flex -space-x-2">
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPGQMzjiZWf3sBsefUHVCYldnqqRBow2wLud7TqF9rUnQ7ZWR3Oapdq9oxMhCAF2DI9qaQjnCKqZ9DXcxigde5UEYs2x4bo2G1PJJlD1nX-kvBg7iFTs8HbpD41bM3J77m_N89c3DedT08SBPBMAa5U2N2bqcHrA7fgEp2sY0izyp4GPemHwipoBRA1UnsSNwONcMTZlMbT--bpN7Vd0UpW9_YqwozRvVF8m2KgsFahMZlIa9eINOOYC_LaN1ANEsfrkIKqSGt5gY"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkm86_cSXULy6dnd6YYWdIYn_reFTgOgiFkxfRR7Y1mHPeXUV5t22pl992VMyA_MEM5FKXKP16yqh27WC4auSp3jw8MyCc8iuOqCyqI4nKT-c6HEJHHQjWiJ54w56uC6Y1Vb6rJ7jeTSdy-68HCeAXCOIcBlDlTKDTCJnHTYPCuXuRSrQX2qJIax9-vbMTvO4R73_P0-uKa5Eu7u-qlebMRTtH_NdvsVYLeQa-7Q69aMEXRkhfRNVHwVG98uxpZhRbDiIBF_th4r4"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3iodri14iiJiAB27_jFAu3QFB9HRNWjFyiBsQaiVdmmodb_a5e0T_h6fpCSJMPk_74D0Zy_w1xA58nUxbTY_qiEVrZ1jj_ApEDBTC1GYdOfdnt0OoieIisGhkF1tofhe7MggE4JTCXqt70IAD_YUtbGGGGDArGGF_Zni7S1G2B9H6TDLUsnSLNcxlQGRMNXNS9ZDxPaCEMTEah1nx0Mg9pDXEVRmhEE9Cv1CS2bNFBZSfzXeFEpNN7vtCLTt-bZJyRImTli8gA8A"/>
+</div>
+</div>
+<div class="absolute left-[70%] w-[20%] h-10 top-2 bg-task-orange text-white rounded-lg flex items-center px-3 hover:shadow-lg transition-shadow cursor-pointer">
+<span class="mr-2 text-sm">🤖</span>
+<span class="text-xs font-medium truncate">3D Illustration</span>
+<div class="absolute -right-16 top-1/2 transform -translate-y-1/2 flex -space-x-2">
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGbqLPKp7a7AlKuuhqhdR3JZQApBwgE0gKgB6kK9tQawqHefG8XnsikLi35J74r6xW4UheKsru6HI4m4VPSmzA-nBzj03IC9ehNVn_doXqoykBpp0WKkGY5acq4dCdsnSBymxHnK7xY9s5XXxUWiGGMykQPazdjPG6pVNYI8-psrQgbuQNzSTr57kRReRQSXz97YswGCuG3h5mLNDpyKlNshXH9WcVrBdYylaoh-j4MC-SB6_XmwLtRpqF2JDJFAqEwWYMk4Rp4HY"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHefodjsksdwxwWVc-HKQJ5Z198qqNRrSFuHvjavUMPqbTYqbNobYfUvMP6Bi9bLcn4He1BwArFPf90ve-2Xi6ND-v2WhFgWy2Gz1Yeit0jorjfM8OnHIgH1yRvelOLsnpHV5ea9C0XFVqlLI8-V26cGTAQw7auJQz--8z0yWNzrs8xs2abLOYxyO9z0s4D8yzq3M3v6vBX2f5IEM8hyJhYYHR6dareKEobPHJ_zbLQfbDVzzkbngJ6NGYvZLtRrXzmI50qu9JgaY"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTO0zIQWHpSU27__k4T9ZRAyJ15A5_Zrh3IK8_e0sJqhpxAZIy_JES840ZDwYiEKZoI8a32zOTuXY8zpmvTTvJ0fHOmUM_is7esqEbAi0ILbSVhgZJH-BPBEXXdKJYp1wI4qNgJpSzAe3G5TedP9xGJ9ywGOX1CGtjhwUWLmi_hJbqKaK5Ep2Rlkuxu4o1-kzZEsmyUeTaOt4dV80bYI801TFXCJOs7Mos2pipxW6wEGVXpbK3b-8k4RL6cOsLvFCfXCaFxqfjcV8"/>
+</div>
+</div>
+</div>
+<div class="h-14 relative w-full mb-1">
+<div class="absolute left-[45%] w-[28%] h-10 top-2 bg-task-purple text-white rounded-lg flex items-center px-3 hover:shadow-lg transition-shadow cursor-pointer">
+<span class="mr-2 text-sm">🔥</span>
+<span class="text-xs font-medium truncate">Work on Revision</span>
+<div class="absolute -right-20 top-1/2 transform -translate-y-1/2 flex -space-x-2 items-center">
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJKv3Blc4BNoOoi7nQeUJS63GPXWeGEnkPQfCpIORUtnXoRubcr9OawiU_6JJG84FoqeYYFDDZ4k8fkBYTz5JfF3gjHp3qZXc4apCv7UnYXoQqmwTEBaBNTdmwAEThSzdJbv9tChnzD-OhAYqcC--t-wqkm_qUf_Q8IKYj2fRY30oJqVASxW8TB14vY-u4SZ6qXeBa8Zb-09wtFBcq9sMoq1BJwWE54bgL_xkSyLwJ9u8VPkAYZ1m4SL7qfxygQP-N7m4GjdlOSCA"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZcNL5d5VME4UVqXOBGPisHOLu_4a5DzYZS8AXt06bGecPLrv7nGUu2BYVr8LYALClgSpEas-6O1agwzIeJEWJ51ei8KNBDpaOJKVSqr3P8KKbIzxVsVGI62WtmcCvmf1E9DlmblXXQfvBF2cdYYcsba3GctjCBttoGF2aGVms6hG_xRxXuOqjS9b9E0x856873yGzg1tGWxbSD1oL43GA-4MHe6yzgUP7eroMo-ta7cO1OOX9w8MnNwgSxvTlurjifkn7vfzXoxw"/>
+<div class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 bg-primary text-[10px] text-white flex items-center justify-center">+5</div>
+</div>
+</div>
+</div>
+<div class="h-14 relative w-full mb-1">
+<div class="absolute left-[80%] w-[25%] h-10 top-2 bg-task-blue text-white rounded-lg flex items-center px-3 hover:shadow-lg transition-shadow cursor-pointer">
+<span class="material-icons-outlined mr-2 text-sm text-white/80">devices</span>
+<span class="text-xs font-medium truncate">Prototyping</span>
+<div class="absolute right-2 bg-white/30 p-0.5 rounded flex items-center justify-center h-5 w-5">
+<span class="material-icons-outlined text-[10px]">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="h-14 relative w-full mb-1">
+<div class="absolute left-[20%] w-[35%] h-10 top-2 bg-task-green text-white rounded-lg flex items-center px-3 hover:shadow-lg transition-shadow cursor-pointer">
+<span class="mr-2 text-sm">📝</span>
+<span class="text-xs font-medium truncate">Testing</span>
+<div class="absolute -right-12 top-1/2 transform -translate-y-1/2 flex -space-x-2">
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcnFCEcK3-BQP6NyZDLfEXHHLg1CdSrt3ST1eA-kCfSYQ5f-XmYceBV0jwZT87zEeJDDcLmDVY9iGRL2TfZrU88VzVDJIDKWygzn-oQ51qKZF7dZhlGZas2GzA0aOa8pa4v5Kic4t7GLba9xHD_PtICKs714Eodugne5827fJ15IFkHu7mX_-R_c2-xcG40D7c-giLaSt83hEpqLwauFTB2IfUzdCJYAzIZ51bU-OPTKe17yrnswU6_gzq6_JRxHQVxJYHX4KKkP8"/>
+<img alt="Assignee" class="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY4U5vFysg4n86f1nCy6SZNSM_2bTWYk6Wpp17_u0DSiyXt-0S3RJy5MkOvW8c7BJuM8N1228QAnGgJ0FM8QIp8qXv_MLNkFEbScixexuzLU1jyP2agas04_FpOstXJVg5dZp1uhrF_D_PqQU-IG2LRDvlSG4A79c1OMKTfL_1sn25wE6qwZlshOJba6Q4p14_K2gB7tRHwFjjXiY23JWhYENB1sY9Lf9RZRbLAf04xa7AgXeU6vcSr_dOkyqiyTigoZEFpt2r7tY"/>
+</div>
+</div>
+</div>
+<div class="fixed bottom-8 right-8 flex space-x-2 z-50">
+<button class="h-12 w-12 bg-task-orange hover:bg-orange-500 text-white rounded-lg shadow-xl flex items-center justify-center transition-all">
+<span class="material-icons-outlined">arrow_forward</span>
+</button>
+<button class="h-12 w-12 bg-task-orange/70 hover:bg-task-orange text-white rounded-lg shadow-xl flex items-center justify-center transition-all">
+<span class="material-icons-outlined">folder</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple dark mode toggle logic for demonstration
+        // Check for saved user preference, if any, on load of the website
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+        // Just centering the scroll view on the "Active" day for better UX
+        window.onload = function() {
+            const container = document.getElementById('gantt-container');
+            // Scroll roughly to middle
+            container.scrollLeft = 400; 
+        }
+    </script>
+
+</body></html>

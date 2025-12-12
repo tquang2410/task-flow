@@ -26,7 +26,7 @@ import { ListSkeleton } from '@/components/list-view/list-skeleton'
 import { ProjectList } from '@/components/list-view/project-list'
 import { ProjectSettings } from '@/components/project/project-settings'
 import { ProjectTimeline } from '@/components/timeline/project-timeline'
-import { TimelineSkeleton } from '@/components/timeline/timeline-skeleton'
+// import { TimelineSkeleton } from '@/components/timeline/timeline-skeleton'
 import { PlusCircle, Share } from 'lucide-react'
 
 interface ProjectDetailPageProps {
@@ -134,9 +134,9 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         </TabsContent>
 
         <TabsContent value="timeline" className="flex-grow min-h-0">
-          <Suspense fallback={<TimelineSkeleton />}>
+          {/*<Suspense fallback={<TimelineSkeleton />}>*/}
             <ProjectTimeline projectId={project.id} />
-          </Suspense>
+          {/*</Suspense>*/}
         </TabsContent>
 
         <TabsContent value="settings" className="flex-grow overflow-y-auto">
