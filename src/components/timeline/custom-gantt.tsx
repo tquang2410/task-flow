@@ -1,192 +1,287 @@
-"use client";
+'use client'
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { format, eachDayOfInterval, startOfMonth, endOfMonth, isSameDay, differenceInDays, addMonths, subMonths, startOfDay } from 'date-fns';
-import { Search, ChevronLeft, ChevronRight, User, Calendar as CalendarIcon, MoreHorizontal } from 'lucide-react';
-import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TaskWithDetails } from "@/types/prisma";
+import React, { useEffect, useRef, useState, useMemo } from 'react'
+import {
+    ChevronLeft,
+    ChevronRight,
+    Calendar,
+    Plus,
+    Search,
+    Settings,
+    Smartphone,
+    MonitorSmartphone,
+    ArrowLeft,
+    ArrowRight,
+    Folder
+} from 'lucide-react'
+import {
+    addDays,
+    addMonths,
+    differenceInDays,
+    eachDayOfInterval,
+    endOfMonth,
+    format,
+    isSameDay,
+    isWeekend,
+    startOfMonth,
+    subMonths
+} from 'date-fns'
+import { TaskWithDetails } from '@/types/prisma'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
+// =================================================================
+// 🧠 LOGIC VÀ CÁC HÀM HELPERS
+// =================================================================
+
+const DAY_WIDTH_PX = 56; // Mỗi ngày rộng 56px
+const ROW_HEIGHT_PX = 56; // Mỗi hàng cao 56px (h-14)
+
+/**
+ * Lấy ra màu sắc tương ứng với độ ưu tiên của task
+ * @param priority Độ ưu tiên của task (HIGH, MEDIUM, LOW)
+ * @returns Object chứa các class của Tailwind
+ */
+const getTaskColorStyle = (priority: string | null) => {
+    switch (priority) {
+        case 'HIGH':
+            return {
+                bg: 'bg-task-orange/20',
+                border: 'border-task-orange',
+                text: 'text-task-orange',
+                iconBg: 'bg-task-orange',
+            };
+        case 'MEDIUM':
+            return {
+                bg: 'bg-task-blue/20',
+                border: 'border-task-blue',
+                text: 'text-task-blue',
+                iconBg: 'bg-task-blue',
+            };
+        case 'LOW':
+            return {
+                bg: 'bg-task-green/20',
+                border: 'border-task-green',
+                text: 'text-task-green',
+                iconBg: 'bg-task-green',
+            };
+        default: // Mặc định nếu priority null
+            return {
+                bg: 'bg-task-purple/20',
+                border: 'border-task-purple',
+                text: 'text-task-purple',
+                iconBg: 'bg-task-purple',
+            };
+    }
+};
+
+
+// =================================================================
+// 🎨 COMPONENT CHÍNH
+// =================================================================
 
 interface CustomGanttProps {
     tasks: TaskWithDetails[];
-    columns?: any[]; // Using any[] for simplicity with Json type, or define generic
 }
 
-export function CustomGantt({ tasks, columns = [] }: CustomGanttProps) {
+export function CustomGantt({ tasks }: CustomGanttProps) {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const sidebarRef = useRef<HTMLDivElement>(null);
-    const timelineRef = useRef<HTMLDivElement>(null);
-    const isScrolling = useRef(false);
+    const [selectedTask, setSelectedTask] = useState<TaskWithDetails | null>(null);
 
-    // Helper to get task status color based on column
-    const getTaskStatusColor = (columnId: string) => {
-        const column = columns.find((c: any) => c.id === columnId);
-        const title = column?.title?.toLowerCase() || "";
+    const ganttContainerRef = useRef<HTMLDivElement>(null);
+    const activityListRef = useRef<HTMLDivElement>(null);
 
-        if (title.includes('done') || title.includes('complete')) return "bg-task-green";
-        if (title.includes('progress')) return "bg-task-blue";
-        if (title.includes('todo') || title.includes('backlog')) return "bg-gray-500";
-        return "bg-task-purple";
-    };
+    // --- Date Logic ---
+    const startOfMonthDate = useMemo(() => startOfMonth(currentDate), [currentDate]);
+    const endOfMonthDate = useMemo(() => endOfMonth(currentDate), [currentDate]);
+    const daysInMonth = useMemo(() => eachDayOfInterval({ start: startOfMonthDate, end: endOfMonthDate }), [startOfMonthDate, endOfMonthDate]);
+    const totalDaysInMonth = daysInMonth.length;
 
-    // Sync scrolling
-    const handleScroll = (source: 'sidebar' | 'timeline') => (e: React.UIEvent<HTMLDivElement>) => {
-        if (isScrolling.current) return;
-        isScrolling.current = true;
-
-        const target = source === 'sidebar' ? timelineRef.current : sidebarRef.current;
-        const sourceEl = e.currentTarget;
-
-        if (target) {
-            target.scrollTop = sourceEl.scrollTop;
+    // --- Scroll Sync Logic ---
+    const handleGanttScroll = () => {
+        if (ganttContainerRef.current && activityListRef.current) {
+            activityListRef.current.scrollTop = ganttContainerRef.current.scrollTop;
         }
-
-        setTimeout(() => {
-            isScrolling.current = false;
-        }, 50);
     };
 
-    // Date Logic
-    const monthStart = startOfMonth(currentDate);
-    const monthEnd = endOfMonth(currentDate);
-    const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+    // Scroll tới ngày hôm nay khi component mount lần đầu
+    useEffect(() => {
+        if (ganttContainerRef.current) {
+            const today = new Date();
+            if (today >= startOfMonthDate && today <= endOfMonthDate) {
+                const dayDiff = differenceInDays(today, startOfMonthDate);
+                // Scroll tới giữa màn hình
+                ganttContainerRef.current.scrollLeft = (dayDiff * DAY_WIDTH_PX) - (ganttContainerRef.current.clientWidth / 2) + (DAY_WIDTH_PX / 2);
+            }
+        }
+    }, [startOfMonthDate, endOfMonthDate]);
 
-    // Filter tasks for current view (optional: currently showing all but positioning relative to month)
-    // Or just show tasks that overlap with current month? For now, let's keep it simple and show all tasks in list,
-    // but only render bars if they are in range.
 
-    // Constants
-    const DAY_WIDTH = 50; // pixels per day
-    const HEADER_HEIGHT = 64; // h-16
-    const ROW_HEIGHT = 56; // h-14
-
+    // --- Handlers ---
     const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
     const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
-    return (
-        <div className="flex flex-col h-full w-full bg-background-dark text-gray-200 overflow-hidden rounded-lg border border-border-dark">
-            {/* Toolbar */}
-            <div className="h-16 flex items-center justify-between px-6 border-b border-border-dark bg-surface-dark flex-shrink-0">
-                <div className="flex items-center space-x-4">
-                    <h2 className="text-lg font-bold text-white">Project Timeline</h2>
-                    <div className="flex items-center space-x-2 bg-background-dark rounded-md p-1 border border-border-dark">
-                        <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-700 rounded"><ChevronLeft className="w-4 h-4" /></button>
-                        <span className="text-sm font-medium min-w-[100px] text-center">{format(currentDate, 'MMMM yyyy')}</span>
-                        <button onClick={handleNextMonth} className="p-1 hover:bg-gray-700 rounded"><ChevronRight className="w-4 h-4" /></button>
-                    </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                    {/* Actions placeholder */}
-                    <button className="p-2 hover:bg-gray-700 rounded-full"><Search className="w-5 h-5 text-gray-400" /></button>
-                </div>
-            </div>
+    // --- Task bar calculation ---
+    const calculateTaskStyle = (task: TaskWithDetails) => {
+        const startDate = task.startDate ?? task.createdAt;
+        const dueDate = task.dueDate ?? addDays(startDate, 2);
 
-            <div className="flex-1 flex overflow-hidden">
-                {/* Sidebar: Task List */}
-                <div
-                    className="w-80 bg-surface-dark border-r border-border-dark flex flex-col flex-shrink-0 z-10"
-                >
-                    <div className="h-12 border-b border-border-dark flex items-center px-4 bg-surface-dark">
-                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Task Name</span>
-                    </div>
+        // Tính số ngày lệch so với ngày đầu tháng
+        const dayDiff = differenceInDays(startDate, startOfMonthDate);
+        // Tính độ dài (số ngày) của task
+        const duration = differenceInDays(dueDate, startDate) + 1; // +1 để bao gồm cả ngày kết thúc
+
+        const left = dayDiff * DAY_WIDTH_PX;
+        const width = duration * DAY_WIDTH_PX;
+
+        return { left: `${left}px`, width: `${width}px` };
+    };
+
+    return (
+        <div
+            className="flex flex-col h-full w-full bg-gantt-bg-dark text-gray-200 overflow-hidden rounded-lg border border-gantt-border-dark font-sans">
+
+            {/* --- HEADER --- */}
+            <header
+                className="h-16 bg-gantt-surface-dark border-b border-gantt-border-dark flex items-center justify-between px-6 flex-shrink-0">
+                <div className="flex items-center space-x-4">
                     <div
-                        ref={sidebarRef}
-                        onScroll={handleScroll('sidebar')}
-                        className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide"
-                    >
-                        {tasks.map((task) => (
-                            <div key={task.id} className="h-14 flex items-center px-4 border-b border-white/5 hover:bg-gray-800 transition-colors">
-                                <div className="flex items-center space-x-3 truncate">
-                                    <div className={cn("w-2 h-2 rounded-full flex-shrink-0", getTaskStatusColor(task.columnId))} />
-                                    <span className="text-sm font-medium truncate text-gray-200">{task.title}</span>
-                                </div>
+                        className="flex items-center bg-gray-800 border border-gray-700 rounded-md px-3 py-1.5 shadow-sm">
+                        <Calendar className="text-gray-400 w-4 h-4 mr-2" />
+                        <span className="text-sm font-medium text-gray-200">{format(currentDate, 'MMMM yyyy')}</span>
+                    </div>
+                </div>
+                <div className="flex items-center text-sm font-medium text-gray-300">
+                    <button onClick={handlePrevMonth} className="p-1 hover:bg-gray-700 rounded"><ChevronLeft
+                        className="w-4 h-4" /></button>
+                    <span className="mx-3">{format(new Date(), 'dd MMMM')}</span>
+                    <button onClick={handleNextMonth} className="p-1 hover:bg-gray-700 rounded"><ChevronRight
+                        className="w-4 h-4" /></button>
+                </div>
+            </header>
+
+            {/* --- BODY --- */}
+            <div className="flex flex-1 overflow-hidden">
+
+                {/* LEFT SIDEBAR: Activity List */}
+                <div className="w-64 bg-gantt-surface-dark border-r border-gantt-border-dark flex flex-col flex-shrink-0 z-10">
+                    <div className="p-6 pb-2">
+                        <h2 className="text-lg font-bold text-white">Activity List</h2>
+                    </div>
+
+                    {/* Container này sẽ ẩn scrollbar và được điều khiển bởi grid bên phải */}
+                    <div ref={activityListRef} className="flex-1 overflow-y-hidden px-4 pb-4 space-y-1 mt-6">
+                        {tasks.map(task => (
+                            <div
+                                key={task.id}
+                                onClick={() => setSelectedTask(task)}
+                                className={`group flex items-center p-3 rounded-lg cursor-pointer h-14 transition-colors ${selectedTask?.id === task.id ? 'bg-gray-800/50 border border-gray-700' : 'hover:bg-gray-800'}`}
+                            >
+                                <Search className="text-gray-400 mr-3 w-5 h-5 flex-shrink-0" />
+                                <span className="text-sm font-medium truncate">{task.title}</span>
                             </div>
                         ))}
-                        {/* Empty spacer if needed */}
-                        {tasks.length === 0 && <div className="p-4 text-center text-gray-500 text-sm">No tasks</div>}
+                    </div>
+
+                    <div className="p-4 border-t border-gantt-border-dark">
+                        <button
+                            className="w-full bg-gantt-primary hover:bg-opacity-90 text-white rounded-lg py-3 px-4 flex items-center justify-center transition-all">
+                            <Plus className="mr-2 w-4 h-4" />
+                            <span className="text-sm font-medium">Add New Activity</span>
+                        </button>
                     </div>
                 </div>
 
-                {/* Main Content: Timeline */}
-                <div className="flex-1 flex flex-col bg-background-dark min-w-0">
-
-                    {/* Timeline Scroll Container */}
+                {/* RIGHT CONTENT: Timeline Grid */}
+                <div className="flex-1 flex flex-col bg-gantt-bg-dark min-w-0">
                     <div
-                        className="flex-1 overflow-auto timeline-scroll relative"
-                        ref={timelineRef}
-                        onScroll={handleScroll('timeline')}
+                        id="gantt-container"
+                        ref={ganttContainerRef}
+                        onScroll={handleGanttScroll}
+                        className="flex-1 overflow-auto relative"
                     >
-                        <div
-                            className="h-full relative"
-                            style={{ width: `${daysInMonth.length * DAY_WIDTH}px` }}
-                        >
-                            {/* Header: Days */}
-                            <div className="sticky top-0 z-20 flex bg-surface-dark border-b border-border-dark h-12">
-                                {daysInMonth.map((day) => (
+                        <div style={{ width: `${totalDaysInMonth * DAY_WIDTH_PX}px`, minHeight: '100%' }} className="relative h-full">
+
+                            {/* --- Grid Columns (Days) --- */}
+                            <div className="absolute inset-0 flex">
+                                {daysInMonth.map(day => (
                                     <div
-                                        key={day.toISOString()}
-                                        className="flex-shrink-0 border-r border-border-dark flex flex-col items-center justify-center text-xs text-gray-400"
-                                        style={{ width: `${DAY_WIDTH}px` }}
+                                        key={day.toString()}
+                                        style={{ minWidth: `${DAY_WIDTH_PX}px` }}
+                                        className={`border-r border-gantt-border-dark flex flex-col group ${isWeekend(day) ? 'bg-gray-800/20' : ''}`}
                                     >
-                                        <span className="font-medium">{format(day, 'd')}</span>
-                                        <span className="text-[10px] text-gray-500">{format(day, 'EEE')}</span>
+                                        <div
+                                            className={`h-12 border-b border-gantt-border-dark flex items-center justify-center text-xs group-hover:bg-gray-800 ${isSameDay(day, new Date()) ? 'bg-gantt-primary text-white font-semibold rounded-t-sm relative' : 'text-gray-400 bg-gantt-surface-dark'}`}>
+                                            <span className="uppercase">{format(day, 'EEEEEE')}</span>
+                                            <span className="ml-1.5">{format(day, 'd')}</span>
+                                            {isSameDay(day, new Date()) && (
+                                                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gantt-primary rotate-45"></div>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
+                                {/* Đường line chỉ ngày hiện tại */}
+                                {new Date() >= startOfMonthDate && new Date() <= endOfMonthDate && (
+                                    <div
+                                        className="absolute top-0 bottom-0 border-l-2 border-gantt-accent-pink z-20"
+                                        style={{ left: `${differenceInDays(new Date(), startOfMonthDate) * DAY_WIDTH_PX + (DAY_WIDTH_PX / 2) - 1}px`, height: '100%' }}
+                                    >
+                                        <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gantt-accent-pink rounded-full"></div>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Grid Lines Background */}
-                            <div className="absolute inset-0 top-12 flex pointer-events-none">
-                                {daysInMonth.map((day) => (
+
+                            {/* --- Grid Rows (Tasks) --- */}
+                            <div className="absolute inset-0 top-12">
+                                {tasks.map((_, index) => (
                                     <div
-                                        key={`grid-${day.toISOString()}`}
-                                        className="flex-shrink-0 border-r border-border-dark/50 h-full"
-                                        style={{ width: `${DAY_WIDTH}px` }}
+                                        key={`row-${index}`}
+                                        className="h-14 w-full border-b border-gantt-border-dark"
+                                        style={{ top: `${index * ROW_HEIGHT_PX}px` }}
                                     />
                                 ))}
                             </div>
 
-                            {/* Task Bars Content */}
-                            <div className="relative pt-0">
-                                {tasks.map((task) => {
-                                    // Calculate position
-                                    if (!task.startDate || !task.dueDate) return <div key={`bar-${task.id}`} className="h-14 border-b border-white/5" />; // Empty row placeholder
 
-                                    const start = new Date(task.startDate);
-                                    const end = new Date(task.dueDate);
+                            {/* --- TASK BARS LAYER --- */}
+                            <div className="absolute inset-0 top-12 pt-2">
+                                {tasks.map((task, index) => {
+                                    const style = calculateTaskStyle(task);
+                                    const colors = getTaskColorStyle(task.priority);
 
-                                    // Check overlap with current month
-                                    if (end < monthStart || start > monthEnd) {
-                                        return <div key={`bar-${task.id}`} className="h-14 border-b border-white/5" />; // Empty row, task out of range
+                                    // Check if task is out of current month's view
+                                    const startDate = task.startDate ?? task.createdAt;
+                                    const dueDate = task.dueDate ?? addDays(startDate, 2);
+                                    if (dueDate < startOfMonthDate || startDate > endOfMonthDate) {
+                                        return null;
                                     }
 
-                                    // Clamp dates to current month view for display
-                                    const displayStart = start < monthStart ? monthStart : start;
-                                    const displayEnd = end > monthEnd ? monthEnd : end;
-
-                                    const dayDiff = differenceInDays(displayStart, monthStart);
-                                    const duration = differenceInDays(displayEnd, displayStart) + 1; // +1 to include at least one day or partial
-
-                                    const left = dayDiff * DAY_WIDTH;
-                                    const width = Math.max(duration * DAY_WIDTH, DAY_WIDTH); // Min 1 slot
-
                                     return (
-                                        <div key={`bar-${task.id}`} className="h-14 relative w-full border-b border-white/5 group">
+                                        <div
+                                            key={task.id}
+                                            className="h-14 relative w-full"
+                                            style={{ top: `${index * ROW_HEIGHT_PX}px` }}
+                                        >
                                             <div
-                                                className={cn(
-                                                    "absolute top-2 h-10 rounded-lg flex items-center px-3 border border-white/10 shadow-sm cursor-pointer hover:shadow-md transition-all",
-                                                    "bg-task-blue/20 border-task-blue/50 text-task-blue" // Default style, can add logic for different colors
-                                                )}
-                                                style={{ left: `${left}px`, width: `${width}px` }}
+                                                className={`absolute h-10 top-2 ${colors.bg} rounded-lg flex items-center px-3 border-2 ${colors.border} hover:shadow-lg transition-shadow cursor-pointer`}
+                                                style={style}
                                             >
-                                                <span className="text-xs font-medium truncate sticky left-0 px-1">{task.title}</span>
+                                                <div className={`${colors.iconBg} p-1 rounded mr-2 flex items-center justify-center h-6 w-6`}>
+                                                    <ArrowLeft className="w-3 h-3 text-white" />
+                                                </div>
+                                                <Search className={`${colors.text} mr-2 w-4 h-4 flex-shrink-0`} />
+                                                <span
+                                                    className={`text-xs font-medium ${colors.text} truncate`}>{task.title}</span>
 
-                                                {/* Assignee Avatar */}
+                                                {/* Avatars */}
                                                 {task.assignee && (
-                                                    <div className="absolute -right-3 top-1/2 transform -translate-y-1/2 translate-x-full">
-                                                        <Avatar className="h-6 w-6 border border-background-dark">
-                                                            <AvatarImage src={task.assignee.avatarUrl || undefined} />
-                                                            <AvatarFallback className="text-[10px] bg-indigo-900 text-white">
-                                                                {task.assignee.name?.charAt(0) || "?"}
+                                                    <div
+                                                        className="absolute -right-4 top-1/2 transform -translate-y-1/2 flex -space-x-2">
+                                                        <Avatar
+                                                            className="w-7 h-7 border-2 border-gantt-bg-dark">
+                                                            <AvatarImage src={task.assignee.avatarUrl || ''} />
+                                                            <AvatarFallback className="bg-slate-700 text-xs">
+                                                                {task.assignee.name?.[0]}
                                                             </AvatarFallback>
                                                         </Avatar>
                                                     </div>
@@ -196,21 +291,45 @@ export function CustomGantt({ tasks, columns = [] }: CustomGanttProps) {
                                     );
                                 })}
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Floating Action Buttons */}
+            <div className="fixed bottom-8 right-8 flex space-x-2 z-50">
+                <button className="h-12 w-12 bg-task-orange hover:bg-orange-500 text-white rounded-lg shadow-xl flex items-center justify-center transition-all">
+                    <ArrowRight className="w-6 h-6" />
+                </button>
+                <button className="h-12 w-12 bg-task-orange/70 hover:bg-task-orange text-white rounded-lg shadow-xl flex items-center justify-center transition-all">
+                    <Folder className="w-6 h-6" />
+                </button>
+            </div>
+
             <style jsx>{`
-                .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
-                }
-                .scrollbar-hide {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-                .timeline-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
-                .timeline-scroll::-webkit-scrollbar-thumb { background-color: #374151; border-radius: 4px; }
-                .timeline-scroll::-webkit-scrollbar-track { background-color: #111827; }
+              .no-scrollbar::-webkit-scrollbar {
+                display: none;
+              }
+
+              .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+              }
+
+              #gantt-container::-webkit-scrollbar {
+                height: 8px;
+                width: 8px;
+              }
+
+              #gantt-container::-webkit-scrollbar-thumb {
+                background-color: #4B5563;
+                border-radius: 4px;
+              }
+
+              #gantt-container::-webkit-scrollbar-track {
+                background: transparent;
+              }
             `}</style>
         </div>
     );

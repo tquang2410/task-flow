@@ -83,3 +83,11 @@
     - Removed unused variables/imports from `src/app/app/project/[id]/page.tsx`, `src/components/kanban/kanban-board.tsx`, `src/components/kanban/task-card.tsx`, `src/components/project/project-settings.tsx`, and `src/components/settings/profile-form.tsx`.
     - Renamed `middleware` function to `proxy` in `src/proxy.ts`.
     - Removed `members` prop from `TaskCard` usage in `src/components/kanban/board-column.tsx` and `src/components/kanban/kanban-board.tsx`.
+
+## ~~[2025-12-12] Implement Custom Gantt UI~~
+- Status: Done
+- Changes:
+    - Replaced `gantt-task-react` with custom `CustomGantt` component.
+    - Implemented synced scrolling, month navigation, and task rendering logic.
+    - Updated `tailwind.config.ts` with requested color palette.
+    - Integrated new component into `ProjectTimeline`.
