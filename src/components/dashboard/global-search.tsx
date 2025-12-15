@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, FolderKanban, CheckSquare, Loader2 } from 'lucide-react'
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Search, FolderKanban, FileText, Loader2 } from 'lucide-react'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import {
     Command,
     CommandEmpty,
@@ -129,6 +129,10 @@ export function GlobalSearch() {
 
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="p-0 overflow-hidden max-w-[500px]">
+                    <DialogTitle className="sr-only">Global Search</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Search projects and tasks across your workspace
+                    </DialogDescription>
                     <Command shouldFilter={false} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
                         <CommandInput
                             placeholder="Search projects and tasks..."
@@ -180,7 +184,7 @@ export function GlobalSearch() {
                                                     onSelect={() => handleSelect('task', task.id, task.projectId)}
                                                     className="cursor-pointer"
                                                 >
-                                                    <CheckSquare className="mr-2 h-4 w-4 text-green-400" />
+                                                    <FileText className="mr-2 h-4 w-4 text-purple-400" />
                                                     <div className="flex flex-col">
                                                         <span>{task.title}</span>
                                                         <span className="text-xs text-gray-500">
