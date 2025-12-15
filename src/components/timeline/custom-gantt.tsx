@@ -55,7 +55,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { CreateTaskSchema } from '@/lib/schemas'
-import { createTask } from '@/app/actions'
+import { createTask, updateTask } from '@/app/actions'
 
 // =================================================================
 // 🧠 LOGIC VÀ CÁC HÀM HELPERS
@@ -181,6 +181,19 @@ export function CustomGantt({ tasks, projectId, columns, members, currentUser }:
     const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
+    // Resize state
+    const [resizingTask, setResizingTask] = useState<{
+        id: string;
+        direction: 'left' | 'right';
+        initialX: number;
+        initialStartDate: Date;
+        initialDueDate: Date;
+        originalTask: TaskWithDetails;
+    } | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [currentMouseX, setCurrentMouseX] = useState<number>(0);
+    const [justFinishedResizing, setJustFinishedResizing] = useState(false);
+
     const ganttContainerRef = useRef<HTMLDivElement>(null);
     const activityListRef = useRef<HTMLDivElement>(null);
 
@@ -207,6 +220,116 @@ export function CustomGantt({ tasks, projectId, columns, members, currentUser }:
             toast.error(result.message);
         }
     }
+
+    // Resize handlers
+    function handleResizeStart(
+        e: React.MouseEvent,
+        task: TaskWithDetails,
+        direction: 'left' | 'right'
+    ) {
+        e.stopPropagation(); // Prevent TaskDetailSheet from opening
+
+        const startDate = task.startDate || task.createdAt;
+        const dueDate = task.dueDate || addDays(startDate, 2);
+
+        setResizingTask({
+            id: task.id,
+            direction,
+            initialX: e.clientX,
+            initialStartDate: startDate,
+            initialDueDate: dueDate,
+            originalTask: task,
+        });
+        setIsDragging(false);
+    }
+
+    async function handleResizeEnd(e: MouseEvent) {
+        if (!resizingTask) return;
+
+        if (!isDragging) {
+            // No drag occurred, just a click
+            setResizingTask(null);
+            return;
+        }
+
+        // Set flag to prevent onClick from triggering
+        setJustFinishedResizing(true);
+        setTimeout(() => setJustFinishedResizing(false), 300);
+
+        // Calculate final dates
+        const deltaX = e.clientX - resizingTask.initialX;
+        const deltaDays = Math.round(deltaX / DAY_WIDTH_PX);
+
+        if (deltaDays === 0) {
+            setResizingTask(null);
+            setIsDragging(false);
+            return;
+        }
+
+        let newStartDate = resizingTask.initialStartDate;
+        let newDueDate = resizingTask.initialDueDate;
+
+        if (resizingTask.direction === 'left') {
+            newStartDate = addDays(resizingTask.initialStartDate, deltaDays);
+            // Prevent start date from being after due date
+            if (newStartDate >= newDueDate) {
+                newStartDate = addDays(newDueDate, -1);
+            }
+        } else {
+            newDueDate = addDays(resizingTask.initialDueDate, deltaDays);
+            // Prevent due date from being before start date
+            if (newDueDate <= newStartDate) {
+                newDueDate = addDays(newStartDate, 1);
+            }
+        }
+
+        // Save to server
+        toast.promise(
+            updateTask({
+                id: resizingTask.id,
+                startDate: newStartDate,
+                dueDate: newDueDate,
+            }),
+            {
+                loading: 'Updating task dates...',
+                success: (result: any) => {
+                    if (result.status === 'success') {
+                        // Refresh to show updated task
+                        window.location.reload();
+                        return 'Task dates updated successfully';
+                    } else {
+                        throw new Error(result.message);
+                    }
+                },
+                error: (err: any) => err.message || 'Failed to update task dates',
+            }
+        );
+
+        setResizingTask(null);
+        setIsDragging(false);
+    }
+
+    // Global mouse event listeners for resize
+    useEffect(() => {
+        if (!resizingTask) return;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            setIsDragging(true);
+            setCurrentMouseX(e.clientX);
+        };
+
+        const handleMouseUp = (e: MouseEvent) => {
+            handleResizeEnd(e);
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [resizingTask, isDragging]);
 
     // --- Date Logic ---
     const startOfMonthDate = useMemo(() => startOfMonth(currentDate), [currentDate]);
@@ -247,6 +370,39 @@ export function CustomGantt({ tasks, projectId, columns, members, currentUser }:
         const dayDiff = differenceInDays(startDate, startOfMonthDate);
         // Tính độ dài (số ngày) của task
         const duration = differenceInDays(dueDate, startDate) + 1; // +1 để bao gồm cả ngày kết thúc
+
+        const left = dayDiff * DAY_WIDTH_PX;
+        const width = duration * DAY_WIDTH_PX;
+
+        return { left: `${left}px`, width: `${width}px` };
+    };
+
+    // Calculate preview style when resizing
+    const calculateResizePreviewStyle = (task: TaskWithDetails) => {
+        if (!resizingTask || resizingTask.id !== task.id || !isDragging) {
+            return calculateTaskStyle(task);
+        }
+
+        const deltaX = currentMouseX - resizingTask.initialX;
+        const deltaDays = Math.round(deltaX / DAY_WIDTH_PX);
+
+        let previewStartDate = resizingTask.initialStartDate;
+        let previewDueDate = resizingTask.initialDueDate;
+
+        if (resizingTask.direction === 'left') {
+            previewStartDate = addDays(resizingTask.initialStartDate, deltaDays);
+            if (previewStartDate >= previewDueDate) {
+                previewStartDate = addDays(previewDueDate, -1);
+            }
+        } else {
+            previewDueDate = addDays(resizingTask.initialDueDate, deltaDays);
+            if (previewDueDate <= previewStartDate) {
+                previewDueDate = addDays(previewStartDate, 1);
+            }
+        }
+
+        const dayDiff = differenceInDays(previewStartDate, startOfMonthDate);
+        const duration = differenceInDays(previewDueDate, previewStartDate) + 1;
 
         const left = dayDiff * DAY_WIDTH_PX;
         const width = duration * DAY_WIDTH_PX;
@@ -403,9 +559,10 @@ export function CustomGantt({ tasks, projectId, columns, members, currentUser }:
                             {/* --- TASK BARS LAYER --- */}
                             <div className="absolute inset-0 top-12 pt-2">
                                 {tasks.map((task, index) => {
-                                    const style = calculateTaskStyle(task);
+                                    const style = calculateResizePreviewStyle(task);
                                     const colors = getTaskColorStyle(task.priority);
                                     const TaskIcon = getTaskIcon(task.title);
+                                    const isBeingResized = resizingTask?.id === task.id && isDragging;
 
                                     // Check if task is out of current month's view
                                     const startDate = task.startDate ?? task.createdAt;
@@ -421,13 +578,24 @@ export function CustomGantt({ tasks, projectId, columns, members, currentUser }:
                                             style={{ top: `${index * ROW_HEIGHT_PX}px` }}
                                         >
                                             <div
-                                                className={`absolute h-10 top-2 ${colors.bg} rounded-lg flex items-center px-3 border-2 ${colors.border} hover:shadow-lg transition-shadow cursor-pointer`}
+                                                className={`absolute h-10 top-2 ${colors.bg} rounded-lg flex items-center px-3 border-2 ${colors.border} hover:shadow-lg transition-all cursor-pointer relative ${isBeingResized ? 'opacity-70 blur-[1px]' : ''}`}
                                                 style={style}
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    if (isDragging || justFinishedResizing) {
+                                                        e.stopPropagation();
+                                                        return;
+                                                    }
                                                     setSelectedTask(task);
                                                     setIsTaskDetailOpen(true);
                                                 }}
                                             >
+                                                {/* Left Resize Handle */}
+                                                <div
+                                                    className="cursor-w-resize absolute left-0 top-0 bottom-0 w-2 z-10 hover:bg-white/20 rounded-l-lg"
+                                                    onMouseDown={(e) => handleResizeStart(e, task, 'left')}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
+
                                                 <div className={`${colors.iconBg} p-1 rounded mr-2 flex items-center justify-center h-6 w-6`}>
                                                     <ArrowLeft className="w-3 h-3 text-white" />
                                                 </div>
@@ -435,20 +603,30 @@ export function CustomGantt({ tasks, projectId, columns, members, currentUser }:
                                                 <span
                                                     className={`text-xs font-medium ${colors.text} truncate`}>{task.title}</span>
 
-                                                {/* Avatars */}
-                                                {task.assignee && (
-                                                    <div
-                                                        className="absolute -right-4 top-1/2 transform -translate-y-1/2 flex -space-x-2">
-                                                        <Avatar
-                                                            className="w-7 h-7 border-2 border-gantt-bg-dark">
-                                                            <AvatarImage src={task.assignee.avatarUrl || ''} />
-                                                            <AvatarFallback className="bg-slate-700 text-xs">
-                                                                {task.assignee.name?.[0]}
-                                                            </AvatarFallback>
-                                                        </Avatar>
-                                                    </div>
-                                                )}
+                                                {/* Right Resize Handle */}
+                                                <div
+                                                    className="cursor-e-resize absolute right-0 top-0 bottom-0 w-2 z-10 hover:bg-white/20 rounded-r-lg"
+                                                    onMouseDown={(e) => handleResizeStart(e, task, 'right')}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
                                             </div>
+
+                                            {/* Avatars - Positioned outside task bar */}
+                                            {task.assignee && (
+                                                <div
+                                                    className="absolute top-1/2 transform -translate-y-1/2 flex -space-x-2"
+                                                    style={{
+                                                        left: `calc(${style.left} + ${style.width} + 8px)`
+                                                    }}
+                                                >
+                                                    <Avatar className="w-7 h-7 border-2 border-gantt-bg-dark">
+                                                        <AvatarImage src={task.assignee.avatarUrl || ''} />
+                                                        <AvatarFallback className="bg-slate-700 text-xs">
+                                                            {task.assignee.name?.[0]}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}
