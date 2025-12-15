@@ -110,3 +110,40 @@
     - **Scroll Sync**: Implemented synchronized scrolling between task list and gantt chart
     - **Files Modified**: `src/components/timeline/custom-gantt.tsx`
     - **Commit**: `b8a2a59` on branch `feat/timeline-view`
+
+## ~~[2025-12-12] Implement Dynamic Task Icons Based on Keywords~~
+- Status: Done
+- Changes:
+    - **Dynamic Icon Selection**: Created `getTaskIcon` helper function to map task titles to appropriate icons
+    - **Icon Mapping**: Implemented keyword-based icon selection:
+        * research/analysis → Search icon 🔍
+        * design/ui/ux → Layout icon 🎨
+        * mobile/app → Smartphone icon 📱
+        * bug/fix/error → Bug icon 🐛
+        * dev/api/backend → Code icon 💻
+        * test/qa → ClipboardCheck icon ✅
+        * default → Circle icon ⭕
+    - **Imports**: Added new icons (Bug, Code, Layout, ClipboardCheck, Circle) from lucide-react
+    - **UI Update**: Task bars now display context-appropriate icons based on task title
+    - **Files Modified**: `src/components/timeline/custom-gantt.tsx`
+    - **Commit**: `e526672` on branch `feat/timeline-view`
+
+## ~~[2025-12-13] Add Interactive Features for Task Management~~
+- Status: Done
+- Changes:
+    - **Task Editing**: Added click handler to task bars to open TaskDetailSheet
+    - **Task Creation**: Implemented inline create task dialog for "Add New Activity" button
+    - **Data Fetching**: Updated project query to include comments and attachments for TaskDetailSheet
+    - **Props Passing**: Pass projectId, columns, and workspace members to CustomGantt
+    - **Form Validation**: Integrated CreateTaskSchema with react-hook-form and zod
+    - **User Feedback**: Added toast notifications for task creation success/error
+    - **Auto Refresh**: Implemented page reload after task creation to show new tasks
+    - **Dialog Components**: Added Dialog, Form, Input, Button components from shadcn/ui
+    - **Features**:
+        * Click task bar → Open TaskDetailSheet to view/edit task details
+        * Click "Add New Activity" → Open dialog to create new task in first column
+        * Full task management from Timeline view (view, edit, create)
+    - **Files Modified**: 
+        * `src/components/timeline/custom-gantt.tsx` - Added Dialog, Form components and create task logic
+        * `src/components/timeline/project-timeline.tsx` - Include comments and attachments in task query
+    - **Commit**: `b7387fa` on branch `feat/timeline-view`

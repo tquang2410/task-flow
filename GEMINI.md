@@ -247,10 +247,11 @@ import { Suspense } from 'react'
 ---
 
 ### Feature: Custom Gantt UI Implementation
-**Date:** 2025-12-12
+**Date:** 2025-12-12 - 2025-12-13
 **Files:** `src/components/timeline/custom-gantt.tsx`, `src/components/timeline/project-timeline.tsx`, `tailwind.config.ts`, `package.json`
-**Changes:** Replaced conflict-prone `gantt-task-react` library with a custom-built Gantt component using `date-fns` and Tailwind CSS. Implemented dynamic rendering with priority-based colors (HIGH=orange, MEDIUM=blue, LOW=green, default=purple), synced scrolling, current day indicator with diamond shape and pink vertical line, full-height calendar grid, and task bar calculation based on startDate/dueDate. Added icon box wrapper and positioned avatars outside task bars.
+**Changes:** Replaced conflict-prone `gantt-task-react` library with a custom-built Gantt component using `date-fns` and Tailwind CSS. Implemented dynamic rendering with priority-based colors (HIGH=orange, MEDIUM=blue, LOW=green, default=purple), keyword-based dynamic task icons (7 types), synced scrolling, current day indicator with diamond shape and pink vertical line, full-height calendar grid, and task bar calculation based on startDate/dueDate. Added icon box wrapper and positioned avatars outside task bars. Implemented interactive features: click task bars to open TaskDetailSheet for editing, "Add New Activity" button with inline dialog for task creation, full CRUD operations from Timeline view.
 
 ---
 
-**Last Updated:** 2025-12-12
+**Last Updated:** 2025-12-15
+
