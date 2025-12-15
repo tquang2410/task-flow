@@ -163,9 +163,19 @@ interface CustomGanttProps {
         createdAt: Date;
         updatedAt: Date;
     }>;
+    currentUser: {
+        id: string;
+        supabaseId: string;
+        name: string | null;
+        email: string;
+        avatarUrl: string | null;
+        workspaceIds: string[];
+        createdAt: Date;
+        updatedAt: Date;
+    };
 }
 
-export function CustomGantt({ tasks, projectId, columns, members }: CustomGanttProps) {
+export function CustomGantt({ tasks, projectId, columns, members, currentUser }: CustomGanttProps) {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedTask, setSelectedTask] = useState<TaskWithDetails | null>(null);
     const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
@@ -490,7 +500,7 @@ export function CustomGantt({ tasks, projectId, columns, members }: CustomGanttP
                     task={selectedTask}
                     isOpen={isTaskDetailOpen}
                     onClose={() => setIsTaskDetailOpen(false)}
-                    currentUser={null} // TODO: Get current user from context
+                    currentUser={currentUser}
                     members={members}
                 />
             )}

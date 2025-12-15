@@ -147,3 +147,16 @@
         * `src/components/timeline/custom-gantt.tsx` - Added Dialog, Form components and create task logic
         * `src/components/timeline/project-timeline.tsx` - Include comments and attachments in task query
     - **Commit**: `b7387fa` on branch `feat/timeline-view`
+
+## ~~[2025-12-15] Implement User Context for Timeline Components~~
+- Status: Done
+- Changes:
+    - **Fetch Current User**: Added Prisma query to fetch current user from database in `project-timeline.tsx`
+    - **Pass User Data**: Updated CustomGantt props to include `currentUser`
+    - **Fix TaskDetailSheet**: Replaced `currentUser={null}` with `currentUser={currentUser}` to enable comment functionality
+    - **Type Updates**: Added currentUser type to CustomGanttProps interface
+    - **Result**: Comment feature in TaskDetailSheet now works properly with authenticated user
+    - **Files Modified**:
+        * `src/components/timeline/project-timeline.tsx` - Fetch appUser from Prisma
+        * `src/components/timeline/custom-gantt.tsx` - Add currentUser prop and pass to TaskDetailSheet
+    - **Known Issue**: TaskDetailSheet scroll with touchpad scrolls page background instead of sheet content (needs further investigation)

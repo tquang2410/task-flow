@@ -31,6 +31,13 @@ export async function ProjectTimeline({ projectId }: ProjectTimelineProps) {
 
     if (!user) return redirect('/auth')
 
+    // Fetch current user from Prisma
+    const appUser = await db.user.findUnique({
+        where: { supabaseId: user.id }
+    })
+
+    if (!appUser) return redirect('/auth')
+
     // Fetch dữ liệu thật với columns và workspace members
     const project = await db.project.findUnique({
         where: { id: projectId },
@@ -74,6 +81,7 @@ export async function ProjectTimeline({ projectId }: ProjectTimelineProps) {
                 projectId={projectId}
                 columns={columns}
                 members={project.workspace.members}
+                currentUser={appUser}
             />
         </div>
     )
