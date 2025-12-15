@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/server'
 import { UserProfile } from '@/components/dashboard/user-profile'
 import { Toaster } from 'sonner'
 import { SmoothScroll } from '@/components/providers/smooth-scroll'
+import { GlobalSearch } from '@/components/dashboard/global-search'
 
 export default async function AppLayout({
   children,
@@ -29,7 +30,7 @@ export default async function AppLayout({
       {/* Container chính: Min-height screen để background phủ kín, KHÔNG khóa overflow */}
       <div className="flex min-h-screen w-full bg-dashboard-background text-white">
         <Toaster theme="dark" position="top-right" />
-        
+
         {/* Sidebar - Fixed Position (Đứng yên khi cuộn) */}
         <aside className="fixed left-0 top-0 z-50 flex h-screen w-20 flex-col items-center border-r border-white/10 bg-black/30 py-6 backdrop-blur-md">
           <div className="mb-10">
@@ -37,7 +38,7 @@ export default async function AppLayout({
               <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style={{ backgroundImage: 'url("[https://lh3.googleusercontent.com/aida-public/AB6AXuAoqPnbygc_xatYZmyjqNXuvQsK7srJw2mZteO820bStpfNNhdKAF1uFfLaMP--NYM7ELGELPqnBymq00gu5tlNvgWNC62Ndn_7BG7oTwgyKSl59EUUzRGA0a8PgV9RvTPQsX1wmIA7HotvBa2b6JCEkFDeqr7nXlFf3lXUA-ETmnWsx4wr6mT1RsfXAyZ7IO5Z6OAT2_acNkZfHkEW1xbLcRkeUuwKojkJ3bmfmtE5Qm8cHTbkKxiczvTGex5ZkcJ8l1U-A2eA_9k](https://lh3.googleusercontent.com/aida-public/AB6AXuAoqPnbygc_xatYZmyjqNXuvQsK7srJw2mZteO820bStpfNNhdKAF1uFfLaMP--NYM7ELGELPqnBymq00gu5tlNvgWNC62Ndn_7BG7oTwgyKSl59EUUzRGA0a8PgV9RvTPQsX1wmIA7HotvBa2b6JCEkFDeqr7nXlFf3lXUA-ETmnWsx4wr6mT1RsfXAyZ7IO5Z6OAT2_acNkZfHkEW1xbLcRkeUuwKojkJ3bmfmtE5Qm8cHTbkKxiczvTGex5ZkcJ8l1U-A2eA_9k)")' }}></div>
             </Link>
           </div>
-          
+
           {/* Navigation Links - Đầy đủ 4 icon */}
           <nav className="flex flex-col items-center gap-4">
             <Link
@@ -85,6 +86,11 @@ export default async function AppLayout({
         {/* Main Content - Tự do dãn nở */}
         {/* Padding-left 20 (80px) để tránh Sidebar che mất nội dung */}
         <main className="flex-1 pl-20 flex flex-col relative pb-10">
+          {/* Global Search Bar */}
+          <div className="sticky top-0 z-40 bg-dashboard-background/80 backdrop-blur-md border-b border-white/10 px-6 py-4">
+            <GlobalSearch />
+          </div>
+
           {children}
         </main>
       </div>
