@@ -253,5 +253,12 @@ import { Suspense } from 'react'
 
 ---
 
-**Last Updated:** 2025-12-15
+### Feature: Global Search Implementation
+**Date:** 2025-12-16
+**Files:** `src/app/actions.ts`, `src/components/dashboard/global-search.tsx`, `src/app/app/layout.tsx`
+**Changes:** Implemented Global Search for Projects and Tasks. Used Hybrid Approach (MongoDB `findRaw` with `$regex` + Prisma `findMany`) to solve case-insensitive search limitation in Prisma + MongoDB. Replaced `CommandDialog` with manual `Dialog` composition to disable client-side filtering (`shouldFilter={false}`), ensuring all server results are displayed. Integrated search bar into App Layout sticky header.
+
+---
+
+**Last Updated:** 2025-12-16
 

@@ -903,3 +903,113 @@ export async function deleteAttachment(
     return { status: 'error', message: 'Failed to delete attachment.' }
   }
 }
+
+
+// --- Global Search ---
+export async function globalSearch(query: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { status: 'error', message: 'Unauthorized' };
+  }
+
+  const appUser = await db.user.findUnique({
+    where: { supabaseId: user.id }
+  });
+
+  if (!appUser) {
+    return { status: 'error', message: 'User not found' };
+  }
+
+  try {
+    // MongoDB requires raw query for case-insensitive search
+    // Step 1: Find candidate IDs using regex in Raw Query
+
+    // safe query for regex
+    const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const idsLimit = 20;
+
+    // --- Search Projects ---
+    // Filter projects where workspaceId is in user's workspaceIds list
+    const userWorkspaceIds = appUser.workspaceIds.map(id => ({ "$oid": id }));
+
+    const rawProjects = await db.project.findRaw({
+      filter: {
+        workspaceId: { $in: userWorkspaceIds },
+        $or: [
+          { name: { $regex: safeQuery, $options: 'i' } },
+          { description: { $regex: safeQuery, $options: 'i' } }
+        ]
+      },
+      options: { limit: idsLimit, projection: { _id: 1 } }
+    }) as any;
+
+    const projectIds = Array.isArray(rawProjects)
+      ? rawProjects.map((p: any) => p._id?.$oid).filter(Boolean)
+      : [];
+
+    const projects = await db.project.findMany({
+      where: {
+        id: { in: projectIds }
+      },
+      take: 5,
+      include: {
+        workspace: {
+          select: { name: true }
+        }
+      }
+    });
+
+    // --- Search Tasks ---
+    // We can't easily filter tasks by workspace in raw query without aggregation (Task -> Project -> Workspace)
+    // So we fetch matching tasks by title, then filter by access in Prisma query
+    const rawTasks = await db.task.findRaw({
+      filter: {
+        title: { $regex: safeQuery, $options: 'i' }
+      },
+      options: { limit: idsLimit, projection: { _id: 1 } }
+    }) as any;
+
+    const taskIds = Array.isArray(rawTasks)
+      ? rawTasks.map((t: any) => t._id?.$oid).filter(Boolean)
+      : [];
+
+    const tasks = await db.task.findMany({
+      where: {
+        id: { in: taskIds },
+        project: {
+          workspace: {
+            memberIds: { has: appUser.id }
+          }
+        }
+      },
+      take: 5,
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        assignee: {
+          select: {
+            name: true,
+            avatarUrl: true
+          }
+        }
+      }
+    });
+
+    console.log(`Global Search: '${query}' -> Found ${projects.length} projects, ${tasks.length} tasks`);
+
+    return {
+      status: 'success',
+      data: { projects, tasks }
+    };
+  } catch (error) {
+    console.error('Global search error:', error);
+    // Fallback: Return empty result instead of error to avoid crashing UI
+    return { status: 'success', data: { projects: [], tasks: [] } };
+  }
+}

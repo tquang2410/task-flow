@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
+import { GlobalSearch } from "@/components/dashboard/global-search"
 
 export function DashboardHeader() {
   const router = useRouter()
@@ -36,13 +37,19 @@ export function DashboardHeader() {
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">T</span>
             </div>
             <h1 className="text-xl font-bold text-gray-900">TaskFlow</h1>
           </div>
+
+          {/* Global Search */}
+          <div className="flex-1 max-w-md">
+            <GlobalSearch />
+          </div>
+
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-3">
               <div className="text-right">
