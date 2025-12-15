@@ -558,78 +558,78 @@ export function CustomGantt({ tasks, projectId, columns, members, currentUser }:
 
                             {/* --- TASK BARS LAYER --- */}
                             <div className="absolute inset-0 top-12 pt-2">
-                                {tasks.map((task, index) => {
-                                    const style = calculateResizePreviewStyle(task);
-                                    const colors = getTaskColorStyle(task.priority);
-                                    const TaskIcon = getTaskIcon(task.title);
-                                    const isBeingResized = resizingTask?.id === task.id && isDragging;
+                                {tasks
+                                    .filter(task => {
+                                        // Filter out tasks that are outside current month view
+                                        const startDate = task.startDate ?? task.createdAt;
+                                        const dueDate = task.dueDate ?? addDays(startDate, 2);
+                                        return !(dueDate < startOfMonthDate || startDate > endOfMonthDate);
+                                    })
+                                    .map((task, index) => {
+                                        const style = calculateResizePreviewStyle(task);
+                                        const colors = getTaskColorStyle(task.priority);
+                                        const TaskIcon = getTaskIcon(task.title);
+                                        const isBeingResized = resizingTask?.id === task.id && isDragging;
 
-                                    // Check if task is out of current month's view
-                                    const startDate = task.startDate ?? task.createdAt;
-                                    const dueDate = task.dueDate ?? addDays(startDate, 2);
-                                    if (dueDate < startOfMonthDate || startDate > endOfMonthDate) {
-                                        return null;
-                                    }
-
-                                    return (
-                                        <div
-                                            key={task.id}
-                                            className="h-14 relative w-full"
-                                            style={{ top: `${index * ROW_HEIGHT_PX}px` }}
-                                        >
+                                        return (
                                             <div
-                                                className={`absolute h-10 top-2 ${colors.bg} rounded-lg flex items-center px-3 border-2 ${colors.border} hover:shadow-lg transition-all cursor-pointer relative ${isBeingResized ? 'opacity-70 blur-[1px]' : ''}`}
-                                                style={style}
-                                                onClick={(e) => {
-                                                    if (isDragging || justFinishedResizing) {
-                                                        e.stopPropagation();
-                                                        return;
-                                                    }
-                                                    setSelectedTask(task);
-                                                    setIsTaskDetailOpen(true);
-                                                }}
+                                                key={task.id}
+                                                className="h-14 relative w-full"
+                                                style={{ top: `${index * ROW_HEIGHT_PX}px` }}
                                             >
-                                                {/* Left Resize Handle */}
                                                 <div
-                                                    className="cursor-w-resize absolute left-0 top-0 bottom-0 w-2 z-10 hover:bg-white/20 rounded-l-lg"
-                                                    onMouseDown={(e) => handleResizeStart(e, task, 'left')}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                />
-
-                                                <div className={`${colors.iconBg} p-1 rounded mr-2 flex items-center justify-center h-6 w-6`}>
-                                                    <ArrowLeft className="w-3 h-3 text-white" />
-                                                </div>
-                                                <TaskIcon className={`${colors.text} mr-2 w-4 h-4 flex-shrink-0`} />
-                                                <span
-                                                    className={`text-xs font-medium ${colors.text} truncate`}>{task.title}</span>
-
-                                                {/* Right Resize Handle */}
-                                                <div
-                                                    className="cursor-e-resize absolute right-0 top-0 bottom-0 w-2 z-10 hover:bg-white/20 rounded-r-lg"
-                                                    onMouseDown={(e) => handleResizeStart(e, task, 'right')}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                />
-                                            </div>
-
-                                            {/* Avatars - Positioned outside task bar */}
-                                            {task.assignee && (
-                                                <div
-                                                    className="absolute top-1/2 transform -translate-y-1/2 flex -space-x-2"
-                                                    style={{
-                                                        left: `calc(${style.left} + ${style.width} + 8px)`
+                                                    className={`absolute h-10 top-2 ${colors.bg} rounded-lg flex items-center px-3 border-2 ${colors.border} hover:shadow-lg transition-all cursor-pointer relative ${isBeingResized ? 'opacity-70 blur-[1px]' : ''}`}
+                                                    style={style}
+                                                    onClick={(e) => {
+                                                        if (isDragging || justFinishedResizing) {
+                                                            e.stopPropagation();
+                                                            return;
+                                                        }
+                                                        setSelectedTask(task);
+                                                        setIsTaskDetailOpen(true);
                                                     }}
                                                 >
-                                                    <Avatar className="w-7 h-7 border-2 border-gantt-bg-dark">
-                                                        <AvatarImage src={task.assignee.avatarUrl || ''} />
-                                                        <AvatarFallback className="bg-slate-700 text-xs">
-                                                            {task.assignee.name?.[0]}
-                                                        </AvatarFallback>
-                                                    </Avatar>
+                                                    {/* Left Resize Handle */}
+                                                    <div
+                                                        className="cursor-w-resize absolute left-0 top-0 bottom-0 w-2 z-10 hover:bg-white/20 rounded-l-lg"
+                                                        onMouseDown={(e) => handleResizeStart(e, task, 'left')}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
+
+                                                    <div className={`${colors.iconBg} p-1 rounded mr-2 flex items-center justify-center h-6 w-6`}>
+                                                        <ArrowLeft className="w-3 h-3 text-white" />
+                                                    </div>
+                                                    <TaskIcon className={`${colors.text} mr-2 w-4 h-4 flex-shrink-0`} />
+                                                    <span
+                                                        className={`text-xs font-medium ${colors.text} truncate`}>{task.title}</span>
+
+                                                    {/* Right Resize Handle */}
+                                                    <div
+                                                        className="cursor-e-resize absolute right-0 top-0 bottom-0 w-2 z-10 hover:bg-white/20 rounded-r-lg"
+                                                        onMouseDown={(e) => handleResizeStart(e, task, 'right')}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
                                                 </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+
+                                                {/* Avatars - Positioned outside task bar */}
+                                                {task.assignee && (
+                                                    <div
+                                                        className="absolute top-1/2 transform -translate-y-1/2 flex -space-x-2"
+                                                        style={{
+                                                            left: `calc(${style.left} + ${style.width} + 8px)`
+                                                        }}
+                                                    >
+                                                        <Avatar className="w-7 h-7 border-2 border-gantt-bg-dark">
+                                                            <AvatarImage src={task.assignee.avatarUrl || ''} />
+                                                            <AvatarFallback className="bg-slate-700 text-xs">
+                                                                {task.assignee.name?.[0]}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
                             </div>
 
                         </div>
